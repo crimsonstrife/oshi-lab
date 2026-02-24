@@ -27,3 +27,8 @@ pnpm-debug.log*
 /.idea/oshi-lab.iml
 /.idea/vcs.xml
 /.idea/workspace.xml
+/.idea/copilot.data.migration.ask.xml
+/.idea/.gitignore
+/.idea/copilot.data.migration.agent.xml
+/.idea/copilot.data.migration.edit.xml
+/.idea/discord.xml
