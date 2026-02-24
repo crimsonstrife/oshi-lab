@@ -1,0 +1,10 @@
+<div id="lab-root" data-base="/"></div>
+
+<link rel="stylesheet" href="/styles/bootstrap.css" />
+<link rel="stylesheet" href="/styles/lab.css" />
+<script is:inline src="/scripts/bootstrap.bundle.js"></script>
+
+<script type="module">
+    import { initLab } from '../../ui/lab/initLab';
+    initLab(document.getElementById('lab-root'));
+</script>

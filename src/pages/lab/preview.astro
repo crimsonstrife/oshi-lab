@@ -1,0 +1,17 @@
+---
+import LabLayout from '../../ui/LabLayout.astro';
+---
+
+<LabLayout title="Preview">
+    <div class="container-fluid p-2" style="height: 100vh;">
+        <iframe
+                id="fullPreviewFrame"
+                title="Full Preview"
+                class="w-100 h-100 border rounded"
+                sandbox=""
+                referrerpolicy="no-referrer"
+        ></iframe>
+    </div>
+
+    <script src="../../ui/lab/initPreview.ts"></script>
+</LabLayout>

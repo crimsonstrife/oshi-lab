@@ -1,0 +1,351 @@
+/* Astro host + Bootstrap integration tweaks for MyOshi Theme Lab */
+#myoshi-theme-lab.myoshi-lab-host {
+  min-height: calc(100vh - 8rem);
+}
+
+#myoshi-theme-lab .app {
+  height: auto;
+  min-height: calc(100vh - 8rem);
+}
+
+#myoshi-theme-lab .main {
+  align-items: stretch;
+}
+
+#myoshi-theme-lab .panel.card {
+  background: rgba(18, 26, 38, 0.75);
+  border: 1px solid rgba(34, 48, 73, 0.9) !important;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+#myoshi-theme-lab .panel-head.card-header {
+  background: rgba(10, 14, 22, 0.55);
+  border-bottom-color: rgba(34, 48, 73, 0.9);
+}
+
+#myoshi-theme-lab .tab.nav-link {
+  padding: 0.35rem 0.65rem;
+  line-height: 1.1;
+}
+
+#myoshi-theme-lab .tab.nav-link.active {
+  color: var(--accent, #6df);
+}
+
+#myoshi-theme-lab .editor-wrap textarea,
+#myoshi-theme-lab textarea.form-control {
+  box-shadow: none;
+}
+
+#myoshi-theme-lab .meta {
+  border-top: 1px solid rgba(34, 48, 73, 0.9);
+}
+
+#myoshi-theme-lab .preview-wrap {
+  min-height: 0;
+}
+
+#myoshi-theme-lab .preview-frame-shell {
+  min-height: clamp(560px, 65vh, 1200px);
+}
+
+#myoshi-theme-lab #frameViewport {
+  min-height: inherit;
+}
+
+#myoshi-theme-lab .form-range {
+  min-width: 120px;
+}
+
+#myoshi-theme-lab .badge {
+  min-width: 64px;
+  text-align: center;
+}
+
+#myoshi-theme-lab details > summary {
+  list-style: none;
+}
+
+#myoshi-theme-lab details > summary::-webkit-details-marker {
+  display: none;
+}
+
+@media (max-width: 1399.98px) {
+  #myoshi-theme-lab .panel .hint {
+    max-width: 36ch;
+  }
+}
+
+@media (max-width: 991.98px) {
+  #myoshi-theme-lab .app {
+    min-height: auto;
+  }
+
+  #myoshi-theme-lab .preview-frame-shell {
+    min-height: 520px;
+  }
+}
+
+body.lab {
+    margin: 0;
+    background: #0f1218;
+    color: #e8edf5;
+}
+
+.myoshi-lab-host {
+    --lab-border: rgba(120, 140, 170, 0.28);
+    --lab-panel: #1b202b;
+    --lab-panel-2: #242b37;
+    --lab-panel-3: #2e3644;
+    --lab-muted: rgba(232, 237, 245, 0.72);
+    --lab-ok: #1fbf75;
+    --lab-warn: #f0b429;
+    --lab-err: #ff5d73;
+    color: #e8edf5;
+}
+
+.myoshi-lab-host .app {
+    padding: 12px;
+    min-height: 100vh;
+}
+
+.myoshi-lab-host .lab-header {
+    margin-bottom: 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--lab-border);
+    border-radius: 12px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+}
+
+.myoshi-lab-host .title h1 {
+    margin: 0;
+    font-size: 1.45rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.myoshi-lab-host .title .sub {
+    margin-top: 4px;
+    color: var(--lab-muted);
+    font-size: .9rem;
+}
+
+.myoshi-lab-host .main {
+    min-height: calc(100vh - 110px);
+}
+
+.myoshi-lab-host .panel.card {
+    background: var(--lab-panel);
+    border: 1px solid var(--lab-border) !important;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.myoshi-lab-host .panel-head.card-header {
+    background: var(--lab-panel-2);
+    border-bottom: 1px solid var(--lab-border);
+    color: #f3f6fb;
+}
+
+.myoshi-lab-host .panel-head .name {
+    font-weight: 700;
+}
+
+.myoshi-lab-host .panel-head .hint {
+    color: var(--lab-muted);
+    font-size: .82rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.myoshi-lab-host .tabs .tab.nav-link {
+    color: #cdd6e2;
+    border: 1px solid transparent;
+    background: transparent;
+    padding: .25rem .55rem;
+    font-size: .85rem;
+}
+
+.myoshi-lab-host .tabs .tab.nav-link.active {
+    color: #fff;
+    background: #0d6efd;
+}
+
+.myoshi-lab-host .editor-wrap {
+    display: none;
+    flex-direction: column;
+    min-height: 520px;
+    background: #171c25;
+}
+
+.myoshi-lab-host .editor-wrap.active {
+    display: flex;
+}
+
+.myoshi-lab-host .editor-wrap textarea {
+    flex: 1 1 auto;
+    min-height: 240px;
+    resize: vertical;
+    background: #131821;
+    color: #e8edf5;
+    border-color: transparent;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+.myoshi-lab-host .editor-wrap textarea:focus {
+    box-shadow: none;
+    border-color: transparent;
+}
+
+.myoshi-lab-host .meta {
+    border-top: 1px solid var(--lab-border);
+    background: var(--lab-panel-3);
+    padding: 8px;
+    display: grid;
+    gap: 8px;
+}
+
+.myoshi-lab-host .meta .row {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.myoshi-lab-host .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--lab-border);
+    background: rgba(255,255,255,.03);
+    font-size: 12px;
+}
+
+.myoshi-lab-host .preview-wrap.card-body {
+    background: #171c25;
+}
+
+.myoshi-lab-host .template-select-wrap {
+    min-width: min(100%, 620px);
+    flex: 1 1 420px;
+}
+
+.myoshi-lab-host #templateSelect {
+    min-width: 260px;
+}
+
+.myoshi-lab-host #templateInfo {
+    min-width: 220px;
+}
+
+.myoshi-lab-host .snapshot-select {
+    max-width: 220px;
+}
+
+.myoshi-lab-host .range-label {
+    min-width: 56px;
+}
+
+.myoshi-lab-host details {
+    border: 1px solid var(--lab-border);
+    border-radius: 10px;
+    background: #202632;
+}
+
+.myoshi-lab-host details > summary {
+    cursor: pointer;
+    padding: 8px 10px;
+    font-weight: 600;
+}
+
+.myoshi-lab-host .details-body {
+    padding: 10px;
+    border-top: 1px solid var(--lab-border);
+    display: grid;
+    gap: 8px;
+}
+
+.myoshi-lab-host .details-body label {
+    display: grid;
+    gap: 4px;
+}
+
+.myoshi-lab-host .details-body label > span {
+    font-size: 12px;
+    color: var(--lab-muted);
+}
+
+.myoshi-lab-host .grid2 {
+    display: grid;
+    gap: 8px;
+    grid-template-columns: 1fr 1fr;
+}
+
+.myoshi-lab-host .preview-frame-shell {
+    border: 1px solid var(--lab-border);
+    border-radius: 10px;
+    background: #0f141c;
+    overflow: auto;
+    min-height: 1080px;
+}
+
+.myoshi-lab-host .preview-frame-shell.mobile #frameViewport {
+    justify-content: flex-start !important;
+}
+
+.myoshi-lab-host .preview-frame-shell.mobile #previewFrame {
+    width: 390px !important;
+}
+
+.myoshi-lab-host #previewFrame {
+    display: block;
+    width: 100%;
+    min-height: 100%;
+    border: 0;
+    background: #fff;
+}
+
+.myoshi-lab-host .status {
+    max-width: 100%;
+    font-size: 12px;
+    color: var(--lab-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.myoshi-lab-host .status.ok { color: var(--lab-ok); }
+.myoshi-lab-host .status.warn { color: var(--lab-warn); }
+.myoshi-lab-host .status.err { color: var(--lab-err); }
+
+@media (max-width: 1199px) {
+    .myoshi-lab-host .editor-wrap {
+        min-height: 420px;
+    }
+}
+
+@media (max-width: 767px) {
+    .myoshi-lab-host .grid2 {
+        grid-template-columns: 1fr;
+    }
+
+    .myoshi-lab-host .panel-head .hint {
+        white-space: normal;
+    }
+
+    .myoshi-lab-host .template-select-wrap {
+        min-width: 100%;
+    }
+
+    .myoshi-lab-host #templateSelect {
+        min-width: 0;
+        width: 100%;
+    }
+}

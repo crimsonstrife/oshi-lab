@@ -1,0 +1,28 @@
+---
+import LabLayout from '../../ui/LabLayout.astro';
+---
+
+<LabLayout title="Theme Lab">
+    <div id="lab-root" data-base={import.meta.env.BASE_URL}></div>
+
+    <script>
+        import { initLab } from '../../ui/lab/initLab.ts';
+
+        const root = document.getElementById('lab-root');
+
+        try {
+            initLab(document.getElementById('lab-root') as HTMLElement | null).catch((err) => {
+                console.error('initLab failed:', err);
+                if (root) {
+                    root.innerHTML = `
+          <div class="alert alert-danger m-3" role="alert">
+            <strong>Failed to load initLab.</strong><br>
+            Check the browser console for details.
+          </div>`;
+                }
+            });
+        } catch (e) {
+            console.error('initLab failed:', e);
+        }
+    </script>
+</LabLayout>

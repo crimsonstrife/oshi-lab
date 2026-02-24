@@ -1,0 +1,123 @@
+---
+title: Theme Lab
+description: How the lab works, previews, snapshots, exporting, and recommended patterns.
+---
+
+# Theme Lab
+
+The Theme Lab is an editor + live preview built for experimenting with MyOshi themes.
+
+It is intentionally split into:
+
+- **Base Template** (demo profile HTML/CSS)
+- **Custom CSS** (what you paste into MyOshi)
+- **Custom HTML** (what you paste into MyOshi)
+
+This makes it easier to keep templates maintainable while your theme stays portable.
+
+---
+
+## Core concepts
+
+### Base Template
+A template supplies:
+
+- A CSS baseline resembling MyOshi’s styling patterns
+- A realistic body structure (cards, headers, sections, etc.)
+- A `.profile-custom-html` mount point where your Custom HTML is injected
+
+Templates are stored as files (see **Templates**).
+
+### Custom CSS
+Your Custom CSS is appended after the template’s base CSS, so it can override defaults.
+
+Recommended patterns:
+
+- Prefer CSS variables for theme colors
+- Use a top-level namespace selector to avoid collisions:
+- `.profile-page.profile-custom-css { ... }`
+- Use progressive enhancement:
+- your theme should still be readable if images fail to load
+
+### Custom HTML
+Custom HTML is inserted into the first `.profile-custom-html` element found in the base template.
+
+Use Custom HTML when you need:
+- a consistent wrapper for layout grids
+- badges / link cards / “now playing” style blocks
+- a custom header section
+
+Avoid Custom HTML for:
+- things that require JavaScript (preview blocks scripts anyway)
+
+---
+
+## Preview modes
+
+### Embedded preview
+The preview panel renders your template + custom CSS/HTML in an iframe.
+
+### Pop-out preview
+The **Pop out preview** button opens a dedicated preview page that can be:
+
+- full height
+- easier to inspect
+- shown on a second monitor
+
+In most builds, the editor pushes updates to the pop-out via a lightweight messaging channel (no server required).
+
+---
+
+## Preview scaling
+If the preview area supports scaling:
+
+- Use the **Scale** slider to zoom the iframe content.
+- Scaling should not affect what you copy into MyOshi — it’s just for comfort while editing.
+
+If you’re authoring mobile-first styles:
+- Use the **Mobile** width toggle if provided
+- Use responsive media queries:
+- `@media (max-width: 640px) { ... }`
+
+---
+
+## Snapshots
+
+Snapshots store your current work in your browser (LocalStorage):
+
+- Custom CSS
+- Custom HTML
+- Any toggles (append/replace behavior, mock data settings, etc.)
+
+Snapshots do **not** include:
+- the entire base template
+- imported MyOshi preview HTML (if used)
+
+This keeps snapshots small and portable.
+
+---
+
+## Exporting
+
+When you click **Copy Custom CSS** or **Copy Custom HTML**:
+
+- only your custom content is copied
+- no base template content is included
+
+This is the safest workflow for MyOshi usage.
+
+---
+
+## Recommended “starter theme” structure
+
+A good starting point is to define variables and a few core surfaces:
+
+```css
+.profile-page.profile-custom-css {
+  --theme-bg: #0b0f17;
+  --theme-panel: rgba(18, 24, 36, 0.85);
+  --theme-border: rgba(40, 60, 90, 0.55);
+  --theme-text: #e7eefc;
+  --theme-muted: rgba(231, 238, 252, 0.75);
+  --theme-accent: #6df;
+}

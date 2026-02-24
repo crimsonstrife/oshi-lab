@@ -1,0 +1,91 @@
+---
+title: Getting Started
+description: What this project is, where to click, and the fastest way to start styling.
+---
+
+# Getting Started
+
+MyOshi Theme Lab is a browser-based sandbox for authoring **MyOshi Custom CSS** and **Custom HTML** safely.
+
+It gives you:
+
+- A **demo profile** so you can style immediately (no copy/paste required).
+- A **sandboxed preview** (scripts blocked) to reduce risk while experimenting.
+- A way to **export only what you paste into MyOshi** (Custom CSS/HTML), not the entire page.
+
+> MyOshi is currently private, so this tool does **not** fetch live profiles.
+> Instead, it ships with maintainable demo templates and documentation.
+
+---
+
+## Open the Lab
+
+- Go to **Theme Lab**: `/lab/`
+- Optional: open the preview as a separate window using **Pop out preview**.
+
+If you're on GitHub Pages, the URLs look like:
+
+- `https://YOUR_USER.github.io/YOUR_REPO/lab/`
+- `https://YOUR_USER.github.io/YOUR_REPO/lab/preview/`
+
+---
+
+## Typical workflow
+
+1. Pick a **Template** (demo profile).
+2. Write **Custom CSS** until it looks right.
+3. Add **Custom HTML** if you need extra structure (widgets, badges, layout wrappers, etc.).
+4. Copy **Custom CSS** and **Custom HTML** into MyOshi.
+5. Save a **Snapshot** while iterating.
+
+---
+
+## What gets copied into MyOshi?
+
+Only these two fields:
+
+- **Custom CSS** (paste into MyOshi’s Custom CSS editor)
+- **Custom HTML** (paste into MyOshi’s Custom HTML editor)
+
+The demo template is only there so your CSS has something realistic to style.
+
+---
+
+## Safety model (important)
+
+The preview is rendered in an `<iframe>` with a restrictive sandbox:
+
+- **No scripts execute**
+- This prevents accidental (or malicious) JS from running in the preview.
+
+That said, always be careful with third-party assets:
+
+- Remote images are generally fine.
+- Avoid embedding third-party “widgets” that require JS.
+
+---
+
+## Troubleshooting
+
+### The preview looks different from MyOshi
+That’s expected unless you import an exact MyOshi preview HTML (if/when that becomes available). The built-in templates aim to be *faithful enough* to develop styles comfortably.
+
+### My CSS works in the Lab but not on MyOshi
+MyOshi may have additional wrappers, specificity, or different DOM structure.
+
+Fixes:
+- Increase specificity (e.g. `.profile-page.profile-custom-css .card { ... }`)
+- Avoid relying on overly narrow selectors that only match the demo template
+- Use browser DevTools to confirm your selector matches what you think
+
+### I can’t copy to clipboard
+Some browsers block clipboard access unless the page is served over HTTPS or you’ve interacted with the page.
+
+Fallback: manually select text → copy.
+
+---
+
+## Next steps
+
+- Read **Theme Lab** for feature details and power-user tips.
+- Read **Templates** if you want to add/modify demo templates.

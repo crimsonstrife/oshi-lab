@@ -1,0 +1,42 @@
+---
+title: Templates
+description: How demo templates are stored, edited, and added without touching application code.
+---
+
+# Templates
+
+Templates are the “base profile” used by the Theme Lab.
+
+They exist for one reason:
+
+> Give your Custom CSS and Custom HTML a realistic target to style immediately, even when MyOshi profiles cannot be fetched.
+
+---
+
+## Template storage design
+
+Templates are stored as:
+
+- a single registry file: `public/templates/templates.json`
+- one CSS file per template: `public/templates/<id>.css`
+- one HTML body file per template: `public/templates/<id>.html`
+
+This makes templates easy to update without editing JavaScript.
+
+---
+
+## `templates.json` format
+
+Example:
+
+```json
+{
+  "templates": [
+    {
+      "id": "demo-default",
+      "name": "Demo: Default-ish MyOshi Shell",
+      "css": "/templates/demo-default.css",
+      "body": "/templates/demo-default.html"
+    }
+  ]
+}
