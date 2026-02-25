@@ -1,0 +1,95 @@
+---
+import { getCollection } from "astro:content";
+import DocsSidebarNode from "./DocsSidebarNode.astro";
+
+const { currentSlug = "" } = Astro.props;
+
+const docs = await getCollection("docs");
+
+const getOrder = (e) => {
+    const o = e?.data?.sidebar?.order ?? e?.data?.order;
+    const n = Number(o);
+    return Number.isFinite(n) ? n : 9999;
+};
+
+const getLabel = (e) =>
+    String(e?.data?.sidebar?.label ?? e?.data?.title ?? e?.slug ?? "");
+
+const titleize = (s) =>
+    s
+        .split(/[-_]/g)
+        .filter(Boolean)
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(" ");
+
+function buildTree(entries) {
+    const root = {
+        name: "",
+        path: "",
+        label: "Docs",
+        order: 9999,
+        entry: null,
+        children: new Map(),
+    };
+
+    for (const entry of entries) {
+        const parts = String(entry.slug || "").split("/").filter(Boolean);
+        if (!parts.length) continue;
+
+        let node = root;
+
+        for (const part of parts) {
+            const path = node.path ? `${node.path}/${part}` : part;
+
+            if (!node.children.has(part)) {
+                node.children.set(part, {
+                    name: part,
+                    path,
+                    label: titleize(part),
+                    order: 9999,
+                    entry: null,
+                    children: new Map(),
+                });
+            }
+
+            node = node.children.get(part);
+        }
+
+        node.entry = entry;
+        node.label = getLabel(entry) || node.label;
+        node.order = Math.min(node.order, getOrder(entry));
+    }
+
+    const finalize = (n) => {
+        const kids = Array.from(n.children.values()).map(finalize);
+
+        if (kids.length) {
+            const childMin = Math.min(...kids.map((k) => k.order ?? 9999));
+            n.order = Math.min(n.order ?? 9999, childMin);
+        }
+
+        kids.sort(
+            (a, b) =>
+                (a.order ?? 9999) - (b.order ?? 9999) ||
+                String(a.label).localeCompare(String(b.label))
+        );
+
+        n.items = kids;
+        return n;
+    };
+
+    return finalize(root);
+}
+
+const tree = buildTree(docs);
+---
+
+<nav class="docs-sidebar">
+    <div class="docs-sidebar-title">Docs</div>
+
+    <ul class="docs-nav">
+        {tree.items.map((node) => (
+                <DocsSidebarNode node={node} currentSlug={currentSlug} />
+        ))}
+    </ul>
+</nav>

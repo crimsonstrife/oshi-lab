@@ -1,0 +1,23 @@
+---
+import DocsLayout from '../../ui/DocsLayout.astro';
+import { getCollection } from 'astro:content';
+
+const docs = await getCollection('docs', ({ data }) => !data.sidebar?.hidden);
+docs.sort((a, b) => (a.data.order ?? a.data.sidebar?.order ?? 9999) - (b.data.order ?? b.data.sidebar?.order ?? 9999));
+---
+
+<DocsLayout title="Docs">
+    <div class="container py-4">
+        <h1 class="mb-3">Docs</h1>
+        <p class="text-body-secondary">Guides and reference for MyOshi Theme Lab.</p>
+
+        <ul class="list-group">
+            {docs.map((d) => (
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <a href={`/docs/${d.slug}/`}>{d.data.title}</a>
+                        {d.data.description ? <span class="text-body-secondary small">{d.data.description}</span> : null}
+                    </li>
+            ))}
+        </ul>
+    </div>
+</DocsLayout>

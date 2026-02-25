@@ -3,9 +3,7 @@ title: Theme Lab
 description: How the lab works, previews, snapshots, exporting, and recommended patterns.
 ---
 
-# Theme Lab
-
-The Theme Lab is an editor + live preview built for experimenting with MyOshi themes.
+The Theme Lab is an editor and live preview built for experimenting with MyOshi themes.
 
 It is intentionally split into:
 
@@ -37,7 +35,7 @@ Recommended patterns:
 - Use a top-level namespace selector to avoid collisions:
 - `.profile-page.profile-custom-css { ... }`
 - Use progressive enhancement:
-- your theme should still be readable if images fail to load
+- Accessibility Tip! Your theme should still be readable if images fail to load, avoid replacing text with images.
 
 ### Custom HTML
 Custom HTML is inserted into the first `.profile-custom-html` element found in the base template.
@@ -64,12 +62,12 @@ The **Pop out preview** button opens a dedicated preview page that can be:
 - easier to inspect
 - shown on a second monitor
 
-In most builds, the editor pushes updates to the pop-out via a lightweight messaging channel (no server required).
+Currently the pop-out preview does not update automatically when you make changes to your Custom CSS/HTML, you'll need to close and reopen the preview panel.
 
 ---
 
 ## Preview scaling
-If the preview area supports scaling:
+The preview area supports scaling:
 
 - Use the **Scale** slider to zoom the iframe content.
 - Scaling should not affect what you copy into MyOshi — it’s just for comfort while editing.
