@@ -1,0 +1,117 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Theme Lab | MyOshi Theme Lab - by CrimsonStrife</title><link rel="icon" href="/favicon.ico"><link rel="stylesheet" href="/styles/bootstrap.css"><script src="/scripts/bootstrap.bundle.js"></script></head> <body class="min-vh-100 d-flex flex-column docs"> <header class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom"> <div class="container-fluid"> <a class="navbar-brand fw-semibold" href="/">MyOshi Theme Lab</a> <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#siteNav" aria-controls="siteNav" aria-expanded="false" aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button> <div class="collapse navbar-collapse" id="siteNav"> <ul class="navbar-nav me-auto mb-2 mb-lg-0"> <li class="nav-item"> <a class="nav-link " href="/">Home</a> </li> <li class="nav-item"> <a class="nav-link " href="/lab/">Lab</a> </li> <li class="nav-item"> <a class="nav-link active" href="/docs/" aria-current="page">Docs</a> </li> </ul> <a class="btn btn-sm btn-outline-light" href="https://github.com/crimsonstrife/oshi-lab" target="_blank" rel="noopener">
+GitHub
+</a> </div> </div> </header> <main class="flex-grow-1">  <link rel="stylesheet" href="/styles/docs.css"> <div class="container-fluid py-3"> <div class="row g-3"> <aside class="col-12 col-lg-3"> <div class="sticky-top" style="top: 72px;"> <nav class="docs-sidebar"> <div class="docs-sidebar-title">Docs</div> <ul class="docs-nav"> <li class="docs-group"><details><summary>Developers</summary><ul><li class="docs-group"><details><summary>Extending Templates</summary><ul><li><a href="/docs/developers/extending-templates/templates">Templates</a></li></ul></details></li></ul></details></li><li><a href="/docs/getting-started">Getting Started</a></li><li class="docs-group"><details><summary>How To</summary><ul><li><a href="/docs/how-to/get-preview">How To - Get Preview HTML</a></li></ul></details></li><li><a href="/docs/theme-lab" class="active" aria-current="page">Theme Lab</a></li> </ul> </nav> </div> </aside> <section class="col-12 col-lg-7" data-pagefind-body>  <article class="bg-body border rounded p-3"> <h1 class="mb-2">Theme Lab</h1> <p class="text-body-secondary">How the lab works, previews, snapshots, exporting, and recommended patterns.</p> <hr> <p>The Theme Lab is an editor and live preview built for experimenting with MyOshi themes.</p>
+<p>It is intentionally split into:</p>
+<ul>
+<li><strong>Base Template</strong> (demo profile HTML/CSS)</li>
+<li><strong>Custom CSS</strong> (what you paste into MyOshi)</li>
+<li><strong>Custom HTML</strong> (what you paste into MyOshi)</li>
+</ul>
+<p>This makes it easier to keep templates maintainable while your theme stays portable.</p>
+<hr/>
+<h2 id="core-concepts">Core concepts</h2>
+<h3 id="base-template">Base Template</h3>
+<p>A template supplies:</p>
+<ul>
+<li>A CSS baseline resembling MyOshi’s styling patterns</li>
+<li>A realistic body structure (cards, headers, sections, etc.)</li>
+<li>A <code>.profile-custom-html</code> mount point where your Custom HTML is injected</li>
+</ul>
+<p>Templates are stored as files (see <strong>Templates</strong>).</p>
+<h3 id="custom-css">Custom CSS</h3>
+<p>Your Custom CSS is appended after the template’s base CSS, so it can override defaults.</p>
+<p>Recommended patterns:</p>
+<ul>
+<li>Prefer CSS variables for theme colors</li>
+<li>Use a top-level namespace selector to avoid collisions:</li>
+<li><code>.profile-page.profile-custom-css { ... }</code></li>
+<li>Use progressive enhancement:</li>
+<li>Accessibility Tip! Your theme should still be readable if images fail to load, avoid replacing text with images.</li>
+</ul>
+<h3 id="custom-html">Custom HTML</h3>
+<p>Custom HTML is inserted into the first <code>.profile-custom-html</code> element found in the base template.</p>
+<p>Use Custom HTML when you need:</p>
+<ul>
+<li>a consistent wrapper for layout grids</li>
+<li>badges / link cards / “now playing” style blocks</li>
+<li>a custom header section</li>
+</ul>
+<p>Avoid Custom HTML for:</p>
+<ul>
+<li>things that require JavaScript (preview blocks scripts anyway)</li>
+</ul>
+<hr/>
+<h2 id="preview-modes">Preview modes</h2>
+<h3 id="embedded-preview">Embedded preview</h3>
+<p>The preview panel renders your template + custom CSS/HTML in an iframe.</p>
+<h3 id="pop-out-preview">Pop-out preview</h3>
+<p>The <strong>Pop out preview</strong> button opens a dedicated preview page that can be:</p>
+<ul>
+<li>full height</li>
+<li>easier to inspect</li>
+<li>shown on a second monitor</li>
+</ul>
+<p>Currently the pop-out preview does not update automatically when you make changes to your Custom CSS/HTML, you’ll need to close and reopen the preview panel.</p>
+<hr/>
+<h2 id="preview-scaling">Preview scaling</h2>
+<p>The preview area supports scaling:</p>
+<ul>
+<li>Use the <strong>Scale</strong> slider to zoom the iframe content.</li>
+<li>Scaling should not affect what you copy into MyOshi — it’s just for comfort while editing.</li>
+</ul>
+<p>If you’re authoring mobile-first styles:</p>
+<ul>
+<li>Use the <strong>Mobile</strong> width toggle if provided</li>
+<li>Use responsive media queries:</li>
+<li><code>@media (max-width: 640px) { ... }</code></li>
+</ul>
+<hr/>
+<h2 id="snapshots">Snapshots</h2>
+<p>Snapshots store your current work in your browser (LocalStorage):</p>
+<ul>
+<li>Custom CSS</li>
+<li>Custom HTML</li>
+<li>Any toggles (append/replace behavior, mock data settings, etc.)</li>
+</ul>
+<p>Snapshots do <strong>not</strong> include:</p>
+<ul>
+<li>the entire base template</li>
+<li>imported MyOshi preview HTML (if used)</li>
+</ul>
+<p>This keeps snapshots small and portable.</p>
+<hr/>
+<h2 id="exporting">Exporting</h2>
+<p>When you click <strong>Copy Custom CSS</strong> or <strong>Copy Custom HTML</strong>:</p>
+<ul>
+<li>only your custom content is copied</li>
+<li>no base template content is included</li>
+</ul>
+<p>This is the safest workflow for MyOshi usage.</p>
+<hr/>
+<h2 id="recommended-starter-theme-structure">Recommended “starter theme” structure</h2>
+<p>A good starting point is to define variables and a few core surfaces:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="css"><code><span class="line"><span style="color:#B392F0">.profile-page.profile-custom-css</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#FFAB70">  --theme-bg</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">#0b0f17</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#FFAB70">  --theme-panel</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">rgba</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">18</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">24</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">36</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0.85</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#FFAB70">  --theme-border</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">rgba</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">40</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">60</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">90</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0.55</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#FFAB70">  --theme-text</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">#e7eefc</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#FFAB70">  --theme-muted</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">rgba</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">231</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">238</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">252</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0.75</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#FFAB70">  --theme-accent</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">#6df</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre> </article>   </section> <aside class="col-12 col-lg-2"> <div> <div class="sticky-top" style="top: 72px;"> <div class="border rounded p-3 bg-body"> <div class="fw-semibold mb-2">On this page</div> <ul class="list-unstyled mb-0 small"> <li style="margin-left:0px"> <a href="#core-concepts">Core concepts</a> </li><li style="margin-left:12px"> <a href="#base-template">Base Template</a> </li><li style="margin-left:12px"> <a href="#custom-css">Custom CSS</a> </li><li style="margin-left:12px"> <a href="#custom-html">Custom HTML</a> </li><li style="margin-left:0px"> <a href="#preview-modes">Preview modes</a> </li><li style="margin-left:12px"> <a href="#embedded-preview">Embedded preview</a> </li><li style="margin-left:12px"> <a href="#pop-out-preview">Pop-out preview</a> </li><li style="margin-left:0px"> <a href="#preview-scaling">Preview scaling</a> </li><li style="margin-left:0px"> <a href="#snapshots">Snapshots</a> </li><li style="margin-left:0px"> <a href="#exporting">Exporting</a> </li><li style="margin-left:0px"> <a href="#recommended-starter-theme-structure">Recommended “starter theme” structure</a> </li> </ul> </div> </div> </div> </aside> </div> </div>  </main> <footer class="border-top bg-body"> <div class="container-fluid py-3 d-flex flex-wrap gap-2 justify-content-between align-items-center"> <div class="text-body-secondary small">
+© 2026 MyOshi Theme Lab
+</div> <div class="d-flex gap-3 small"> <a class="link-secondary" href="/docs/">Docs</a> <a class="link-secondary" href="/lab/">Lab</a> <a class="link-secondary" href="https://github.com/crimsonstrife/oshi-lab" target="_blank" rel="noopener">GitHub</a> </div> </div> </footer> <div> <button type="button" class="btn btn-primary rounded-circle shadow help-fab" data-bs-toggle="offcanvas" data-bs-target="#helpDrawer" aria-controls="helpDrawer" aria-label="Help" title="Help">
+?
+</button> <div class="offcanvas offcanvas-end" tabindex="-1" id="helpDrawer" aria-labelledby="helpDrawerLabel"> <div class="offcanvas-header"> <h5 class="offcanvas-title" id="helpDrawerLabel">Help</h5> <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button> </div> <div class="offcanvas-body">  <div class="mb-3"> <div class="fw-semibold mb-2">Quick links</div> <div class="list-group"> <a class="list-group-item list-group-item-action" href="/lab/">Open the Lab</a> <a class="list-group-item list-group-item-action" href="/docs/getting-started/">Getting Started</a> <a class="list-group-item list-group-item-action" href="/docs/">All Docs</a> </div> </div> <div> <div class="fw-semibold mb-2">Shortcuts</div> <ul class="small text-body-secondary mb-0"> <li><kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>K</kbd>: Tools palette (Lab)</li> </ul> </div>  </div> </div> <style is:global>
+                .help-fab {
+                    position: fixed;
+                    right: 1rem;
+                    bottom: 1rem;
+                    width: 48px;
+                    height: 48px;
+                    padding: 0;
+                    display: grid;
+                    place-items: center;
+                    font-size: 20px;
+                    z-index: 1040; /* below offcanvas (1045) */
+                }
+            </style> </div> </body> </html>

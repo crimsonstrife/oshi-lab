@@ -1,0 +1,75 @@
+/* How-it-works timeline */
+#how-it-works .how-timeline {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 1.5rem;
+    position: relative;
+}
+
+/* Horizontal connector line behind the nodes */
+#how-it-works .how-timeline::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 22px;              /* center of 44px node */
+    height: 2px;
+    background: var(--bs-border-color);
+    opacity: 0.75;
+}
+
+#how-it-works .how-step {
+    flex: 1;
+    min-width: 0;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#how-it-works .how-node {
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+    background: var(--bs-body-bg);
+    border: 2px solid var(--bs-primary);
+    color: var(--bs-primary);
+    z-index: 1; /* above the connector line */
+}
+
+#how-it-works .how-card {
+    width: 100%;
+    margin-top: 0.75rem;
+}
+
+/* Mobile: switch to vertical timeline */
+@media (max-width: 991.98px) {
+    #how-it-works .how-timeline {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    #how-it-works .how-timeline::before {
+        left: 22px;           /* center of node */
+        right: auto;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        height: auto;
+    }
+
+    #how-it-works .how-step {
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    #how-it-works .how-card {
+        margin-top: 0;
+    }
+}
