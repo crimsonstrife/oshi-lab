@@ -1,0 +1,98 @@
+---
+import AppLayout from '../ui/AppLayout.astro';
+
+const effectiveDate = "February 25, 2026";
+---
+
+<AppLayout title="Privacy Policy">
+  <main id="main" class="container py-5">
+    <h1 class="mb-2">Privacy Policy</h1>
+    <p class="text-body-secondary small mb-4">Effective date: {effectiveDate}</p>
+
+    <div class="vstack gap-4" style="max-width: 60rem;">
+      <section>
+        <p>
+          Oshi‑Lab ("we", "us", "our", "I") is a browser-based tool for drafting and previewing MyOshi Custom CSS and Custom
+          HTML. This policy explains what data is processed when you use the site.
+        </p>
+        <p class="mb-0"><strong>Short version:</strong> the Theme Lab is designed to keep your work on your device. We do not ask you to create an account.</p>
+      </section>
+
+      <section>
+        <h2 class="h4">Data you provide</h2>
+        <ul>
+          <li>
+            <strong>Theme content:</strong> Anything you type or paste into the editor (Custom CSS, Custom HTML, and (optionally)
+            template HTML) is processed in your browser to render the preview.
+          </li>
+          <li>
+            <strong>Snapshots:</strong> If you use Snapshots, your theme content is stored in your browser’s <code>localStorage</code>
+            so you can return later.
+          </li>
+        </ul>
+        <p class="mb-0">
+          We do not intentionally transmit your theme content to our servers as part of normal operation. If you choose to share
+          content via GitHub Issues/Discussions, that content is subject to GitHub’s privacy practices.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="h4">Data collected automatically</h2>
+        <p>
+          Like most websites, our hosting provider (for example, GitHub Pages and/or its CDN) may process basic request logs
+          (such as IP address, user agent, requested URL, and timestamps) to deliver the site, prevent abuse, and maintain
+          reliability.
+        </p>
+        <p class="mb-0">
+          We do not run first-party advertising and we do not knowingly sell personal information.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="h4">Cookies and local storage</h2>
+        <ul>
+          <li><strong>LocalStorage:</strong> Used for Snapshots and UI preferences (if enabled).</li>
+          <li><strong>Cookies:</strong> Oshi‑Lab does not require cookies to function, but your browser settings may affect storage behavior.</li>
+        </ul>
+        <p class="mb-0">
+          You can clear saved Snapshots by clearing site data for <code>oshi-lab.app</code> in your browser.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="h4">Third-party links and assets</h2>
+        <p>
+          The site links to third-party services (e.g., GitHub, MyOshi). We are not responsible for their content or privacy
+          practices.
+        </p>
+        <p class="mb-0">
+          If you reference remote images/fonts in your theme, your browser will request those assets from the third-party
+          servers you specify.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="h4">Security</h2>
+        <p class="mb-0">
+          We take reasonable measures to protect the site. However, no method of transmission or storage is 100% secure.
+          Please avoid pasting secrets (API keys, passwords) into the editor.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="h4">Changes to this policy</h2>
+        <p class="mb-0">
+          We may update this policy from time to time. The effective date above will reflect the most recent revision.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="h4">Contact</h2>
+        <p class="mb-0">
+          For questions or requests, open an issue in the repository:
+          <a href="https://github.com/crimsonstrife/oshi-lab" target="_blank" rel="noopener">github.com/crimsonstrife/oshi-lab</a>
+        </p>
+      </section>
+    </div>
+  </main>
+</AppLayout>
