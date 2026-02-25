@@ -1,0 +1,14 @@
+@import "@fortawesome/fontawesome-free/css/all.min.css";
+
+.help-fab {
+    position: fixed;
+    right: 1rem;
+    bottom: 5rem;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    font-size: 20px;
+    z-index: 1040; /* below offcanvas (1045) */
+}
