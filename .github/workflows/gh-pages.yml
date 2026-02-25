@@ -31,16 +31,14 @@ jobs:
           env | sort | grep -iE 'NODE_AUTH_TOKEN|NPM_TOKEN|NPM_CONFIG|npm_config|_auth|registry' || true
           npm config list -l | sed -E 's/(_authToken=).*/\1[redacted]/; s/(_password=).*/\1[redacted]/'
 
-      - name: Install dependencies (force public npm)
+      - name: Install dependencies
+        continue-on-error: true
+        run: npm ci --loglevel verbose
+
+      - name: Dump npm debug log
+        if: always()
         run: |
-          cat > "$RUNNER_TEMP/npmrc" <<'EOF'
-          registry=https://registry.npmjs.org/
-          always-auth=false
-          EOF
-          npm ci
-        env:
-          NPM_CONFIG_USERCONFIG: ${{ runner.temp }}/npmrc
-          NODE_AUTH_TOKEN: ""
+          ls -t /home/runner/.npm/_logs/*debug-0.log | head -n 1 | xargs -r sed -n '1,220p'
 
       - name: Compute PUBLIC_APP_VERSION from package.json
         run: echo "PUBLIC_APP_VERSION=$(node -p \"require('./package.json').version\")" >> $GITHUB_ENV
