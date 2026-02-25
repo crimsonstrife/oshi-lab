@@ -197,16 +197,22 @@ function decodeHtmlEntities(str) {
   return txt.value;
 }
 
-function maybeExtractSrcdoc(maybeOuterHtml) {
-  try {
-    if (!maybeOuterHtml.includes("<iframe") || !maybeOuterHtml.includes("srcdoc=")) return null;
-    const doc = new DOMParser().parseFromString(maybeOuterHtml, "text/html");
-    const iframe = doc.querySelector("iframe[srcdoc]");
-    if (!iframe) return null;
-    return iframe.getAttribute("srcdoc");
-  } catch {
-    return null;
-  }
+function maybeExtractSrcdoc(input) {
+    try {
+        if (!input) return null;
+
+        // Regex path: supports srcdoc/srcDoc, single or double quotes
+        const m = input.match(/<iframe\b[^>]*\bsrcdoc\s*=\s*(["'])([\s\S]*?)\1/i);
+        if (m) return m[2];
+
+        // DOMParser fallback (case-insensitive check)
+        if (!/<iframe/i.test(input) || !/srcdoc\s*=/i.test(input)) return null;
+
+        const doc = new DOMParser().parseFromString(input, "text/html");
+        return doc.querySelector("iframe[srcdoc]")?.getAttribute("srcdoc") ?? null;
+    } catch {
+        return null;
+    }
 }
 
 function summarizeBase(css, body) {
@@ -351,46 +357,162 @@ function downloadFile(filename, content) {
   URL.revokeObjectURL(a.href);
 }
 
+function splitCssFromPreview(cssText) {
+    const raw = (cssText || "").trim();
+    if (!raw) return { baseCss: "", userCss: "", marker: null };
+
+    // Prefer the MyOshi marker if present
+    const myoshiMarker = raw.match(/\/\*\s*User's\s+custom\s+CSS[\s\S]*?\*\//i);
+    if (myoshiMarker && typeof myoshiMarker.index === "number") {
+        const idx = myoshiMarker.index;
+        const baseCss = raw.slice(0, idx).trim();
+        const userCss = raw.slice(idx + myoshiMarker[0].length).trim();
+        return { baseCss, userCss, marker: "myoshi" };
+    }
+
+    // Fallback: your lab’s own marker (in case someone pastes a built srcdoc)
+    const labMarker = raw.match(/\/\*\s*={2,}\s*User\s+Custom\s+CSS[\s\S]*?\*\//i);
+    if (labMarker && typeof labMarker.index === "number") {
+        const idx = labMarker.index;
+        const baseCss = raw.slice(0, idx).trim();
+        const userCss = raw.slice(idx + labMarker[0].length).trim();
+        return { baseCss, userCss, marker: "lab" };
+    }
+
+    return { baseCss: raw, userCss: "", marker: null };
+}
+
+function splitBodyFromPreview(doc) {
+    const body = doc?.body;
+    if (!body) return { baseBody: "", userHtml: "" };
+
+    const nodes = [...body.querySelectorAll(".profile-custom-html")];
+
+    // Pick the “best” candidate: non-empty, and largest content (most likely the user’s injected block)
+    let bestNode = null;
+    let bestHtml = "";
+    for (const n of nodes) {
+        const html = (n.innerHTML || "").trim();
+        if (!html) continue;
+        if (!bestNode || html.length > bestHtml.length) {
+            bestNode = n;
+            bestHtml = html;
+        }
+    }
+
+    if (bestNode) {
+        // Clear injected content from base so our renderer re-injects it from the editor
+        bestNode.innerHTML = "";
+    }
+
+    return {
+        baseBody: (body.innerHTML || "").trim(),
+        userHtml: bestHtml,
+    };
+}
+
+function autoBackupBeforeExtract() {
+    const hasWork =
+        (els.customCss?.value || "").trim() ||
+        (els.customHtml?.value || "").trim();
+
+    if (!hasWork) return false;
+
+    try {
+        const list = loadSnapshots();
+        list.unshift({
+            id: safeUUID(),
+            name: `Auto-backup before Extract (${new Date().toLocaleString()})`,
+            createdAt: new Date().toISOString(),
+            customCss: els.customCss?.value || "",
+            customHtml: els.customHtml?.value || "",
+            appendInstead: !!els.appendInstead?.checked,
+            enableMock: !!els.enableMock?.checked,
+            mock: {
+                displayName: els.mockDisplayName?.value || "",
+                username: els.mockUsername?.value || "",
+                tagline: els.mockTagline?.value || "",
+                avatar: els.mockAvatar?.value || "",
+                bg: els.mockBg?.value || "",
+            },
+        });
+        saveSnapshots(list);
+        loadSnapshots();
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+function safeStripInjectedCssNoise(css) {
+    // If you already have a real implementation elsewhere, this will use it.
+    if (typeof stripInjectedCssNoise === "function") return stripInjectedCssNoise(css);
+
+    // Fallback: no-op (keeps extraction working)
+    return { css: css || "" };
+}
+
 /** -----------------------------
  *  Extract Base from Template
  *  ----------------------------- */
 function extractBase() {
-  const raw = (els.templateInput?.value || "").trim();
-  if (!raw) {
-    setStatus("err", "Template input is empty.");
-    return;
-  }
+    try {
+        const raw = (els.templateInput?.value || "").trim();
+        if (!raw) {
+            setStatus("err", "Template input is empty.");
+            return;
+        }
 
-  let srcdoc = maybeExtractSrcdoc(raw);
-  if (srcdoc) {
-    srcdoc = decodeHtmlEntities(srcdoc);
-  } else {
-    srcdoc = raw.includes("&lt;") ? decodeHtmlEntities(raw) : raw;
-  }
+        let srcdoc = maybeExtractSrcdoc(raw);
+        if (srcdoc) {
+            srcdoc = decodeHtmlEntities(srcdoc);
+        } else {
+            srcdoc = raw.includes("&lt;") ? decodeHtmlEntities(raw) : raw;
+        }
 
-  let doc;
-  try {
-    doc = new DOMParser().parseFromString(srcdoc, "text/html");
-  } catch {
-    setStatus("err", "Failed to parse template HTML.");
-    return;
-  }
+        const doc = new DOMParser().parseFromString(srcdoc, "text/html");
 
-  const styles = [...doc.querySelectorAll("style")].map(s => s.textContent || "");
-  const extractedCss = styles.join("\n\n").trim();
-  const extractedBody = (doc.body && doc.body.innerHTML) ? doc.body.innerHTML.trim() : "";
+        const backedUp = autoBackupBeforeExtract();
 
-  if (!extractedCss && !extractedBody) {
-    setStatus("err", "Could not extract base CSS/body. Make sure you pasted the actual srcdoc HTML.");
-    return;
-  }
+        const styles = [...doc.querySelectorAll("style")].map(s => s.textContent || "");
+        const extractedCssAll = styles.join("\n\n").trim();
 
-  baseCss = extractedCss;
-  baseBody = extractedBody;
+        const { baseCss: cssBaseRaw, userCss: cssUserRaw, marker } = splitCssFromPreview(extractedCssAll);
+        const { css: cssBase} = safeStripInjectedCssNoise(cssBaseRaw);
 
-  if (els.basePeek) els.basePeek.value = summarizeBase(baseCss, baseBody);
-  setStatus("ok", `Extracted base. CSS: ${baseCss.length.toLocaleString()} chars • Body: ${baseBody.length.toLocaleString()} chars`);
-  if (els.autoUpdate?.checked) renderPreview();
+        const { baseBody: bodyBase, userHtml } = splitBodyFromPreview(doc);
+
+        if (!cssBase && !bodyBase) {
+            setStatus("err", "Could not extract base CSS/body. Make sure you pasted the actual srcdoc HTML.");
+            return;
+        }
+
+        baseCss = (cssBase || "").trim();
+        baseBody = (bodyBase || "").trim();
+
+        if (els.customCss && cssUserRaw.trim()) {
+            const header = "/* ===== Imported from existing MyOshi Custom CSS ===== */\n";
+            els.customCss.value = cssUserRaw.trim().startsWith("/* ===== Imported")
+                ? cssUserRaw.trim()
+                : header + cssUserRaw.trim();
+        }
+
+        if (els.customHtml && userHtml.trim()) els.customHtml.value = userHtml.trim();
+        if (els.basePeek) els.basePeek.value = summarizeBase(baseCss, baseBody);
+
+        const parts = [
+            `Extracted base. Base CSS: ${baseCss.length.toLocaleString()} chars • Base body: ${baseBody.length.toLocaleString()} chars`,
+            `Imported custom CSS: ${(els.customCss?.value || "").length.toLocaleString()} chars • Imported custom HTML: ${(els.customHtml?.value || "").length.toLocaleString()} chars`,
+        ];
+        if (marker) parts.push(`Split CSS via marker: ${marker}`);
+        if (backedUp) parts.push("Auto-backed up your current draft to Snapshots.");
+
+        setStatus("ok", parts.join(" • "));
+        if (els.autoUpdate?.checked) renderPreview();
+    } catch (err) {
+        console.error(err);
+        setStatus("err", `Extract failed: ${err?.message || String(err)}`);
+    }
 }
 
 function restoreTemplateBase() {
