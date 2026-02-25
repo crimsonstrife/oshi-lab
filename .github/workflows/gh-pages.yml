@@ -2,8 +2,7 @@ name: Deploy Astro to GitHub Pages
 
 on:
   push:
-    branches:
-      - production
+    branches: [production]
 
 permissions:
   contents: write
@@ -11,29 +10,24 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           lfs: true
           fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20.19.0
 
       - name: Install dependencies
-        run: npm ci --loglevel
+        run: npm ci
 
-      - name: Compute PUBLIC_APP_VERSION from package.json
+      - name: Compute PUBLIC_APP_VERSION
         shell: bash
         run: |
           VERSION="$(node -p "require('./package.json').version")"
-          {
-            echo "PUBLIC_APP_VERSION=$VERSION"
-          } >> "$GITHUB_ENV"
+          echo "PUBLIC_APP_VERSION=$VERSION" >> "$GITHUB_ENV"
 
       - name: Build Astro site
         run: npm run build
@@ -41,6 +35,6 @@ jobs:
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:
-          github_token: ${{ secrets.GH_PAGES_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
           cname: oshi-lab.app
