@@ -1,15 +1,121 @@
 ---
+import AppLayout from '../ui/AppLayout.astro';
+import { getCollection } from 'astro:content';
+
 const base = import.meta.env.BASE_URL;
+
+const docs = await getCollection('docs', ({ data }) => !data.sidebar?.hidden);
+docs.sort((a, b) => (a.data.sidebar?.order ?? a.data.order ?? 9999) - (b.data.sidebar?.order ?? b.data.order ?? 9999));
+const popular = docs.slice(0, 5);
 ---
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>MyOshi Theme Lab</title>
-</head>
-<body style="font-family: system-ui; padding: 24px;">
-<h1>MyOshi Theme Lab</h1>
-<p><a href={`${base}lab/`}>Open the Lab</a></p>
-<p><a href={`${base}docs/`}>Read the Docs</a></p>
-</body>
-</html>
+
+<AppLayout title="Home" bodyClass="home">
+    <link rel="stylesheet" href="/styles/homepage.css" />
+    <section class="bg-dark text-light border-bottom">
+        <div class="container py-5">
+            <h1 class="display-5 fw-semibold mb-2">MyOshi Theme Lab</h1>
+            <p class="lead text-body-secondary mb-4">
+                Build and test MyOshi Custom CSS/HTML against a sandboxed profile preview — templates included.
+            </p>
+
+            <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-primary" href={`${base}lab/`}>Open the Lab</a>
+                <a class="btn btn-outline-light" href={`${base}docs/getting-started/`}>Getting Started</a>
+                <a class="btn btn-outline-light" href={`${base}docs/`}>All Docs</a>
+            </div>
+
+            <div class="mt-4 small text-body-secondary">
+                Runs locally in your browser. No accounts. No uploads. Saved snapshots are local to your browser.
+            </div>
+        </div>
+    </section>
+
+    <section id="how-it-works" class="container py-5">
+        <div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-3">
+            <h2 class="h4 fw-semibold mb-0">How it works</h2>
+            <a class="small link-secondary" href={`${base}docs/getting-started/`}>Read the full guide →</a>
+        </div>
+
+        <ol class="how-timeline">
+            <li class="how-step">
+                <div class="how-node" aria-hidden="true">1</div>
+                <div class="card how-card h-100">
+                    <div class="card-body">
+                        <div class="fw-semibold mb-1">Choose a starting point</div>
+                        <div class="text-body-secondary mb-2">
+                            Start from a built-in scaffold or paste MyOshi preview HTML.
+                        </div>
+                        <div class="d-flex flex-wrap gap-2">
+                            <span class="badge text-bg-secondary">Template scaffold</span>
+                            <span class="badge text-bg-secondary">Real preview + Extract Base</span>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+            <li class="how-step">
+                <div class="how-node" aria-hidden="true">2</div>
+                <div class="card how-card h-100">
+                    <div class="card-body">
+                        <div class="fw-semibold mb-1">Iterate in the Lab</div>
+                        <div class="text-body-secondary">
+                            Edit Custom CSS/HTML, checkpoint with snapshots, and verify in the sandboxed preview.
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+            <li class="how-step">
+                <div class="how-node" aria-hidden="true">3</div>
+                <div class="card how-card h-100">
+                    <div class="card-body">
+                        <div class="fw-semibold mb-1">Export + ship</div>
+                        <div class="text-body-secondary">
+                            Copy/paste into MyOshi or download a bundle when you’re ready.
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <section class="container pb-5">
+        <div class="row g-3">
+            <div class="col-12 col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header fw-semibold">Quickstart</div>
+                    <div class="card-body">
+                        <ol class="mb-0">
+                            <li class="mb-2">Open the Lab → choose a template.</li>
+                            <li class="mb-2">Paste preview HTML → click <b>Extract Base</b>.</li>
+                            <li class="mb-2">Edit <b>Custom CSS</b>/<b>Custom HTML</b> and preview.</li>
+                            <li class="mb-2">Use snapshots to checkpoint changes.</li>
+                            <li>Copy/paste into MyOshi or download your bundle.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header fw-semibold">Popular Docs</div>
+                    <div class="list-group list-group-flush">
+                        {popular.map((d) => (
+                                <a class="list-group-item list-group-item-action" href={`${base}docs/${d.slug}/`}>
+                                    <div class="fw-semibold">{d.data.sidebar?.label ?? d.data.title}</div>
+                                    {d.data.description ? <div class="small text-body-secondary">{d.data.description}</div> : null}
+                                </a>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert alert-secondary mt-4 mb-0">
+            <div class="fw-semibold mb-1">Coming soon</div>
+            <div class="text-body-secondary">
+                Lab Tools palette (color converter, gradient builder, snippet inserter, accessibility checks).
+            </div>
+        </div>
+    </section>
+</AppLayout>

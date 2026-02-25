@@ -56,6 +56,7 @@ export async function initLab(root: HTMLElement | null): Promise<void> {
           </div>
           <div class="toolbar d-flex flex-wrap gap-2 justify-content-end">
             <button class="btn btn-sm btn-outline-info secondary" id="btnDocs" type="button">Docs</button>
+            <button class="btn btn-sm btn-outline-primary secondary" id="btnTools" type="button">Tools</button>
             <button class="btn btn-sm btn-outline-light secondary" id="btnLoadDemo" type="button">Load Demo</button>
             <button class="btn btn-sm btn-outline-light secondary" id="btnExtract" type="button">Extract Base</button>
             <button class="btn btn-sm btn-outline-light secondary" id="btnRestoreTemplate" type="button">Restore Template</button>
@@ -220,6 +221,48 @@ export async function initLab(root: HTMLElement | null): Promise<void> {
           </section>
         </div>
       </div>
+      <!-- Tools / Command Palette -->
+<div class="modal fade" id="toolsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="d-flex flex-column">
+          <h5 class="modal-title mb-0">Tools</h5>
+          <div class="small text-body-secondary">Press <kbd>Ctrl</kbd> / <kbd>⌘</kbd> + <kbd>K</kbd></div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <input
+          id="toolsSearch"
+          class="form-control mb-3"
+          placeholder="Search tools…"
+          autocomplete="off"
+        />
+
+        <div class="row g-3">
+          <div class="col-12 col-lg-4">
+            <div id="toolsList" class="list-group"></div>
+          </div>
+
+          <div class="col-12 col-lg-8">
+            <div id="toolsPanel" class="border rounded p-3 bg-body-tertiary">
+              <div class="text-body-secondary">Select a tool on the left.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer justify-content-between">
+        <div class="small text-body-secondary">
+          Tip: tools can insert snippets directly into Custom CSS/HTML at your cursor.
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-light" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
     </div>
   `;
 

@@ -1,0 +1,43 @@
+---
+import DocsLayout from '../../ui/DocsLayout.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+    const docs = await getCollection('docs');
+    return docs.map((doc) => ({
+        params: { slug: doc.slug },
+        props: { doc },
+}));
+}
+
+const { doc } = Astro.props;
+const { Content, headings } = await doc.render();
+
+const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
+---
+
+<DocsLayout title={doc.data.title} currentSlug={doc.slug}>
+    <article class="bg-body border rounded p-3">
+        <h1 class="mb-2">{doc.data.title}</h1>
+        {doc.data.description ? <p class="text-body-secondary">{doc.data.description}</p> : null}
+        <hr />
+        <Content />
+    </article>
+
+    <div slot="right">
+        {toc.length ? (
+                <div class="sticky-top" style="top: 72px;">
+                    <div class="border rounded p-3 bg-body">
+                        <div class="fw-semibold mb-2">On this page</div>
+                        <ul class="list-unstyled mb-0 small">
+                            {toc.map((h) => (
+                                    <li style={`margin-left:${(h.depth - 2) * 12}px`}>
+                                        <a href={`#${h.slug}`}>{h.text}</a>
+                                    </li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+        ) : null}
+    </div>
+</DocsLayout>

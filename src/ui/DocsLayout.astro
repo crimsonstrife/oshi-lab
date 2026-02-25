@@ -1,0 +1,26 @@
+---
+import AppLayout from './AppLayout.astro';
+import DocsSidebar from '../components/docs/DocsSidebar.astro';
+
+const { title, currentSlug } = Astro.props;
+---
+
+<AppLayout title={title} bodyClass="docs">
+    <div class="container-fluid py-3">
+        <div class="row g-3">
+            <aside class="col-12 col-lg-3">
+                <div class="sticky-top" style="top: 72px;">
+                    <DocsSidebar currentSlug={currentSlug} />
+                </div>
+            </aside>
+
+            <section class="col-12 col-lg-7" data-pagefind-body>
+                <slot />
+            </section>
+
+            <aside class="col-12 col-lg-2">
+                <slot name="right" />
+            </aside>
+        </div>
+    </div>
+</AppLayout>

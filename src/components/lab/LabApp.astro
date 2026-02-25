@@ -1,8 +1,8 @@
-<div id="lab-root" data-base="/"></div>
+---
+const base = import.meta.env.BASE_URL;
+---
 
-<link rel="stylesheet" href="/styles/bootstrap.css" />
-<link rel="stylesheet" href="/styles/lab.css" />
-<script is:inline src="/scripts/bootstrap.bundle.js"></script>
+<div id="lab-root" data-base={base}></div>
 
 <script type="module">
     import { initLab } from '../../ui/lab/initLab';

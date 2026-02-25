@@ -1,17 +1,14 @@
 ---
+import AppLayout from './AppLayout.astro';
+
 const { title, fullBleed = false } = Astro.props;
 ---
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>{title} | MyOshi Theme Lab - by CrimsonStrife</title>
-    <link rel="icon" href="/favicon.ico" />
-    <link rel="stylesheet" href="/styles/bootstrap.css" />
-    <link rel="stylesheet" href="/styles/lab.css" />
-    <script is:inline src="/scripts/bootstrap.bundle.js"></script>
-</head>
-<body class={fullBleed ? 'lab-fullbleed' : 'lab'}>
-<slot />
-</body>
-</html>
+
+<AppLayout
+        title={title}
+        bodyClass={fullBleed ? 'lab-fullbleed' : 'lab'}
+        mainClass={fullBleed ? 'flex-grow-1 p-0' : 'flex-grow-1'}
+        extraStyles={['/styles/lab.css']}
+>
+    <slot />
+</AppLayout>

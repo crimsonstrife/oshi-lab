@@ -21,18 +21,13 @@ It gives you:
 ## Open the Lab
 
 - Go to **Theme Lab**: `/lab/`
-- Optional: open the preview as a separate window using **Pop out preview**.
-
-If you're on GitHub Pages, the URLs look like:
-
-- `https://YOUR_USER.github.io/YOUR_REPO/lab/`
-- `https://YOUR_USER.github.io/YOUR_REPO/lab/preview/`
+- Optional: open the preview as a separate window using **Pop out preview**. NOTE: the pop-out preview does not auto-update as you edit, so it’s best for testing responsiveness or seeing your theme without the editor UI, you can close and reopen the preview window after changes to refresh.
 
 ---
 
 ## Typical workflow
 
-1. Pick a **Template** (demo profile).
+1. Pick a **Template** (demo profile) to start with or paste your preview code from MyOshi.
 2. Write **Custom CSS** until it looks right.
 3. Add **Custom HTML** if you need extra structure (widgets, badges, layout wrappers, etc.).
 4. Copy **Custom CSS** and **Custom HTML** into MyOshi.
@@ -56,7 +51,7 @@ The demo template is only there so your CSS has something realistic to style.
 The preview is rendered in an `<iframe>` with a restrictive sandbox:
 
 - **No scripts execute**
-- This prevents accidental (or malicious) JS from running in the preview.
+- This prevents accidental (or malicious) JS from running in the preview.  This is also representative of how MyOshi works.
 
 That said, always be careful with third-party assets:
 
@@ -68,7 +63,7 @@ That said, always be careful with third-party assets:
 ## Troubleshooting
 
 ### The preview looks different from MyOshi
-That’s expected unless you import an exact MyOshi preview HTML (if/when that becomes available). The built-in templates aim to be *faithful enough* to develop styles comfortably.
+That’s currently expected unless you import an exact MyOshi preview HTML. The built-in templates aim to be *faithful enough* to develop styles comfortably.
 
 ### My CSS works in the Lab but not on MyOshi
 MyOshi may have additional wrappers, specificity, or different DOM structure.
@@ -77,11 +72,13 @@ Fixes:
 - Increase specificity (e.g. `.profile-page.profile-custom-css .card { ... }`)
 - Avoid relying on overly narrow selectors that only match the demo template
 - Use browser DevTools to confirm your selector matches what you think
+- Use the **Inspect** option in your browser to confirm the element is in the DOM
+- When in doubt, submit a bug report with screenshots.
 
 ### I can’t copy to clipboard
 Some browsers block clipboard access unless the page is served over HTTPS or you’ve interacted with the page.
 
-Fallback: manually select text → copy.
+Fallback: manually select text, right-click → copy.
 
 ---
 

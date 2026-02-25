@@ -6,6 +6,16 @@ let baseBody = "";
 let lastBuildSrcdoc = "";
 let mobileMode = false;
 
+function getBasePath() {
+    const root = document.getElementById("lab-root");
+    let base = root?.dataset?.base || "/";
+    if (!base.startsWith("/")) base = "/" + base;
+    if (!base.endsWith("/")) base += "/";
+    return base;
+}
+
+const BASE_PATH = getBasePath();
+
 /** -----------------------------
  *  Built-in Templates
  *  ----------------------------- */
@@ -169,8 +179,8 @@ function popoutPreview() {
     return;
   }
 
-  const url = `/lab/preview?key=${encodeURIComponent(key)}`;
-  const win = window.open(url, "_blank");
+    const url = `${BASE_PATH}lab/preview?key=${encodeURIComponent(key)}`;
+    const win = window.open(url, "_blank");
   if (!win) setStatus("warn", "Pop-up blocked. Allow pop-ups for this site to use Pop out.");
 }
 
@@ -494,6 +504,260 @@ function deleteSelectedSnapshot() {
   setStatus("ok", "Snapshot deleted.");
 }
 
+let toolsModal = null;
+
+function ensureToolsModal() {
+    const el = document.getElementById("toolsModal");
+    const Modal = window.bootstrap?.Modal;
+    if (!el || !Modal) return null;
+    if (!toolsModal) toolsModal = new Modal(el, { focus: true });
+    return toolsModal;
+}
+
+function openTools() {
+    const modal = ensureToolsModal();
+    if (!modal) {
+        setStatus("warn", "Tools modal unavailable (Bootstrap not loaded).");
+        return;
+    }
+    modal.show();
+
+    // Focus search on open
+    setTimeout(() => {
+        const search = document.getElementById("toolsSearch");
+        if (search) search.focus();
+    }, 50);
+}
+
+function insertAtCursor(textarea, text) {
+    if (!textarea) return;
+    const start = textarea.selectionStart ?? textarea.value.length;
+    const end = textarea.selectionEnd ?? textarea.value.length;
+    textarea.setRangeText(text, start, end, "end");
+    textarea.focus();
+}
+
+function clampByte(n) {
+    n = Number(n);
+    if (!Number.isFinite(n)) return 0;
+    return Math.max(0, Math.min(255, Math.round(n)));
+}
+
+function parseColor(input) {
+    if (!input) return null;
+    const s = input.trim();
+
+    // Hex (#RGB, #RGBA, #RRGGBB, #RRGGBBAA)
+    const hex = s.match(/^#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i);
+    if (hex) {
+        let h = hex[1].toLowerCase();
+        if (h.length === 3 || h.length === 4) h = h.split("").map((c) => c + c).join("");
+        const r = parseInt(h.slice(0, 2), 16);
+        const g = parseInt(h.slice(2, 4), 16);
+        const b = parseInt(h.slice(4, 6), 16);
+        const a = h.length === 8 ? parseInt(h.slice(6, 8), 16) / 255 : 1;
+        return { r, g, b, a };
+    }
+
+    // rgb() / rgba()
+    const rgb = s.match(/^rgba?\(\s*([0-9.]+)\s*,\s*([0-9.]+)\s*,\s*([0-9.]+)(?:\s*,\s*([0-9.]+)\s*)?\)$/i);
+    if (rgb) {
+        const r = clampByte(rgb[1]);
+        const g = clampByte(rgb[2]);
+        const b = clampByte(rgb[3]);
+        let a = rgb[4] == null ? 1 : Number(rgb[4]);
+        if (!Number.isFinite(a)) a = 1;
+        a = Math.max(0, Math.min(1, a));
+        return { r, g, b, a };
+    }
+
+    return null;
+}
+
+function toHex2(n) {
+    return clampByte(n).toString(16).padStart(2, "0");
+}
+
+function formatHex({ r, g, b, a }) {
+    const base = `#${toHex2(r)}${toHex2(g)}${toHex2(b)}`;
+    if (a == null || a >= 1) return base;
+    return `${base}${toHex2(a * 255)}`;
+}
+
+function formatRgba({ r, g, b, a }) {
+    const alpha = (a == null ? 1 : a);
+    const aText = alpha >= 1 ? "1" : String(Math.round(alpha * 1000) / 1000);
+    return `rgba(${clampByte(r)}, ${clampByte(g)}, ${clampByte(b)}, ${aText})`;
+}
+
+const TOOL_DEFS = [
+    {
+        id: "color",
+        name: "Color Converter",
+        keywords: "color hex rgb rgba css",
+        render(panel) {
+            panel.innerHTML = `
+        <div class="d-flex justify-content-between align-items-start gap-2">
+          <div>
+            <div class="fw-semibold">Color Converter</div>
+            <div class="small text-body-secondary">Paste a color and get HEX / RGBA. Insert snippets into your editors.</div>
+          </div>
+          <div id="colorSwatch" class="border rounded" style="width:48px;height:48px;background:#000;"></div>
+        </div>
+
+        <hr class="my-3" />
+
+        <label class="form-label small">Input</label>
+        <input id="colorInput" class="form-control" placeholder="#ff3366, #f36, rgba(255, 51, 102, .8)" />
+
+        <div class="row g-2 mt-2">
+          <div class="col-12 col-md-6">
+            <label class="form-label small">HEX</label>
+            <div class="input-group">
+              <input id="colorHex" class="form-control" readonly />
+              <button id="copyHex" class="btn btn-outline-secondary" type="button">Copy</button>
+            </div>
+          </div>
+          <div class="col-12 col-md-6">
+            <label class="form-label small">RGBA</label>
+            <div class="input-group">
+              <input id="colorRgba" class="form-control" readonly />
+              <button id="copyRgba" class="btn btn-outline-secondary" type="button">Copy</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3">
+          <label class="form-label small">Insert into Custom CSS</label>
+          <div class="input-group">
+            <span class="input-group-text">var</span>
+            <input id="varName" class="form-control" value="--accent" />
+            <button id="insertVar" class="btn btn-outline-primary" type="button">Insert</button>
+          </div>
+          <div class="form-text">Inserts <code>--accent: …;</code> at your cursor in Custom CSS.</div>
+        </div>
+      `;
+
+            const input = panel.querySelector("#colorInput");
+            const outHex = panel.querySelector("#colorHex");
+            const outRgba = panel.querySelector("#colorRgba");
+            const swatch = panel.querySelector("#colorSwatch");
+
+            const update = () => {
+                const parsed = parseColor(input.value);
+                if (!parsed) {
+                    outHex.value = "";
+                    outRgba.value = "";
+                    swatch.style.background = "#000";
+                    return;
+                }
+                const hex = formatHex(parsed);
+                const rgba = formatRgba(parsed);
+                outHex.value = hex;
+                outRgba.value = rgba;
+                swatch.style.background = rgba;
+            };
+
+            input.addEventListener("input", update);
+            update();
+
+            panel.querySelector("#copyHex").addEventListener("click", async () => {
+                if (!outHex.value) return;
+                await copyToClipboard(outHex.value);
+                setStatus("ok", "Copied HEX.");
+            });
+
+            panel.querySelector("#copyRgba").addEventListener("click", async () => {
+                if (!outRgba.value) return;
+                await copyToClipboard(outRgba.value);
+                setStatus("ok", "Copied RGBA.");
+            });
+
+            panel.querySelector("#insertVar").addEventListener("click", () => {
+                const parsed = parseColor(input.value);
+                if (!parsed) return;
+                const name = (panel.querySelector("#varName").value || "--accent").trim();
+                const value = formatHex(parsed);
+                const snippet = `${name}: ${value};\n`;
+                insertAtCursor(els.customCss, snippet);
+                setStatus("ok", `Inserted ${name} into Custom CSS.`);
+                if (els.autoUpdate?.checked) renderPreview();
+            });
+        },
+    },
+];
+
+function initTools() {
+    on("btnTools", "click", openTools);
+
+    // Ctrl/Cmd+K
+    document.addEventListener("keydown", (e) => {
+        const key = (e.key || "").toLowerCase();
+        if ((e.ctrlKey || e.metaKey) && key === "k") {
+            e.preventDefault();
+            openTools();
+        }
+    });
+
+    const listEl = document.getElementById("toolsList");
+    const panelEl = document.getElementById("toolsPanel");
+    const searchEl = document.getElementById("toolsSearch");
+    if (!listEl || !panelEl || !searchEl) return;
+
+    let activeToolId = TOOL_DEFS[0]?.id || null;
+
+    const matches = (tool, q) => {
+        if (!q) return true;
+        const hay = `${tool.name} ${tool.keywords}`.toLowerCase();
+        return hay.includes(q.toLowerCase());
+    };
+
+    const renderList = () => {
+        const q = searchEl.value.trim();
+        const visible = TOOL_DEFS.filter((t) => matches(t, q));
+
+        listEl.innerHTML = visible
+            .map((t) => {
+                const active = t.id === activeToolId;
+                return `
+          <button type="button"
+            class="list-group-item list-group-item-action ${active ? "active" : ""}"
+            data-tool="${t.id}">
+            ${t.name}
+          </button>
+        `;
+            })
+            .join("");
+
+        // Auto-select first visible tool if current is filtered out
+        if (!visible.some((t) => t.id === activeToolId)) {
+            activeToolId = visible[0]?.id || null;
+        }
+
+        renderPanel();
+    };
+
+    const renderPanel = () => {
+        const tool = TOOL_DEFS.find((t) => t.id === activeToolId);
+        if (!tool) {
+            panelEl.innerHTML = `<div class="text-body-secondary">No tool selected.</div>`;
+            return;
+        }
+        tool.render(panelEl);
+    };
+
+    listEl.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-tool]");
+        if (!btn) return;
+        activeToolId = btn.getAttribute("data-tool");
+        renderList();
+    });
+
+    searchEl.addEventListener("input", renderList);
+
+    renderList();
+}
+
 /** -----------------------------
  *  UI bindings
  *  ----------------------------- */
@@ -515,8 +779,9 @@ on("btnLoadDemo", "click", () => {
   loadTemplateById(id);
 });
 on("btnRestoreTemplate", "click", restoreTemplateBase);
-on("btnDocs", "click", () => window.open("../getting-started", "_blank", "noopener,noreferrer"));
-
+on("btnDocs", "click", () => {
+    window.open(`${BASE_PATH}docs/getting-started/`, "_blank", "noopener,noreferrer");
+});
 on("btnResetCustom", "click", () => {
   if (els.customCss) els.customCss.value = "";
   if (els.customHtml) els.customHtml.value = "";
@@ -672,3 +937,4 @@ function scheduleRender() {
 loadSnapshots();
 applyPreviewSizing();
 loadTemplatesIndex();
+initTools();

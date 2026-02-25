@@ -1,0 +1,99 @@
+---
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+
+const {
+    title = 'MyOshi Theme Lab',
+    bodyClass = '',
+    mainClass = 'flex-grow-1',
+    extraStyles = [],
+    hideHeader = false,
+    hideFooter = false,
+    showHelp = true,
+} = Astro.props;
+
+const base = import.meta.env.BASE_URL;
+const fullTitle = title ? `${title} | MyOshi Theme Lab - by CrimsonStrife` : 'MyOshi Theme Lab - by CrimsonStrife';
+
+const toHref = (href) =>
+    href.startsWith('http') ? href : `${base}${href.replace(/^\//, '')}`;
+---
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{fullTitle}</title>
+    <link rel="icon" href={`${base}favicon.ico`} />
+    <link rel="stylesheet" href={`${base}styles/bootstrap.css`} />
+    {extraStyles.map((href) => <link rel="stylesheet" href={toHref(href)} />)}
+    <script is:inline src={`${base}scripts/bootstrap.bundle.js`}></script>
+</head>
+
+<body class={`min-vh-100 d-flex flex-column ${bodyClass}`.trim()}>
+{!hideHeader && <SiteHeader />}
+
+<main class={mainClass}>
+    <slot />
+</main>
+
+{!hideFooter && <SiteFooter />}
+{showHelp && (
+        <div>
+            <button
+                    type="button"
+                    class="btn btn-primary rounded-circle shadow help-fab"
+                    data-bs-toggle="offcanvas"
+                    data-bs-target="#helpDrawer"
+                    aria-controls="helpDrawer"
+                    aria-label="Help"
+                    title="Help"
+            >
+                ?
+            </button>
+
+            <div class="offcanvas offcanvas-end" tabindex="-1" id="helpDrawer" aria-labelledby="helpDrawerLabel">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title" id="helpDrawerLabel">Help</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+
+                <div class="offcanvas-body">
+                    <slot name="help">
+                        <div class="mb-3">
+                            <div class="fw-semibold mb-2">Quick links</div>
+                            <div class="list-group">
+                                <a class="list-group-item list-group-item-action" href={`${base}lab/`}>Open the Lab</a>
+                                <a class="list-group-item list-group-item-action" href={`${base}docs/getting-started/`}>Getting Started</a>
+                                <a class="list-group-item list-group-item-action" href={`${base}docs/`}>All Docs</a>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="fw-semibold mb-2">Shortcuts</div>
+                            <ul class="small text-body-secondary mb-0">
+                                <li><kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>K</kbd>: Tools palette (Lab)</li>
+                            </ul>
+                        </div>
+                    </slot>
+                </div>
+            </div>
+
+            <style is:global>
+                .help-fab {
+                    position: fixed;
+                    right: 1rem;
+                    bottom: 1rem;
+                    width: 48px;
+                    height: 48px;
+                    padding: 0;
+                    display: grid;
+                    place-items: center;
+                    font-size: 20px;
+                    z-index: 1040; /* below offcanvas (1045) */
+                }
+            </style>
+        </div>
+)}
+</body>
+</html>

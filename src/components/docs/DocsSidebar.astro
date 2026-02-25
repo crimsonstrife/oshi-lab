@@ -1,0 +1,41 @@
+---
+import { getCollection } from 'astro:content';
+import DocsSearch from './DocsSearch.astro';
+
+const base = import.meta.env.BASE_URL;
+const { currentSlug } = Astro.props;
+
+const docs = await getCollection('docs', ({ data }) => !data.sidebar?.hidden);
+
+docs.sort((a, b) => {
+    const ao = a.data.sidebar?.order ?? a.data.order ?? 9999;
+    const bo = b.data.sidebar?.order ?? b.data.order ?? 9999;
+    return ao - bo || a.data.title.localeCompare(b.data.title);
+});
+
+const labelFor = (d) => d.data.sidebar?.label ?? d.data.title;
+const hrefFor = (d) => `${base}docs/${d.slug}/`;
+const isActive = (d) => currentSlug && d.slug === currentSlug;
+---
+
+<div class="d-grid gap-3">
+    <DocsSearch />
+
+    <div class="list-group">
+        <a class="list-group-item list-group-item-action" href={`${base}docs/`}>Docs Home</a>
+        <a class="list-group-item list-group-item-action" href={`${base}lab/`}>Theme Lab</a>
+    </div>
+
+    <div class="list-group">
+        {docs.map((d) => (
+                <a
+                        class={`list-group-item list-group-item-action ${isActive(d) ? 'active' : ''}`}
+                        href={hrefFor(d)}
+                        aria-current={isActive(d) ? 'page' : undefined}
+                >
+                    {labelFor(d)}
+                    {d.data.description ? <div class="small opacity-75">{d.data.description}</div> : null}
+                </a>
+        ))}
+    </div>
+</div>
