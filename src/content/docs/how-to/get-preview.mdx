@@ -3,4 +3,35 @@ title: How To - Get Preview HTML
 description: How to get the rendered HTML from your MyOshi preview.
 ---
 
-coming soon
+The best way to accurately preview your content is to use a copy of your profile in the editor.
+To get the rendered HTML from your MyOshi preview, you can use the browser's developer tools to inspect the preview iframe. Here's how you can do it:
+
+---
+
+## How to get the rendered HTML from your MyOshi preview
+
+1. Open your MyOshi profile editor on the [MyOshi website](https://myoshi.co).
+    1. Click on the **Settings** link in the top-right corner of the site.
+    2. Click on the **Edit Profile** link.
+   ![Edit Profile link in the Settings menu](/images/docs/how-to/get-preview/edit-profile.png)
+2. Scroll down to the **Profile Customization** section and click on the **Preview Profile** button.
+![Preview button in the Profile Customization section](/images/docs/how-to/get-preview/preview-button.png)
+3. In the preview iframe, right-click anywhere on the page and select **Inspect**.
+![Inspect option in the preview iframe](/images/docs/how-to/get-preview/inspect-option.png)
+4. In the developer tools, navigate to the **Elements** tab.
+    1. Make sure you're in the **Elements** tab.
+    2. Find the **iframe** element with the **Title** attribute set to "Profile Preview".
+    3. Right-click on the **iframe** element and select **Edit as HTML**.
+     ![Preview iframe in the Elements tab](/images/docs/how-to/get-preview/preview-iframe.png)
+5. Select all the HTML code and copy it to your clipboard, either by right-clicking and selecting **Copy** or by pressing Ctrl+A and then Ctrl+C.
+6. Paste the copied HTML code into the **Template** field in the Labs Editor here in the app, then click **Extract Base**.
+![Extract Base button in the Labs Editor](/images/docs/how-to/get-preview/extract-base.png)
+7. Your profile should now be ready to be edited!
+
+---
+
+## Important notes
+
+Any existing CSS and Custom HTML on your profile **should** be extracted automatically into the **CSS** and **Custom HTML** fields in the Labs Editor provided you paste the entire **iframe** HTML code into the **Template** field.
+If you paste just the profile code from the **div** with the classes 'class="profile-page profile-custom-css"', it will may not be able to extract the CSS and Custom HTML, and while it may preview correctly, you may be overwriting your existing CSS and Custom HTML when you paste your finished profile code back to your profile.
+I recommend always backing up your current CSS and Custom HTML from your profile into a text document before overwriting it with designs created here.

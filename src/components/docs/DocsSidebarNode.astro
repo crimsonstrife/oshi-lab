@@ -1,0 +1,56 @@
+---
+const { node, currentSlug = "" } = Astro.props;
+
+const isActive = (slug) => slug === currentSlug;
+const isInPath = (path) => currentSlug === path || currentSlug.startsWith(path + "/");
+
+const hasKids = Array.isArray(node?.items) && node.items.length > 0;
+
+const href = node?.entry ? `/docs/${node.entry.slug}` : null;
+const active = node?.entry ? isActive(node.entry.slug) : false;
+
+// If this folder has an “overview” doc (same slug as folder), show a link for it.
+const overview = node?.entry
+    ? { href, active, label: "Overview" }
+    : null;
+
+const open = hasKids ? isInPath(node.path) : false;
+---
+
+{!hasKids ? (
+    node?.entry ? (
+    <li>
+        <a
+                href={`/docs/${node.entry.slug}`}
+                class:list={{ active: isActive(node.entry.slug) }}
+                aria-current={isActive(node.entry.slug) ? "page" : undefined}
+        >
+            {node.label}
+        </a>
+    </li>
+        ) : null
+    ) : (
+<li class="docs-group">
+    <details open={open}>
+        <summary>{node.label}</summary>
+
+        <ul>
+            {overview ? (
+                    <li>
+                        <a
+                                href={overview.href}
+                                class:list={{ active: overview.active }}
+                                aria-current={overview.active ? "page" : undefined}
+                        >
+                            {overview.label}
+                        </a>
+                    </li>
+            ) : null}
+
+            {node.items.map((child) => (
+                    <Astro.self node={child} currentSlug={currentSlug} />
+            ))}
+        </ul>
+    </details>
+</li>
+    )}
