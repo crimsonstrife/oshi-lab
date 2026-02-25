@@ -1,7 +1,8 @@
 ---
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
-
+import "../../public/styles/global.css";
+import Icon from "../components/ui/Icon.astro";
 const {
     title = 'MyOshi Theme Lab',
     bodyClass = '',
@@ -49,7 +50,7 @@ const toHref = (href) =>
                     aria-label="Help"
                     title="Help"
             >
-                ?
+                <Icon name="fa-solid fa-question" title="Help" />
             </button>
 
             <div class="offcanvas offcanvas-end" tabindex="-1" id="helpDrawer" aria-labelledby="helpDrawerLabel">
@@ -78,21 +79,6 @@ const toHref = (href) =>
                     </slot>
                 </div>
             </div>
-
-            <style is:global>
-                .help-fab {
-                    position: fixed;
-                    right: 1rem;
-                    bottom: 1rem;
-                    width: 48px;
-                    height: 48px;
-                    padding: 0;
-                    display: grid;
-                    place-items: center;
-                    font-size: 20px;
-                    z-index: 1040; /* below offcanvas (1045) */
-                }
-            </style>
         </div>
 )}
 </body>

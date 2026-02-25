@@ -1,15 +1,27 @@
 ---
-const base = import.meta.env.BASE_URL;
-const path = Astro.url.pathname;
+import Icon from "./ui/Icon.astro";
 
-const isHome = path === base;
-const isLab = path.startsWith(`${base}lab`);
-const isDocs = path.startsWith(`${base}docs`);
+const base = import.meta.env.BASE_URL;
+
+// Normalize trailing slash for robust comparisons on GitHub Pages / local
+const withSlash = (p: string) => (p.endsWith("/") ? p : `${p}/`);
+
+const path = withSlash(Astro.url.pathname);
+const baseN = withSlash(base);
+
+const isHome = path === baseN;
+const isLab  = path.startsWith(`${baseN}lab/`);
+const isDocs = path.startsWith(`${baseN}docs/`);
 ---
 
-<header class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom">
+<a class="visually-hidden-focusable" href="#main">Skip to content</a>
+
+<header class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom sticky-top">
     <div class="container-fluid">
-        <a class="navbar-brand fw-semibold" href={base}>MyOshi Theme Lab</a>
+        <a class="navbar-brand fw-semibold d-flex align-items-center gap-2" href={baseN}>
+            <Icon name="fa-solid fa-flask" title="Theme Lab" />
+            <span>MyOshi Theme Lab</span>
+        </a>
 
         <button
                 class="navbar-toggler"
@@ -26,19 +38,111 @@ const isDocs = path.startsWith(`${base}docs`);
         <div class="collapse navbar-collapse" id="siteNav">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class={`nav-link ${isHome ? 'active' : ''}`} href={base} aria-current={isHome ? 'page' : undefined}>Home</a>
+                    <a class={`nav-link ${isHome ? "active" : ""}`} href={baseN} aria-current={isHome ? "page" : undefined}>
+                        Home
+                    </a>
                 </li>
+
                 <li class="nav-item">
-                    <a class={`nav-link ${isLab ? 'active' : ''}`} href={`${base}lab/`} aria-current={isLab ? 'page' : undefined}>Lab</a>
+                    <a class={`nav-link ${isLab ? "active" : ""}`} href={`${baseN}lab/`} aria-current={isLab ? "page" : undefined}>
+                        Lab
+                    </a>
                 </li>
-                <li class="nav-item">
-                    <a class={`nav-link ${isDocs ? 'active' : ''}`} href={`${base}docs/`} aria-current={isDocs ? 'page' : undefined}>Docs</a>
+
+                {/* Docs can stay as a single link OR become a dropdown */}
+                <li class="nav-item dropdown">
+                    <a
+                            class={`nav-link dropdown-toggle ${isDocs ? "active" : ""}`}
+                            href={`${baseN}docs/`}
+                            role="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                            aria-current={isDocs ? "page" : undefined}
+                    >
+                        Docs
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark">
+                        <li><a class="dropdown-item" href={`${baseN}docs/`}>Overview</a></li>
+                        {/* Add these only if the routes exist */}
+                        {/* <li><a class="dropdown-item" href={`${baseN}docs/getting-started/`}>Getting Started</a></li> */}
+                        {/* <li><a class="dropdown-item" href={`${baseN}docs/components/`}>Components</a></li> */}
+                        <li><hr class="dropdown-divider" /></li>
+                        <li>
+                            <a class="dropdown-item" href="https://github.com/crimsonstrife/oshi-lab/issues" target="_blank" rel="noopener">
+                                <Icon name="fa-solid fa-bug" title="Issues" /> <span class="ms-2">Report an issue</span>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
             </ul>
 
-            <a class="btn btn-sm btn-outline-light" href="https://github.com/crimsonstrife/oshi-lab" target="_blank" rel="noopener">
-                GitHub
-            </a>
+            {/* Search (optional): send to docs with ?q=... */}
+            <form class="d-flex me-lg-2 mb-2 mb-lg-0" role="search" action={`${baseN}docs/`} method="get">
+                <input
+                        class="form-control form-control-sm me-2"
+                        type="search"
+                        name="q"
+                        placeholder="Search docs…"
+                        aria-label="Search docs"
+                />
+                <button class="btn btn-sm btn-outline-light" type="submit" aria-label="Search">
+                    <Icon name="fa-solid fa-magnifying-glass" title="Search" />
+                </button>
+            </form>
+
+            <div class="d-flex gap-2 align-items-center">
+                {/* Theme toggle */}
+                <button
+                        class="btn btn-sm btn-outline-light"
+                        type="button"
+                        data-action="toggle-theme"
+                        aria-label="Toggle theme"
+                        title="Toggle theme"
+                >
+                    <Icon name="fa-solid fa-circle-half-stroke" title="Theme" />
+                </button>
+
+                {/* GitHub */}
+                <a
+                        class="btn btn-sm btn-outline-light"
+                        href="https://github.com/crimsonstrife/oshi-lab"
+                        target="_blank"
+                        rel="noopener"
+                        aria-label="Oshi-Lab on GitHub"
+                        title="GitHub"
+                >
+                    <Icon name="fa-brands fa-github" title="GitHub" label="GitHub" />
+                </a>
+            </div>
         </div>
     </div>
+
+    {/* Theme toggle script: Bootstrap 5.3+ */}
+    <script is:inline>
+        (() => {
+            const key = "oshi_theme";
+            const root = document.documentElement;
+
+            const apply = (t) => {
+                root.setAttribute("data-bs-theme", t);
+            };
+
+            const getPreferred = () => {
+                const saved = localStorage.getItem(key);
+                if (saved === "light" || saved === "dark") return saved;
+                return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+            };
+
+            apply(getPreferred());
+
+            document.addEventListener("click", (e) => {
+                const btn = e.target && e.target.closest && e.target.closest('[data-action="toggle-theme"]');
+                if (!btn) return;
+                const current = root.getAttribute("data-bs-theme") === "dark" ? "dark" : "light";
+                const next = current === "dark" ? "light" : "dark";
+                localStorage.setItem(key, next);
+                apply(next);
+            });
+        })();
+    </script>
 </header>

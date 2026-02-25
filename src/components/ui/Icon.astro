@@ -1,0 +1,19 @@
+---
+interface Props {
+    name: string;            // "fa-brands fa-github"
+    title?: string;          // tooltip text
+    label?: string;          // accessibility label; if absent, decorative
+    class?: string;
+}
+
+const { name, title, label, class: className = "" } = Astro.props;
+const decorative = !label;
+---
+
+<i
+        class={`${name} ${className}`}
+        title={title}
+        aria-hidden={decorative ? "true" : undefined}
+        aria-label={!decorative ? label : undefined}
+        role={!decorative ? "img" : undefined}
+/>
