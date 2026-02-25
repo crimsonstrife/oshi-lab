@@ -24,20 +24,8 @@ jobs:
         with:
           node-version: 20.19.0
 
-      - name: Debug npm env/config
-        run: |
-          echo "registry=$(npm config get registry)"
-          echo "userconfig=$(npm config get userconfig)"
-          env | sort | grep -iE 'NODE_AUTH_TOKEN|NPM_TOKEN|NPM_CONFIG|npm_config|_auth|registry' || true
-          npm config list -l | sed -E 's/(_authToken=).*/\1[redacted]/; s/(_password=).*/\1[redacted]/'
-
       - name: Install dependencies
-        run: npm ci --loglevel verbose
-
-      - name: Dump npm debug log
-        if: always()
-        run: |
-          ls -t /home/runner/.npm/_logs/*debug-0.log | head -n 1 | xargs -r sed -n '1,220p'
+        run: npm ci --loglevel
 
       - name: Compute PUBLIC_APP_VERSION from package.json
         shell: bash
