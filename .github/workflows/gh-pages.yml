@@ -27,6 +27,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Compute PUBLIC_APP_VERSION from package.json
+        run: echo "PUBLIC_APP_VERSION=$(node -p \"require('./package.json').version\")" >> $GITHUB_ENV
+
       - name: Build Astro site
         run: npm run build
 
