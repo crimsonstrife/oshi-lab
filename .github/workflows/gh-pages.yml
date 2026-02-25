@@ -24,8 +24,23 @@ jobs:
         with:
           node-version: 20.19.0
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Debug npm env/config
+        run: |
+          echo "registry=$(npm config get registry)"
+          echo "userconfig=$(npm config get userconfig)"
+          env | sort | grep -iE 'NODE_AUTH_TOKEN|NPM_TOKEN|NPM_CONFIG|npm_config|_auth|registry' || true
+          npm config list -l | sed -E 's/(_authToken=).*/\1[redacted]/; s/(_password=).*/\1[redacted]/'
+
+      - name: Install dependencies (force public npm)
+        run: |
+          cat > "$RUNNER_TEMP/npmrc" <<'EOF'
+          registry=https://registry.npmjs.org/
+          always-auth=false
+          EOF
+          npm ci
+        env:
+          NPM_CONFIG_USERCONFIG: ${{ runner.temp }}/npmrc
+          NODE_AUTH_TOKEN: ""
 
       - name: Compute PUBLIC_APP_VERSION from package.json
         run: echo "PUBLIC_APP_VERSION=$(node -p \"require('./package.json').version\")" >> $GITHUB_ENV
