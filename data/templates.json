@@ -1,0 +1,47 @@
+{
+  "version": 3,
+  "templates": [
+    {
+      "id": "myoshi-classic",
+      "name": "MyOshi Classic",
+      "description": "Classic MyOshi profile as accurate as possible.",
+      "baseCssFile": "templates/myoshi-classic/base.css",
+      "baseBodyFile": "templates/myoshi-classic/base.html",
+      "mockDefaults": {
+        "displayName": "Username",
+        "username": "@username",
+        "tagline": "I'm a tagline!",
+        "avatar": "https://placehold.co/128x128/png",
+        "background": "https://placehold.co/1600x900/png"
+      }
+    },
+    {
+      "id": "myoshi-core",
+      "name": "MyOshi Core (approx)",
+      "description": "A close-enough approximation of MyOshi profile structure (cards, groups, custom HTML mount).",
+      "baseCssFile": "templates/myoshi-core/base.css",
+      "baseBodyFile": "templates/myoshi-core/base.html",
+      "mockDefaults": {
+        "displayName": "CrimsonStrife",
+        "username": "@crimsonstrife",
+        "tagline": "",
+        "avatar": "https://placehold.co/128x128/png",
+        "background": "https://placehold.co/1600x900/png"
+      }
+    },
+    {
+      "id": "minimal",
+      "name": "Minimal Mount Only",
+      "description": "Bare minimum markup with .profile-page + .profile-custom-html mount for quick experiments.",
+      "baseCssFile": "templates/minimal/base.css",
+      "baseBodyFile": "templates/minimal/base.html",
+      "mockDefaults": {
+        "displayName": "Demo User",
+        "username": "@demo",
+        "tagline": "",
+        "avatar": "",
+        "background": ""
+      }
+    }
+  ]
+}
