@@ -22,9 +22,7 @@ export function safeUUID() {
     ].join('-');
   }
 
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    const r = (Math.random() * 16) | 0;
-    const v = c === 'x' ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
+  // If a cryptographically secure random generator is not available, do do not fall back to Math.random(), which is insecure.
+    // Instead, throw an error.
+  throw new Error('safeUUID requires a cryptographically secure random source (window.crypto)');
 }
