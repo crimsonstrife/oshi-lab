@@ -3,6 +3,9 @@
   "type": "module",
   "version": "0.5.2",
   "scripts": {
+    "sync:templates": "node scripts/sync-templates.mjs",
+    "predev": "npm run sync:templates",
+    "prebuild": "npm run sync:templates",
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
