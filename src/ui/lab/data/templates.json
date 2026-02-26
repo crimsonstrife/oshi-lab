@@ -1,6 +1,20 @@
 {
-  "version": 2,
+  "version": 3,
   "templates": [
+    {
+      "id": "myoshi-classic",
+      "name": "MyOshi Classic",
+      "description": "Classic MyOshi profile as accurate as possible.",
+      "baseCssFile": "templates/myoshi-classic/base.css",
+      "baseBodyFile": "templates/myoshi-classic/base.html",
+      "mockDefaults": {
+        "displayName": "Username",
+        "username": "@username",
+        "tagline": "I'm a tagline!",
+        "avatar": "https://placehold.co/128x128/png",
+        "background": "https://placehold.co/1600x900/png"
+      }
+    },
     {
       "id": "myoshi-core",
       "name": "MyOshi Core (approx)",
