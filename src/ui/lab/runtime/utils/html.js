@@ -1,9 +1,9 @@
 // @ts-check
-import { decode as decodeEntities } from 'he';
+import * as entities from 'entities';
 
 /** @param {string} str */
 export function decodeHtmlEntities(str) {
-    return decodeEntities(str || '');
+    return entities.decodeHTML(str || '');
 }
 
 /**
