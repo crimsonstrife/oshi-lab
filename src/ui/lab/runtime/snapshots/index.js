@@ -8,21 +8,35 @@ import { renderPreview } from '../preview/render.js';
 const SNAP_KEY = 'myoshi_theme_lab_snapshots_v1';
 
 export function loadSnapshots() {
-  /** @type {any[]} */
-  let list = [];
-  try {
-    list = JSON.parse(localStorage.getItem(SNAP_KEY) || '[]');
-  } catch {
-    list = [];
-  }
+    /** @type {any[]} */
+    let list = [];
+    try {
+        list = JSON.parse(localStorage.getItem(SNAP_KEY) || '[]');
+    } catch {
+        list = [];
+    }
 
-  if (els.snapshotSelect) {
-    els.snapshotSelect.innerHTML = `<option value="">Load snapshot…</option>` + list.map((s) =>
-      `<option value="${encodeURIComponent(s.id)}">${s.name}</option>`
-    ).join('');
-  }
+    // localStorage is untrusted, so we need to normalize shape
+    if (!Array.isArray(list)) list = [];
+    list = list.filter((s) => s && typeof s.id === 'string' && typeof s.name === 'string');
 
-  return list;
+    const select = els.snapshotSelect;
+    if (select) {
+        const frag = document.createDocumentFragment();
+
+        // Placeholder option
+        frag.appendChild(new Option('Load snapshot…', ''));
+
+        // Snapshot options (text is NOT interpreted as HTML)
+        for (const s of list) {
+            frag.appendChild(new Option(s.name, s.id));
+        }
+
+        // Clear + insert
+        select.replaceChildren(frag);
+    }
+
+    return list;
 }
 
 /** @param {any[]} list */
@@ -82,21 +96,20 @@ export function loadSnapshotById(id) {
 }
 
 export function deleteSelectedSnapshot() {
-  const encoded = els.snapshotSelect?.value;
-  if (!encoded) return;
+    const id = els.snapshotSelect?.value;
+    if (!id) return;
 
-  const id = decodeURIComponent(encoded);
-  const list = loadSnapshots();
-  const idx = list.findIndex((s) => s.id === id);
-  if (idx === -1) return;
+    const list = loadSnapshots();
+    const idx = list.findIndex((s) => s.id === id);
+    if (idx === -1) return;
 
-  if (!confirm(`Delete snapshot "${list[idx].name}"?`)) return;
+    if (!confirm(`Delete snapshot "${list[idx].name}"?`)) return;
 
-  list.splice(idx, 1);
-  saveSnapshots(list);
-  loadSnapshots();
-  if (els.snapshotSelect) els.snapshotSelect.value = '';
-  setStatus('ok', 'Snapshot deleted.');
+    list.splice(idx, 1);
+    saveSnapshots(list);
+    loadSnapshots();
+    if (els.snapshotSelect) els.snapshotSelect.value = '';
+    setStatus('ok', 'Snapshot deleted.');
 }
 
 export function autoBackupBeforeExtract() {
