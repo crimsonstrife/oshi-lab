@@ -1,0 +1,21 @@
+.labw-card{
+    --labw-bg: rgba(255,255,255,.06);
+    --labw-border: rgba(255,255,255,.14);
+    --labw-radius: 14px;
+
+    border: 1px solid var(--labw-border);
+    background: var(--labw-bg);
+    border-radius: var(--labw-radius);
+    padding: 14px;
+}
+
+.labw-card__title{
+    margin: 0 0 8px 0;
+    font-weight: 900;
+    letter-spacing: .2px;
+}
+
+.labw-card__body{
+    opacity: .92;
+    line-height: 1.35;
+}

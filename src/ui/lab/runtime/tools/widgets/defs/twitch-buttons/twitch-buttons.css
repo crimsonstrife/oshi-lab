@@ -1,0 +1,33 @@
+.labw-btnrow{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.labw-btn{
+    --labw-btn-bg: rgba(255,255,255,.06);
+    --labw-btn-border: rgba(255,255,255,.14);
+    --labw-btn-text: rgba(255,255,255,.92);
+    --labw-btn-accent: #a970ff; /* twitch-ish */
+
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--labw-btn-border);
+    background: var(--labw-btn-bg);
+    color: var(--labw-btn-text);
+    text-decoration:none;
+    font-weight: 800;
+    letter-spacing: .2px;
+}
+
+.labw-btn:hover{
+    transform: translateY(-1px);
+}
+
+.labw-btn--primary{
+    border-color: color-mix(in srgb, var(--labw-btn-accent) 55%, var(--labw-btn-border));
+    background: color-mix(in srgb, var(--labw-btn-accent) 25%, var(--labw-btn-bg));
+}
