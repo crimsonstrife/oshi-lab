@@ -1,56 +1,9 @@
 // @ts-check
+import { decode as decodeEntities } from 'he';
 
-/**
- * Decode a *single pass* of common HTML entities.
- * This avoids DOM sinks like innerHTML/DOMParser, which SAST tools flag.
- * Note: This intentionally decodes &amp; LAST to avoid double-decoding
- * cases like "&amp;lt;" -> "&lt;" (matching typical HTML parser behavior).
- *
- * @param {string} str
- * @returns {string}
- */
+/** @param {string} str */
 export function decodeHtmlEntities(str) {
-    if (typeof str !== 'string' || str.length === 0) return '';
-
-    // Decode named entities except &amp; first (single-pass behavior).
-    const named = {
-        quot: '"',
-        apos: "'",
-        lt: '<',
-        gt: '>',
-        nbsp: '\u00A0',
-    };
-
-    let out = str.replace(/&(quot|apos|lt|gt|nbsp);/gi, (m, name) => {
-        const key = String(name).toLowerCase();
-        return named[key] ?? m;
-    });
-
-    // Decode numeric entities (single pass), before &amp;
-    out = out.replace(/&#(\d+);/g, (m, dec) => {
-        const cp = Number(dec);
-        if (!Number.isFinite(cp) || cp < 0 || cp > 0x10ffff) return m;
-        try {
-            return String.fromCodePoint(cp);
-        } catch {
-            return m;
-        }
-    });
-
-    out = out.replace(/&#x([0-9a-fA-F]+);/g, (m, hex) => {
-        const cp = parseInt(hex, 16);
-        if (!Number.isFinite(cp) || cp < 0 || cp > 0x10ffff) return m;
-        try {
-            return String.fromCodePoint(cp);
-        } catch {
-            return m;
-        }
-    });
-
-    // Decode &amp; last to avoid recursively decoding sequences created above.
-    out = out.replace(/&amp;/gi, '&');
-
-    return out;
+    return decodeEntities(str || '');
 }
 
 /**

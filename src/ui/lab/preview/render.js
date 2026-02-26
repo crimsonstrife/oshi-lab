@@ -12,11 +12,17 @@ export function renderPreview() {
     return;
   }
 
-  const srcdoc = buildSrcdoc();
-  state.lastBuildSrcdoc = srcdoc;
+    const srcdoc = buildSrcdoc();
+    state.lastBuildSrcdoc = srcdoc;
 
-  if (els.previewFrame) els.previewFrame.srcdoc = srcdoc;
-  applyPreviewSizing();
+    const f = els.previewFrame;
+    if (f) {
+        f.setAttribute('sandbox', 'allow-same-origin');
+        f.setAttribute('referrerpolicy', 'no-referrer');
+        f.srcdoc = srcdoc;
+    }
+
+    applyPreviewSizing();
 
   setStatus(
     'ok',

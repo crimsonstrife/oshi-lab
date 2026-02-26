@@ -1,5 +1,5 @@
 // @ts-check
-
+import createDOMPurify from 'dompurify';
 import { state } from '../state.js';
 import { els } from '../dom.js';
 import { setStatus } from '../status.js';
@@ -10,29 +10,54 @@ import { autoBackupBeforeExtract } from '../snapshots/index.js';
 import { renderPreview } from '../preview/render.js';
 import { loadTemplateById } from '../templates/index.js';
 
+const DOMPurify = typeof window !== 'undefined' ? createDOMPurify(window) : null;
+
+/**
+ * Sanitize untrusted template HTML for extraction/preview.
+ * Keeps inline styles and <style> tags (needed for MyOshi templates),
+ * strips scripting & active content.
+ * @param {string} html
+ */
+function sanitizeTemplateHtml(html) {
+    if (!DOMPurify) return html;
+    return DOMPurify.sanitize(html, {
+        WHOLE_DOCUMENT: true,
+        USE_PROFILES: { html: true },
+        ADD_TAGS: ['style'],
+        ADD_ATTR: ['style'],
+        FORBID_TAGS: [
+            'script', 'noscript',
+            'object', 'embed',
+            'base', 'meta', 'link',
+        ],
+    });
+}
+
 function safeStripInjectedCssNoise(css) {
-  // If you already have a real implementation elsewhere, this will use it.
   if (typeof stripInjectedCssNoise === 'function') return stripInjectedCssNoise(css);
   // No-op fallback
   return { css: css || '' };
 }
 
 export function extractBase() {
-  try {
-    const raw = (els.templateInput?.value || '').trim();
-    if (!raw) {
-      setStatus('err', 'Template input is empty.');
-      return;
-    }
+    try {
+        const raw = (els.templateInput?.value || '').trim();
+        if (!raw) {
+            setStatus('err', 'Template input is empty.');
+            return;
+        }
 
-    let srcdoc = maybeExtractSrcdoc(raw);
-    if (srcdoc) {
-      srcdoc = decodeHtmlEntities(srcdoc);
-    } else {
-      srcdoc = raw.includes('&lt;') ? decodeHtmlEntities(raw) : raw;
-    }
+        let srcdoc = maybeExtractSrcdoc(raw);
+        if (srcdoc) {
+            srcdoc = decodeHtmlEntities(srcdoc);
+        } else {
+            srcdoc = raw.includes('&lt;') ? decodeHtmlEntities(raw) : raw;
+        }
 
-    const doc = new DOMParser().parseFromString(srcdoc, 'text/html');
+        // sanitize BEFORE parsing
+        const safeSrcdoc = sanitizeTemplateHtml(srcdoc);
+
+        const doc = new DOMParser().parseFromString(safeSrcdoc, 'text/html');
 
     const backedUp = autoBackupBeforeExtract();
 
