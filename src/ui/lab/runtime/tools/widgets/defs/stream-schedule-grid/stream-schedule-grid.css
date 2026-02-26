@@ -1,0 +1,111 @@
+.labw-schedule{
+    --labw-bg: rgba(255,255,255,.06);
+    --labw-border: rgba(255,255,255,.14);
+    --labw-text: rgba(255,255,255,.92);
+    --labw-muted: rgba(255,255,255,.70);
+    --labw-accent: #8aa9ff;
+    --labw-radius: 14px;
+
+    border: 1px solid var(--labw-border);
+    background: var(--labw-bg);
+    border-radius: var(--labw-radius);
+    padding: 14px;
+    color: var(--labw-text);
+}
+
+.labw-schedule__header{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom: 12px;
+}
+
+.labw-schedule__title{
+    font-weight: 800;
+    letter-spacing: .2px;
+}
+
+.labw-schedule__meta{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+}
+
+.labw-pill{
+    display:inline-flex;
+    align-items:center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--labw-border);
+    background: rgba(0,0,0,.18);
+    font-size: 12px;
+    color: var(--labw-muted);
+}
+
+.labw-link{
+    font-size: 12px;
+    color: var(--labw-accent);
+    text-decoration: none;
+    font-weight: 700;
+}
+.labw-link:hover{ text-decoration: underline; }
+
+.labw-schedule__grid{
+    display:grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+@media (min-width: 900px){
+    .labw-schedule__grid{
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+    }
+}
+
+.labw-day{
+    border: 1px solid var(--labw-border);
+    border-radius: 12px;
+    padding: 10px;
+    background: rgba(0,0,0,.14);
+    min-height: 88px;
+}
+
+.labw-day__name{
+    font-weight: 800;
+    font-size: 12px;
+    opacity: .9;
+    margin-bottom: 8px;
+}
+
+.labw-day__slots{
+    display:flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.labw-slot{
+    display:flex;
+    gap: 8px;
+    align-items: baseline;
+    line-height: 1.2;
+}
+
+.labw-time{
+    font-weight: 800;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: .95;
+}
+
+.labw-what{
+    font-size: 12px;
+    color: var(--labw-muted);
+}
+
+.labw-schedule__footer{
+    margin-top: 10px;
+    opacity: .75;
+}

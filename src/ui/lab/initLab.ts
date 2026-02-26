@@ -223,7 +223,7 @@ export async function initLab(root: HTMLElement | null): Promise<void> {
       </div>
       <!-- Tools / Command Palette -->
 <div class="modal fade" id="toolsModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+  <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header">
         <div class="d-flex flex-column">
@@ -242,11 +242,11 @@ export async function initLab(root: HTMLElement | null): Promise<void> {
         />
 
         <div class="row g-3">
-          <div class="col-12 col-lg-4">
+          <div class="col-12 col-lg-3">
             <div id="toolsList" class="list-group"></div>
           </div>
 
-          <div class="col-12 col-lg-8">
+          <div class="col-12 col-lg-9">
             <div id="toolsPanel" class="border rounded p-3 bg-body-tertiary">
               <div class="text-body-secondary">Select a tool on the left.</div>
             </div>
