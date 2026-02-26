@@ -180,7 +180,7 @@ const x="modulepreload",w=function(e){return"/"+e},v={},C=function(c,n,i){let b=
       </div>
       <!-- Tools / Command Palette -->
 <div class="modal fade" id="toolsModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+  <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header">
         <div class="d-flex flex-column">
@@ -199,11 +199,11 @@ const x="modulepreload",w=function(e){return"/"+e},v={},C=function(c,n,i){let b=
         />
 
         <div class="row g-3">
-          <div class="col-12 col-lg-4">
+          <div class="col-12 col-lg-3">
             <div id="toolsList" class="list-group"></div>
           </div>
 
-          <div class="col-12 col-lg-8">
+          <div class="col-12 col-lg-9">
             <div id="toolsPanel" class="border rounded p-3 bg-body-tertiary">
               <div class="text-body-secondary">Select a tool on the left.</div>
             </div>
@@ -221,7 +221,7 @@ const x="modulepreload",w=function(e){return"/"+e},v={},C=function(c,n,i){let b=
   </div>
 </div>
     </div>
-  `,window.__MYOSHI_LAB_TEMPLATES__=r,await C(()=>import("./oshi-lab.BsVCPC1t.js"),[])}const h=document.getElementById("lab-root");try{S(document.getElementById("lab-root")).catch(e=>{console.error("initLab failed:",e),h&&(h.innerHTML=`
+  `,window.__MYOSHI_LAB_TEMPLATES__=r,await C(()=>import("./oshi-lab.XulKPOc4.js"),[])}const h=document.getElementById("lab-root");try{S(document.getElementById("lab-root")).catch(e=>{console.error("initLab failed:",e),h&&(h.innerHTML=`
           <div class="alert alert-danger m-3" role="alert">
             <strong>Failed to load initLab.</strong><br>
             Check the browser console for details.
