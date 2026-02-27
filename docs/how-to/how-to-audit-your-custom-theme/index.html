@@ -1,0 +1,263 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>How To - Audit Your Custom Theme | MyOshi Theme Lab - by CrimsonStrife</title><link rel="icon" href="/favicon.ico"><link rel="stylesheet" href="/styles/bootstrap.css"><script src="/scripts/bootstrap.bundle.js"></script><link rel="stylesheet" href="/_astro/index.BXTtp3ad.css"></head> <body class="min-vh-100 d-flex flex-column docs"> <a class="visually-hidden-focusable" href="#main">Skip to content</a> <header class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom sticky-top"> <div class="container-fluid"> <a class="navbar-brand fw-semibold d-flex align-items-center gap-2" href="/"> <i class="fa-solid fa-flask " title="Theme Lab" aria-hidden="true"></i> <span>MyOshi Theme Lab</span> </a> <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#siteNav" aria-controls="siteNav" aria-expanded="false" aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button> <div class="collapse navbar-collapse" id="siteNav"> <ul class="navbar-nav me-auto mb-2 mb-lg-0"> <li class="nav-item"> <a class="nav-link " href="/">
+Home
+</a> </li> <li class="nav-item"> <a class="nav-link " href="/lab/">
+Lab
+</a> </li>  <li class="nav-item dropdown"> <a class="nav-link dropdown-toggle active" href="/docs/" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-current="page">
+Docs
+</a> <ul class="dropdown-menu dropdown-menu-dark"> <li><a class="dropdown-item" href="/docs/">Overview</a></li>    <li><hr class="dropdown-divider"></li> <li> <a class="dropdown-item" href="https://github.com/crimsonstrife/oshi-lab/issues" target="_blank" rel="noopener"> <i class="fa-solid fa-bug " title="Issues" aria-hidden="true"></i> <span class="ms-2">Report an issue</span> </a> </li> </ul> </li> </ul>  <form class="d-flex me-lg-2 mb-2 mb-lg-0" role="search" action="/docs/" method="get"> <input class="form-control form-control-sm me-2" type="search" name="q" placeholder="Search docs…" aria-label="Search docs"> <button class="btn btn-sm btn-outline-light" type="submit" aria-label="Search"> <i class="fa-solid fa-magnifying-glass " title="Search" aria-hidden="true"></i> </button> </form> <div class="d-flex gap-2 align-items-center">  <button class="btn btn-sm btn-outline-light" type="button" data-action="toggle-theme" aria-label="Toggle theme" title="Toggle theme"> <i class="fa-solid fa-circle-half-stroke " title="Theme" aria-hidden="true"></i> </button>  <a class="btn btn-sm btn-outline-light" href="https://github.com/crimsonstrife/oshi-lab" target="_blank" rel="noopener" aria-label="Oshi-Lab on GitHub" title="GitHub"> <i class="fa-brands fa-github " title="GitHub" aria-label="GitHub" role="img"></i> </a> </div> </div> </div>  <script>
+        (() => {
+            const key = "oshi_theme";
+            const root = document.documentElement;
+
+            const apply = (t) => {
+                root.setAttribute("data-bs-theme", t);
+            };
+
+            const getPreferred = () => {
+                const saved = localStorage.getItem(key);
+                if (saved === "light" || saved === "dark") return saved;
+                return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+            };
+
+            apply(getPreferred());
+
+            document.addEventListener("click", (e) => {
+                const btn = e.target && e.target.closest && e.target.closest('[data-action="toggle-theme"]');
+                if (!btn) return;
+                const current = root.getAttribute("data-bs-theme") === "dark" ? "dark" : "light";
+                const next = current === "dark" ? "light" : "dark";
+                localStorage.setItem(key, next);
+                apply(next);
+            });
+        })();
+    </script> </header> <div class="alert alert-warning rounded-0 mb-0 py-2" role="note"><div class="container-fluid d-flex align-items-center justify-content-between gap-2"><span><strong>Known Issues:</strong> Click for workarounds and status updates.</span><a class="btn btn-sm btn-dark" href="/known-issues">View details</a></div></div> <main class="flex-grow-1">  <link rel="stylesheet" href="/styles/docs.css"> <div class="container-fluid py-3"> <div class="row g-3"> <aside class="col-12 col-lg-3"> <div class="sticky-top" style="top: 72px;"> <nav class="docs-sidebar"> <div class="docs-sidebar-title">Docs</div> <ul class="docs-nav"> <li class="docs-group"><details><summary>Developers</summary><ul><li class="docs-group"><details><summary>Extending Templates</summary><ul><li><a href="/docs/developers/extending-templates/templates">Templates</a></li></ul></details></li></ul></details></li><li><a href="/docs/getting-started">Getting Started</a></li><li class="docs-group"><details open><summary>How To</summary><ul><li><a href="/docs/how-to/how-to-audit-your-custom-theme" class="active" aria-current="page">How To - Audit Your Custom Theme</a></li><li><a href="/docs/how-to/get-preview">How To - Get Preview HTML</a></li></ul></details></li><li><a href="/docs/theme-lab">Theme Lab</a></li> </ul> </nav> </div> </aside> <section class="col-12 col-lg-7" data-pagefind-body>  <article class="bg-body border rounded p-3"> <h1 class="mb-2">How To - Audit Your Custom Theme</h1> <p class="text-body-secondary">How to use the auditing tools to audit your custom theme.</p> <hr> <p>The <strong>Audit</strong> tool scans your <strong>Custom CSS</strong> and <strong>Custom HTML</strong> for common issues and for rules that match MyOshi’s latest CSS/HTML sanitation behavior. This is currently a ‘best guess’ based on what they publicly announce, so it may not be perfect.
+It then produces a report with <strong>Errors</strong>, <strong>Warnings</strong>, and <strong>Info</strong> items, plus suggested fixes so you can correct problems <em>before</em> saving or sharing your theme.</p>
+<hr/>
+<h2 id="where-to-find-the-audit-tool">Where to find the Audit tool</h2>
+<p>The Audit tool lives <strong>next to the editor tabs</strong> (Custom CSS / Custom HTML), so you don’t need to dig through submenus.</p>
+<p><img src="/images/docs/how-to/audit-theme/audit-tool.png" alt="Audit tool"/></p>
+<hr/>
+<h2 id="run-an-audit">Run an audit</h2>
+<ol>
+<li>Paste or edit your <strong>Custom CSS</strong> and/or <strong>Custom HTML</strong> in their respective tabs.</li>
+<li>Click the <strong>Audit</strong> tab.</li>
+<li>Click <strong>Run Audit</strong>.</li>
+</ol>
+<p>After the scan completes you’ll see:</p>
+<ul>
+<li>A <strong>summary line</strong> (counts of Errors / Warnings / Info)</li>
+<li>A detailed list of issues</li>
+<li>A <strong>badge</strong> on the Audit tab showing how many <strong>Errors</strong> were found</li>
+</ul>
+<p><img src="/images/docs/how-to/audit-theme/audit-summary.png" alt="Audit summary"/></p>
+<hr/>
+<h2 id="optional-run-contrast-checks-slower">Optional: Run contrast checks (slower)</h2>
+<p>If you enable <strong>Contrast checks</strong>, the audit will try to detect low-contrast text by reading the preview’s computed styles.</p>
+<p>This is slower than static checks because it needs a rendered preview.</p>
+<h3 id="important-limitation-preview-sandbox">Important limitation (preview sandbox)</h3>
+<p>If the preview iframe is sandboxed without same-origin access, the app may not be able to read computed styles. In that case, contrast checks may be skipped or show a note.</p>
+<blockquote>
+<p>If you’re unsure whether contrast checks are active, run the audit and look for a message indicating whether contrast analysis was performed.</p>
+</blockquote>
+<hr/>
+<h2 id="understanding-results">Understanding results</h2>
+<p>Each issue is labeled with a severity:</p>
+<ul>
+<li><strong>Error</strong>: Very likely to be blocked, stripped, or broken on MyOshi.</li>
+<li><strong>Warning</strong>: Allowed, but likely to behave differently on MyOshi (capped/converted), or likely to cause theme problems.</li>
+<li><strong>Info</strong>: General suggestions or audit rule notes.</li>
+</ul>
+<p>Each issue may include:</p>
+<ul>
+<li>A <strong>message</strong> explaining what was found</li>
+<li>A <strong>Fix</strong> hint describing how to correct it</li>
+<li>A <strong>Location</strong> (line/column) for CSS issues (when available)</li>
+<li>An <strong>Element path</strong> for HTML / accessibility issues (when available)</li>
+</ul>
+<hr/>
+<h2 id="what-the-audit-checks">What the audit checks</h2>
+<h3 id="css-checks-myoshi-rules">CSS checks (MyOshi rules)</h3>
+<h4 id="1-manual-scoping-prefixes">1) Manual scoping prefixes</h4>
+<p>MyOshi now scopes your selectors automatically, so manually scoping them can cause unexpected results.</p>
+<p><strong>Flagged examples</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="css"><code><span class="line"><span style="color:#B392F0">.profile-page</span><span style="color:#B392F0"> .my-box</span><span style="color:#E1E4E8"> { ... }</span></span>
+<span class="line"><span style="color:#B392F0">.profile-page.profile-custom-css</span><span style="color:#85E89D"> h2</span><span style="color:#E1E4E8"> { ... }</span></span></code></pre>
+<p><strong>Preferred</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="css"><code><span class="line"><span style="color:#B392F0">.my-box</span><span style="color:#E1E4E8"> { ... }</span></span>
+<span class="line"><span style="color:#85E89D">h2</span><span style="color:#E1E4E8"> { ... }</span></span></code></pre>
+<hr/>
+<h4 id="2-position-fixed">2) <code>position: fixed</code></h4>
+<p>MyOshi converts <code>position: fixed</code> to <code>position: absolute</code> for safety.</p>
+<p><strong>Flagged</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="css"><code><span class="line"><span style="color:#B392F0">.my-overlay</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">position</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">fixed</span><span style="color:#E1E4E8">; </span><span style="color:#79B8FF">top</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">; </span><span style="color:#79B8FF">left</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">; }</span></span></code></pre>
+<p><strong>Fix</strong></p>
+<ul>
+<li>Use <code>position: absolute</code> inside a container you control (often with <code>position: relative</code>)</li>
+<li>Or use <code>position: sticky</code> for in-container “sticky” layouts</li>
+</ul>
+<hr/>
+<h4 id="3-z-index-cap">3) <code>z-index</code> cap</h4>
+<p>MyOshi caps <code>z-index</code> to <strong>10000</strong> (and <strong>-10000</strong>).</p>
+<p><strong>Flagged</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="css"><code><span class="line"><span style="color:#B392F0">.my-overlay</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">z-index</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">999999</span><span style="color:#E1E4E8">; }</span></span></code></pre>
+<p><strong>Fix</strong></p>
+<ul>
+<li>Keep <code>z-index</code> within <strong>[-10000, 10000]</strong></li>
+<li>Prefer small, consistent layers (e.g. 10 / 100 / 1000)</li>
+</ul>
+<hr/>
+<h4 id="4-blur-cap">4) <code>blur()</code> cap</h4>
+<p>MyOshi caps <code>filter: blur()</code> and <code>backdrop-filter: blur()</code> at <strong>50px</strong>.</p>
+<p><strong>Flagged</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="css"><code><span class="line"><span style="color:#B392F0">.bg</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">filter</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">blur</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">200</span><span style="color:#F97583">px</span><span style="color:#E1E4E8">); }</span></span></code></pre>
+<p><strong>Fix</strong></p>
+<ul>
+<li>Use values <strong>≤ 50px</strong></li>
+<li>If you need a “softer” look, consider gradients or layered translucent backgrounds</li>
+</ul>
+<hr/>
+<h4 id="5-url-protocol-allowlist">5) <code>url()</code> protocol allowlist</h4>
+<p>MyOshi only allows:</p>
+<ul>
+<li><code>https:</code></li>
+<li><code>data:</code></li>
+</ul>
+<p><strong>Flagged</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="css"><code><span class="line"><span style="color:#B392F0">.bg</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">background-image</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">url</span><span style="color:#E1E4E8">(</span><span style="color:#FFAB70">http://example.com/bg.png</span><span style="color:#E1E4E8">); }</span></span></code></pre>
+<p><strong>Fix</strong></p>
+<ul>
+<li>Host assets over <code>https://</code></li>
+<li>Or embed small assets via <code>data:</code> URIs</li>
+</ul>
+<hr/>
+<h4 id="6-import-restrictions-fonts-only">6) <code>@import</code> restrictions (fonts only)</h4>
+<p><code>@import</code> is only allowed from whitelisted font hosts:</p>
+<ul>
+<li><code>fonts.googleapis.com</code></li>
+<li><code>fonts.gstatic.com</code></li>
+<li><code>fonts.bunny.net</code></li>
+<li><code>use.typekit.net</code></li>
+<li><code>cdnjs.cloudflare.com</code></li>
+</ul>
+<p><strong>Flagged</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="css"><code><span class="line"><span style="color:#F97583">@import</span><span style="color:#79B8FF"> url</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;https://example.com/styles.css&quot;</span><span style="color:#E1E4E8">);</span></span></code></pre>
+<p><strong>Fix</strong></p>
+<ul>
+<li>Import fonts only from allowed hosts</li>
+<li>Paste non-font CSS directly into Custom CSS (up to 50,000 characters)</li>
+</ul>
+<hr/>
+<h4 id="7-protected-elements">7) Protected elements</h4>
+<p>Selectors that target MyOshi navigation/header/footer/etc. are stripped, including when nested in <code>:is()</code>, <code>:where()</code>, and <code>:not()</code>.</p>
+<p><strong>Flagged</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="css"><code><span class="line"><span style="color:#B392F0">.header</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">display</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">none</span><span style="color:#E1E4E8">; }</span></span>
+<span class="line"><span style="color:#B392F0">.site-footer</span><span style="color:#E1E4E8"> { </span><span style="color:#79B8FF">opacity</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">; }</span></span></code></pre>
+<p><strong>Fix</strong></p>
+<ul>
+<li>Don’t target global site elements</li>
+<li>Only style within your profile container</li>
+</ul>
+<hr/>
+<h4 id="8-unsafe-patterns">8) Unsafe patterns</h4>
+<p>The audit flags known unsafe patterns like:</p>
+<ul>
+<li><code>expression()</code></li>
+<li><code>javascript:</code> usage</li>
+</ul>
+<p>These will be blocked or stripped.</p>
+<hr/>
+<h3 id="html-checks-quality--accessibility">HTML checks (quality + accessibility)</h3>
+<h4 id="1-size-limits">1) Size limits</h4>
+<p>MyOshi enforces:</p>
+<ul>
+<li><strong>Custom CSS</strong>: 50,000 characters</li>
+<li><strong>Custom HTML</strong>: 50,000 characters</li>
+</ul>
+<p>If you exceed limits, the audit marks this as an <strong>Error</strong>.</p>
+<hr/>
+<h4 id="2-missing-alt-text-for-images">2) Missing <code>alt</code> text for images</h4>
+<p>Images without <code>alt</code> are flagged.</p>
+<p><strong>Fix</strong></p>
+<ul>
+<li>Add descriptive <code>alt=&quot;...&quot;</code> for meaningful images</li>
+<li>Use <code>alt=&quot;&quot;</code> for decorative images</li>
+</ul>
+<hr/>
+<h4 id="3-missing-accessible-names-for-controls">3) Missing accessible names for controls</h4>
+<p>Buttons/links/inputs should have a readable label:</p>
+<ul>
+<li>Visible text, or</li>
+<li><code>aria-label</code>, or</li>
+<li><code>aria-labelledby</code>, or</li>
+<li><code>&lt;label for=&quot;...&quot;&gt;</code> (inputs)</li>
+</ul>
+<p>Icon-only controls without labels are flagged.</p>
+<hr/>
+<h4 id="4-scripts-and-inline-event-handlers">4) Scripts and inline event handlers</h4>
+<p>The audit flags:</p>
+<ul>
+<li><code>&lt;script&gt;</code> tags</li>
+<li><code>onclick=...</code> and other <code>on*</code> handlers</li>
+</ul>
+<p>These are commonly removed by platform sanitizers and are generally unsafe.</p>
+<hr/>
+<h4 id="5-duplicate-ids">5) Duplicate IDs</h4>
+<p>Repeated <code>id=&quot;...&quot;</code> values can break CSS targeting and accessibility.</p>
+<p><strong>Fix</strong></p>
+<ul>
+<li>IDs must be unique</li>
+<li>Use classes for repeated patterns</li>
+</ul>
+<hr/>
+<h2 id="copy-the-report-for-sharing-or-support">Copy the report (for sharing or support)</h2>
+<p>Use <strong>Copy JSON</strong> to copy the entire report (including metadata) to your clipboard. This is useful when:</p>
+<ul>
+<li>Asking for help in Discord</li>
+<li>Posting a bug report</li>
+<li>Keeping a changelog of fixes</li>
+</ul>
+<p><img src="/images/docs/how-to/audit-theme/copy-json.png" alt="Copy JSON"/></p>
+<hr/>
+<h2 id="common-fixes-after-myoshis-css-rewrite">Common fixes after MyOshi’s CSS rewrite</h2>
+<h3 id="my-theme-broke-after-the-update">“My theme broke after the update”</h3>
+<p>Most often caused by:</p>
+<ul>
+<li>Manual scoping prefixes (<code>.profile-page</code>, <code>.profile-custom-css</code>)</li>
+<li>Reliance on <code>position: fixed</code></li>
+<li>Extremely large <code>z-index</code> values</li>
+</ul>
+<h3 id="my-font-stopped-loading">“My font stopped loading”</h3>
+<p>Most often caused by:</p>
+<ul>
+<li><code>@import</code> from a non-whitelisted host</li>
+<li>Self-hosted font URLs (blocked)</li>
+</ul>
+<h3 id="my-backgroundimage-doesnt-show">“My background/image doesn’t show”</h3>
+<p>Most often caused by:</p>
+<ul>
+<li><code>url()</code> with non-https protocol</li>
+<li>Invalid/blocked URL</li>
+</ul>
+<hr/>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="i-ran-audit-but-nothing-appears">I ran Audit, but nothing appears</h3>
+<ul>
+<li>Make sure you are on the <strong>Audit</strong> tab and clicked <strong>Run Audit</strong></li>
+<li>If you have no issues, you may see only a summary with 0 items</li>
+</ul>
+<h3 id="contrast-checks-dont-report-anything">Contrast checks don’t report anything</h3>
+<ul>
+<li>Contrast checks require access to computed styles in the preview</li>
+<li>If the preview is sandboxed without same-origin access, contrast analysis may be skipped</li>
+</ul>
+<hr/>
+<h2 id="best-practices">Best practices</h2>
+<ul>
+<li>Run <strong>Audit</strong> before saving major updates</li>
+<li>Fix <strong>Errors first</strong>, then <strong>Warnings</strong></li>
+<li>Keep z-index and blur values within recommended ranges to match live behavior</li>
+<li>Add <code>alt</code> text and accessible labels so themes are usable for everyone</li>
+</ul> </article>   </section> <aside class="col-12 col-lg-2"> <div> <div class="sticky-top" style="top: 72px;"> <div class="border rounded p-3 bg-body"> <div class="fw-semibold mb-2">On this page</div> <ul class="list-unstyled mb-0 small"> <li style="margin-left:0px"> <a href="#where-to-find-the-audit-tool">Where to find the Audit tool</a> </li><li style="margin-left:0px"> <a href="#run-an-audit">Run an audit</a> </li><li style="margin-left:0px"> <a href="#optional-run-contrast-checks-slower">Optional: Run contrast checks (slower)</a> </li><li style="margin-left:12px"> <a href="#important-limitation-preview-sandbox">Important limitation (preview sandbox)</a> </li><li style="margin-left:0px"> <a href="#understanding-results">Understanding results</a> </li><li style="margin-left:0px"> <a href="#what-the-audit-checks">What the audit checks</a> </li><li style="margin-left:12px"> <a href="#css-checks-myoshi-rules">CSS checks (MyOshi rules)</a> </li><li style="margin-left:12px"> <a href="#html-checks-quality--accessibility">HTML checks (quality + accessibility)</a> </li><li style="margin-left:0px"> <a href="#copy-the-report-for-sharing-or-support">Copy the report (for sharing or support)</a> </li><li style="margin-left:0px"> <a href="#common-fixes-after-myoshis-css-rewrite">Common fixes after MyOshi’s CSS rewrite</a> </li><li style="margin-left:12px"> <a href="#my-theme-broke-after-the-update">“My theme broke after the update”</a> </li><li style="margin-left:12px"> <a href="#my-font-stopped-loading">“My font stopped loading”</a> </li><li style="margin-left:12px"> <a href="#my-backgroundimage-doesnt-show">“My background/image doesn’t show”</a> </li><li style="margin-left:0px"> <a href="#troubleshooting">Troubleshooting</a> </li><li style="margin-left:12px"> <a href="#i-ran-audit-but-nothing-appears">I ran Audit, but nothing appears</a> </li><li style="margin-left:12px"> <a href="#contrast-checks-dont-report-anything">Contrast checks don’t report anything</a> </li><li style="margin-left:0px"> <a href="#best-practices">Best practices</a> </li> </ul> </div> </div> </div> </aside> </div> </div>  </main> <footer class="border-top bg-body mt-auto"> <div class="container-fluid py-4"> <div class="row g-4 align-items-start"> <div class="col-12 col-lg-5"> <div class="fw-semibold d-flex align-items-center gap-2"> <i class="fa-solid fa-flask " title="Theme Lab" aria-hidden="true"></i> <span>MyOshi Theme Lab</span> </div> <p class="text-body-secondary small mt-2 mb-3">
+Build, preview, and share clean MyOshi profile themes with reusable UI patterns.
+</p> <div class="d-flex flex-wrap gap-2"> <a class="btn btn-sm btn-outline-secondary" href="https://github.com/crimsonstrife/oshi-lab" target="_blank" rel="noopener"> <i class="fa-brands fa-github " title="GitHub" aria-hidden="true"></i> <span class="ms-2">Repo</span> </a> <a class="btn btn-sm btn-outline-secondary" href="https://github.com/crimsonstrife/oshi-lab/issues" target="_blank" rel="noopener"> <i class="fa-solid fa-bug " title="Issues" aria-hidden="true"></i> <span class="ms-2">Issues</span> </a> <a class="btn btn-sm btn-outline-secondary" href="https://github.com/crimsonstrife/oshi-lab/discussions" target="_blank" rel="noopener"> <i class="fa-solid fa-comments " title="Discussions" aria-hidden="true"></i> <span class="ms-2">Discussions</span> </a> </div> </div> <div class="col-6 col-lg-2"> <div class="text-uppercase small fw-semibold mb-2">Site</div> <ul class="list-unstyled small mb-0 d-grid gap-1"> <li><a class="link-secondary" href="/lab/">Lab</a></li> <li><a class="link-secondary" href="/docs/">Docs</a></li> <li><a class="link-secondary" href="/">Home</a></li> </ul> </div> <div class="col-6 col-lg-2"> <div class="text-uppercase small fw-semibold mb-2">Resources</div> <ul class="list-unstyled small mb-0 d-grid gap-1"> <li><a class="link-secondary" href="https://github.com/crimsonstrife/oshi-lab/releases" target="_blank" rel="noopener">Releases</a></li> <li><a class="link-secondary" href="https://github.com/crimsonstrife/oshi-lab/blob/production/README.md" target="_blank" rel="noopener">README</a></li> <li><a class="link-secondary" href="https://github.com/crimsonstrife/oshi-lab/blob/production/LICENSE" target="_blank" rel="noopener">License</a></li> </ul> </div> <div class="col-12 col-lg-3"> <div class="text-uppercase small fw-semibold mb-2">Creator</div> <div class="small text-body-secondary">
+Made with <i class="fa-solid fa-heart " title="Love" aria-hidden="true"></i> by  <a class="link-secondary" href="https://crimsonstrife.live" target="_blank" rel="noopener">CrimsonStrife</a> <span class="ms-2">• v0.5.7</span> </div> <div class="d-flex gap-3 mt-2"> <a class="link-secondary" href="https://discord.gg/TcTMauzNgR" target="_blank" rel="noopener" aria-label="Discord"> <i class="fa-brands fa-discord " title="Discord" aria-label="Discord" role="img"></i> </a> <a class="link-secondary" href="https://x.com/imcrimsonstrife" target="_blank" rel="noopener" aria-label="X/Twitter"> <i class="fa-brands fa-x-twitter " title="X/Twitter" aria-label="X/Twitter" role="img"></i> </a> <a class="link-secondary" href="https://github.com/crimsonstrife/oshi-lab" target="_blank" rel="noopener" aria-label="GitHub"> <i class="fa-brands fa-github " title="GitHub" aria-label="GitHub" role="img"></i> </a> <a class="link-secondary" href="https://crimsonstrife.live" target="_blank" rel="noopener" aria-label="Website"> <i class="fa-solid fa-link " title="Website" aria-label="Author's Website" role="img"></i> </a> <a class="link-secondary" href="#top" aria-label="Back to top" title="Back to top"> <i class="fa-solid fa-arrow-up " title="Back to top" aria-hidden="true"></i> </a> </div> </div> </div> <hr class="my-4"> <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center"> <div class="text-body-secondary small">© 2026 Oshi Theme Lab</div> <div class="small d-flex gap-3"> <a class="link-secondary" href="/privacy/">Privacy</a> <a class="link-secondary" href="/terms/">Terms</a> </div> </div> </div> </footer> <div> <button type="button" class="btn btn-primary rounded-circle shadow help-fab" data-bs-toggle="offcanvas" data-bs-target="#helpDrawer" aria-controls="helpDrawer" aria-label="Help" title="Help"> <i class="fa-solid fa-question " title="Help" aria-hidden="true"></i> </button> <div class="offcanvas offcanvas-end" tabindex="-1" id="helpDrawer" aria-labelledby="helpDrawerLabel"> <div class="offcanvas-header"> <h5 class="offcanvas-title" id="helpDrawerLabel">Help</h5> <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button> </div> <div class="offcanvas-body">  <div class="mb-3"> <div class="fw-semibold mb-2">Quick links</div> <div class="list-group"> <a class="list-group-item list-group-item-action" href="/lab/">Open the Lab</a> <a class="list-group-item list-group-item-action" href="/docs/getting-started/">Getting Started</a> <a class="list-group-item list-group-item-action" href="/docs/">All Docs</a> </div> </div> <div> <div class="fw-semibold mb-2">Shortcuts</div> <ul class="small text-body-secondary mb-0"> <li><kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>K</kbd>: Tools palette (Lab)</li> </ul> </div>  </div> </div> </div> </body></html>

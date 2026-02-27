@@ -1,9 +1,9 @@
-const x="modulepreload",w=function(e){return"/"+e},v={},C=function(c,n,i){let b=Promise.resolve();if(n&&n.length>0){let l=function(t){return Promise.all(t.map(o=>Promise.resolve(o).then(d=>({status:"fulfilled",value:d}),d=>({status:"rejected",reason:d}))))};document.getElementsByTagName("link");const s=document.querySelector("meta[property=csp-nonce]"),u=s?.nonce||s?.getAttribute("nonce");b=l(n.map(t=>{if(t=w(t),t in v)return;v[t]=!0;const o=t.endsWith(".css"),d=o?'[rel="stylesheet"]':"";if(document.querySelector(`link[href="${t}"]${d}`))return;const a=document.createElement("link");if(a.rel=o?"stylesheet":x,o||(a.as="script"),a.crossOrigin="",a.href=t,u&&a.setAttribute("nonce",u),document.head.appendChild(a),o)return new Promise((y,g)=>{a.addEventListener("load",y),a.addEventListener("error",()=>g(new Error(`Unable to preload CSS for ${t}`)))})}))}function p(l){const s=new Event("vite:preloadError",{cancelable:!0});if(s.payload=l,window.dispatchEvent(s),!s.defaultPrevented)throw l}return b.then(l=>{for(const s of l||[])s.status==="rejected"&&p(s.reason);return c().catch(p)})};const k=[{id:"myoshi-classic",name:"MyOshi Classic",description:"Classic MyOshi profile as accurate as possible.",baseCssFile:"templates/myoshi-classic/base.css",baseBodyFile:"templates/myoshi-classic/base.html",mockDefaults:{displayName:"Username",username:"@username",tagline:"I'm a tagline!",avatar:"https://placehold.co/128x128/png",background:"https://placehold.co/1600x900/png"}},{id:"myoshi-core",name:"MyOshi Core (approx)",description:"A close-enough approximation of MyOshi profile structure (cards, groups, custom HTML mount).",baseCssFile:"templates/myoshi-core/base.css",baseBodyFile:"templates/myoshi-core/base.html",mockDefaults:{displayName:"CrimsonStrife",username:"@crimsonstrife",tagline:"",avatar:"https://placehold.co/128x128/png",background:"https://placehold.co/1600x900/png"}},{id:"minimal",name:"Minimal Mount Only",description:"Bare minimum markup with .profile-page + .profile-custom-html mount for quick experiments.",baseCssFile:"templates/minimal/base.css",baseBodyFile:"templates/minimal/base.html",mockDefaults:{displayName:"Demo User",username:"@demo",tagline:"",avatar:"",background:""}}],m={version:3,templates:k},f=m??{},r=Array.isArray(f.templates)?f.templates:Array.isArray(m)?m:[];async function S(e){if(!e)return;if(!r.length){e.innerHTML=`
+const x="modulepreload",w=function(t){return"/"+t},v={},k=function(r,i,n){let b=Promise.resolve();if(i&&i.length>0){let l=function(e){return Promise.all(e.map(o=>Promise.resolve(o).then(d=>({status:"fulfilled",value:d}),d=>({status:"rejected",reason:d}))))};document.getElementsByTagName("link");const s=document.querySelector("meta[property=csp-nonce]"),u=s?.nonce||s?.getAttribute("nonce");b=l(i.map(e=>{if(e=w(e),e in v)return;v[e]=!0;const o=e.endsWith(".css"),d=o?'[rel="stylesheet"]':"";if(document.querySelector(`link[href="${e}"]${d}`))return;const a=document.createElement("link");if(a.rel=o?"stylesheet":x,o||(a.as="script"),a.crossOrigin="",a.href=e,u&&a.setAttribute("nonce",u),document.head.appendChild(a),o)return new Promise((g,y)=>{a.addEventListener("load",g),a.addEventListener("error",()=>y(new Error(`Unable to preload CSS for ${e}`)))})}))}function p(l){const s=new Event("vite:preloadError",{cancelable:!0});if(s.payload=l,window.dispatchEvent(s),!s.defaultPrevented)throw l}return b.then(l=>{for(const s of l||[])s.status==="rejected"&&p(s.reason);return r().catch(p)})};const C=[{id:"myoshi-classic",name:"MyOshi Classic",description:"Classic MyOshi profile as accurate as possible.",baseCssFile:"templates/myoshi-classic/base.css",baseBodyFile:"templates/myoshi-classic/base.html",mockDefaults:{displayName:"Username",username:"@username",tagline:"I'm a tagline!",avatar:"https://placehold.co/128x128/png",background:"https://placehold.co/1600x900/png"}},{id:"myoshi-core",name:"MyOshi Core (approx)",description:"A close-enough approximation of MyOshi profile structure (cards, groups, custom HTML mount).",baseCssFile:"templates/myoshi-core/base.css",baseBodyFile:"templates/myoshi-core/base.html",mockDefaults:{displayName:"CrimsonStrife",username:"@crimsonstrife",tagline:"",avatar:"https://placehold.co/128x128/png",background:"https://placehold.co/1600x900/png"}},{id:"minimal",name:"Minimal Mount Only",description:"Bare minimum markup with .profile-page + .profile-custom-html mount for quick experiments.",baseCssFile:"templates/minimal/base.css",baseBodyFile:"templates/minimal/base.html",mockDefaults:{displayName:"Demo User",username:"@demo",tagline:"",avatar:"",background:""}}],m={version:3,templates:C},h=m??{},c=Array.isArray(h.templates)?h.templates:Array.isArray(m)?m:[];async function S(t){if(!t)return;if(!c.length){t.innerHTML=`
       <div class="alert alert-danger m-3">
         <strong>No templates found.</strong><br>
         Check <code>templates.json</code> format.
       </div>
-    `;return}const c=r.map(i=>`<option value="${encodeURIComponent(i.id)}">${i.name}${i.description?` — ${i.description}`:""}</option>`).join(""),n=r[0]?.description??"Built-in template";e.innerHTML=`
+    `;return}const r=c.map(n=>`<option value="${encodeURIComponent(n.id)}">${n.name}${n.description?` — ${n.description}`:""}</option>`).join(""),i=c[0]?.description??"Built-in template";t.innerHTML=`
     <div id="myoshi-theme-lab" class="myoshi-lab-host" data-bs-theme="dark">
       <div class="app">
         <header class="lab-header d-flex flex-wrap align-items-start align-items-md-center justify-content-between gap-2">
@@ -35,6 +35,9 @@ const x="modulepreload",w=function(e){return"/"+e},v={},C=function(c,n,i){let b=
                     <button type="button" class="tab nav-link active" data-tab="template">Template</button>
                     <button type="button" class="tab nav-link" data-tab="customCss">Custom CSS</button>
                     <button type="button" class="tab nav-link" data-tab="customHtml">Custom HTML</button>
+                    <button type="button" class="tab nav-link" data-tab="audit">
+                      Audit <span id="auditBadge" class="badge text-bg-danger ms-1 d-none">!</span>
+                    </button>
                     <button type="button" class="tab nav-link" data-tab="basePeek">Base Peek</button>
                   </div>
                 </div>
@@ -57,19 +60,29 @@ const x="modulepreload",w=function(e){return"/"+e},v={},C=function(c,n,i){let b=
               </div>
 
               <div class="editor-wrap" id="wrap-customCss">
-                <textarea id="customCss" class="form-control rounded-0 border-0" spellcheck="false" placeholder="Your Custom CSS (paste into MyOshi Custom CSS)"></textarea>
+                <div id="cssEditor" class="code-editor"></div>
+                <textarea id="customCss" class="form-control rounded-0 border-0" spellcheck="false" placeholder="Your Custom CSS (paste into MyOshi Custom CSS)" hidden></textarea>
                 <div class="meta">
                   <div class="row"><span class="pill"><b>Custom CSS</b> appended after base CSS</span></div>
-                  <div class="row d-flex flex-wrap gap-2">
-                    <button class="btn btn-sm btn-outline-light secondary" id="btnFormatCss" type="button">Quick format</button>
+                  <div class="row d-flex flex-wrap gap-2 align-items-center">
+                    <button class="btn btn-sm btn-outline-light secondary" id="btnFormatCss" type="button">Format</button>
+                    <div class="form-check form-switch m-0">
+                      <input class="form-check-input" type="checkbox" role="switch" id="cssLintToggle" checked>
+                      <label class="form-check-label small" for="cssLintToggle">Lint</label>
+                    </div>
+                    <span class="badge text-bg-dark border" id="cssCharCount">0 / 50000</span>
+                    <div class="form-check form-switch m-0">
+                      <input class="form-check-input" type="checkbox" role="switch" id="cssHardCap" checked>
+                      <label class="form-check-label small" for="cssHardCap">Cap</label>
+                    </div>
                     <button class="btn btn-sm btn-outline-light secondary" id="btnCopyCSS" type="button">Copy CSS</button>
                     <span class="badge text-bg-dark border">Base available in Base Peek</span>
                   </div>
-                </div>
-              </div>
+                </div></div>
 
               <div class="editor-wrap" id="wrap-customHtml">
-                <textarea id="customHtml" class="form-control rounded-0 border-0" spellcheck="false" placeholder="Your Custom HTML (injected into .profile-custom-html)"></textarea>
+                <div id="htmlEditor" class="code-editor"></div>
+                <textarea id="customHtml" class="form-control rounded-0 border-0" spellcheck="false" placeholder="Your Custom HTML (injected into .profile-custom-html)" hidden></textarea>
                 <div class="meta">
                   <div class="row"><span class="pill"><b>Custom HTML</b> injected into .profile-custom-html</span></div>
                   <div class="row d-flex flex-wrap gap-3 align-items-center">
@@ -77,7 +90,45 @@ const x="modulepreload",w=function(e){return"/"+e},v={},C=function(c,n,i){let b=
                       <input class="form-check-input m-0" type="checkbox" id="appendInstead">
                       <label for="appendInstead" class="m-0">Append to end</label>
                     </div>
+                    <button class="btn btn-sm btn-outline-light secondary" id="btnFormatHtml" type="button">Format</button>
+                    <div class="form-check form-switch m-0">
+                      <input class="form-check-input" type="checkbox" role="switch" id="htmlLintToggle" checked>
+                      <label class="form-check-label small" for="htmlLintToggle">Lint</label>
+                    </div>
+                    <span class="badge text-bg-dark border" id="htmlCharCount">0 / 50000</span>
+                    <div class="form-check form-switch m-0">
+                      <input class="form-check-input" type="checkbox" role="switch" id="htmlHardCap" checked>
+                      <label class="form-check-label small" for="htmlHardCap">Cap</label>
+                    </div>
                     <button class="btn btn-sm btn-outline-light secondary" id="btnCopyHTML" type="button">Copy HTML</button>
+                  </div>
+                </div></div>
+
+              <div class="editor-wrap" id="wrap-audit">
+                <div class="p-3 d-flex flex-column gap-3 min-h-0" style="height:100%">
+                  <div class="d-flex flex-wrap align-items-start justify-content-between gap-2">
+                    <div class="min-w-0">
+                      <div class="fw-semibold">Audit Report</div>
+                      <div class="text-muted small">Checks Custom CSS/HTML against common issues and the latest MyOshi sanitizer/scoping rules.</div>
+                    </div>
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                      <div class="form-check form-switch m-0">
+                        <input class="form-check-input" type="checkbox" role="switch" id="auditContrastToggle">
+                        <label class="form-check-label small" for="auditContrastToggle">Contrast</label>
+                      </div>
+                      <button class="btn btn-sm btn-outline-info secondary" id="btnRunAudit" type="button">Run Audit</button>
+                      <button class="btn btn-sm btn-outline-light secondary" id="btnCopyAuditJson" type="button">Copy JSON</button>
+                    </div>
+                  </div>
+
+                  <div id="auditSummary" class="d-flex flex-wrap gap-2"></div>
+
+                  <div class="border rounded bg-body-tertiary p-2 flex-grow-1 min-h-0 max-h-800" style="overflow:scroll;max-height: 800px;height: 100%;">
+                    <div id="auditOutput" class="list-group"></div>
+                  </div>
+
+                  <div class="text-muted small">
+                    Note: some checks reflect how MyOshi transforms your CSS at display time (e.g. <code>position: fixed</code> → <code>absolute</code>, caps on <code>z-index</code> and <code>blur()</code>, <code>@import</code> allowlist).
                   </div>
                 </div>
               </div>
@@ -110,10 +161,10 @@ const x="modulepreload",w=function(e){return"/"+e},v={},C=function(c,n,i){let b=
                   <label class="d-flex align-items-center gap-2 m-0 template-select-wrap">
                     <span class="text-muted small">Template</span>
                     <select id="templateSelect" class="form-select form-select-sm">
-                      ${c}
+                      ${r}
                     </select>
                   </label>
-                  <div id="templateInfo" class="small text-muted flex-grow-1">${n}</div>
+                  <div id="templateInfo" class="small text-muted flex-grow-1">${i}</div>
                 </div>
               </div>
 
@@ -221,8 +272,8 @@ const x="modulepreload",w=function(e){return"/"+e},v={},C=function(c,n,i){let b=
   </div>
 </div>
     </div>
-  `,window.__MYOSHI_LAB_TEMPLATES__=r,await C(()=>import("./oshi-lab.DJoAgilD.js"),[])}const h=document.getElementById("lab-root");try{S(document.getElementById("lab-root")).catch(e=>{console.error("initLab failed:",e),h&&(h.innerHTML=`
+  `,window.__MYOSHI_LAB_TEMPLATES__=c,await k(()=>import("./oshi-lab.D7NwaQhN.js"),[])}const f=document.getElementById("lab-root");try{S(document.getElementById("lab-root")).catch(t=>{console.error("initLab failed:",t),f&&(f.innerHTML=`
           <div class="alert alert-danger m-3" role="alert">
             <strong>Failed to load initLab.</strong><br>
             Check the browser console for details.
-          </div>`)})}catch(e){console.error("initLab failed:",e)}
+          </div>`)})}catch(t){console.error("initLab failed:",t)}
