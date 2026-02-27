@@ -169,19 +169,24 @@ export async function initLab(root: HTMLElement | null): Promise<void> {
               </div>
 
               <div class="editor-wrap" id="wrap-customCss">
-                <textarea id="customCss" class="form-control rounded-0 border-0" spellcheck="false" placeholder="Your Custom CSS (paste into MyOshi Custom CSS)"></textarea>
+                <div id="cssEditor" class="code-editor"></div>
+                <textarea id="customCss" class="form-control rounded-0 border-0" spellcheck="false" placeholder="Your Custom CSS (paste into MyOshi Custom CSS)" hidden></textarea>
                 <div class="meta">
                   <div class="row"><span class="pill"><b>Custom CSS</b> appended after base CSS</span></div>
-                  <div class="row d-flex flex-wrap gap-2">
-                    <button class="btn btn-sm btn-outline-light secondary" id="btnFormatCss" type="button">Quick format</button>
+                  <div class="row d-flex flex-wrap gap-2 align-items-center">
+                    <button class="btn btn-sm btn-outline-light secondary" id="btnFormatCss" type="button">Format</button>
+                    <div class="form-check form-switch m-0">
+                      <input class="form-check-input" type="checkbox" role="switch" id="cssLintToggle" checked>
+                      <label class="form-check-label small" for="cssLintToggle">Lint</label>
+                    </div>
                     <button class="btn btn-sm btn-outline-light secondary" id="btnCopyCSS" type="button">Copy CSS</button>
                     <span class="badge text-bg-dark border">Base available in Base Peek</span>
                   </div>
-                </div>
-              </div>
+                </div></div>
 
               <div class="editor-wrap" id="wrap-customHtml">
-                <textarea id="customHtml" class="form-control rounded-0 border-0" spellcheck="false" placeholder="Your Custom HTML (injected into .profile-custom-html)"></textarea>
+                <div id="htmlEditor" class="code-editor"></div>
+                <textarea id="customHtml" class="form-control rounded-0 border-0" spellcheck="false" placeholder="Your Custom HTML (injected into .profile-custom-html)" hidden></textarea>
                 <div class="meta">
                   <div class="row"><span class="pill"><b>Custom HTML</b> injected into .profile-custom-html</span></div>
                   <div class="row d-flex flex-wrap gap-3 align-items-center">
@@ -189,10 +194,14 @@ export async function initLab(root: HTMLElement | null): Promise<void> {
                       <input class="form-check-input m-0" type="checkbox" id="appendInstead">
                       <label for="appendInstead" class="m-0">Append to end</label>
                     </div>
+                    <button class="btn btn-sm btn-outline-light secondary" id="btnFormatHtml" type="button">Format</button>
+                    <div class="form-check form-switch m-0">
+                      <input class="form-check-input" type="checkbox" role="switch" id="htmlLintToggle" checked>
+                      <label class="form-check-label small" for="htmlLintToggle">Lint</label>
+                    </div>
                     <button class="btn btn-sm btn-outline-light secondary" id="btnCopyHTML" type="button">Copy HTML</button>
                   </div>
-                </div>
-              </div>
+                </div></div>
 
               <div class="editor-wrap" id="wrap-basePeek">
                 <textarea id="basePeek" class="form-control rounded-0 border-0" spellcheck="false" readonly placeholder="After Extract Base, preview extracted CSS/body here."></textarea>

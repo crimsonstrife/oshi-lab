@@ -16,6 +16,8 @@ import { loadTemplateById } from './templates/index.js';
 import { copyToClipboard } from './utils/clipboard.js';
 import { downloadFile } from './utils/download.js';
 import { quickFormatCss } from './utils/format.js';
+import { formatCss, formatHtml } from './scripts/format/prettier.js';
+import { syncEditorsFromTextareas } from './scripts/editors/index.js';
 
 import { saveSnapshot, deleteSelectedSnapshot, loadSnapshotById } from './snapshots/index.js';
 
@@ -52,6 +54,8 @@ export function bindUI() {
     if (els.customCss) els.customCss.value = '';
     if (els.customHtml) els.customHtml.value = '';
     if (els.appendInstead) els.appendInstead.checked = false;
+    // keep CodeMirror in sync if mounted
+    syncEditorsFromTextareas();
     setStatus('ok', 'Custom CSS/HTML reset.');
     if (els.autoUpdate?.checked) renderPreview();
   });
@@ -109,9 +113,34 @@ export function bindUI() {
     setStatus('ok', `Downloaded: ${filename}`);
   });
 
-  on('btnFormatCss', 'click', () => {
-    if (els.customCss) els.customCss.value = quickFormatCss(els.customCss.value || '');
-    if (els.autoUpdate?.checked) renderPreview();
+  on('btnFormatCss', 'click', async () => {
+    if (!els.customCss) return;
+    try {
+      els.customCss.value = await formatCss(els.customCss.value || '');
+      syncEditorsFromTextareas();
+      if (els.autoUpdate?.checked) renderPreview();
+      setStatus('ok', 'Formatted CSS.');
+    } catch (e) {
+      // fallback to simple formatter
+      console.error(e);
+      els.customCss.value = quickFormatCss(els.customCss.value || '');
+      syncEditorsFromTextareas();
+      if (els.autoUpdate?.checked) renderPreview();
+      setStatus('warn', 'CSS format failed; applied quick format.');
+    }
+  });
+
+  on('btnFormatHtml', 'click', async () => {
+    if (!els.customHtml) return;
+    try {
+      els.customHtml.value = await formatHtml(els.customHtml.value || '');
+      syncEditorsFromTextareas();
+      if (els.autoUpdate?.checked) renderPreview();
+      setStatus('ok', 'Formatted HTML.');
+    } catch (e) {
+      console.error(e);
+      setStatus('warn', 'HTML format failed.');
+    }
   });
 
   on('btnCopyBaseCss', 'click', async () => {

@@ -6,6 +6,7 @@ import { loadTemplatesIndex } from './templates/index.js';
 import { loadSnapshots } from './snapshots/index.js';
 import { initTools } from './tools/index.js';
 import { bindUI } from './bindings.js';
+import { initEditors } from './scripts/editors/index.js';
 
 /**
  * Initializes the lab runtime system.
@@ -17,6 +18,9 @@ import { bindUI } from './bindings.js';
  */
 export async function initLabRuntime() {
   refreshEls();
+
+  // Mount CodeMirror editors (keeps textareas as the data bus).
+  initEditors();
 
   // UI first so early user interactions are handled.
   bindUI();

@@ -9,6 +9,7 @@ import { splitCssFromPreview, splitBodyFromPreview } from './split.js';
 import { autoBackupBeforeExtract } from '../snapshots/index.js';
 import { renderPreview } from '../preview/render.js';
 import { loadTemplateById } from '../templates/index.js';
+import { syncEditorsFromTextareas } from '../scripts/editors/index.js';
 
 /**
  * A variable that holds the instance of DOMPurify for client-side use.
@@ -384,6 +385,9 @@ export function extractBase() {
 
         if (els.customHtml && userHtml.trim()) els.customHtml.value = userHtml.trim();
         if (els.basePeek) els.basePeek.value = summarizeBase(state.baseCss, state.baseBody);
+
+        // keep CodeMirror in sync if mounted
+        syncEditorsFromTextareas();
 
         const parts = [
             `Extracted base. Base CSS: ${state.baseCss.length.toLocaleString()} chars • Base body: ${state.baseBody.length.toLocaleString()} chars`,
