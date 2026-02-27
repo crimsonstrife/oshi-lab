@@ -1,0 +1,12 @@
+---
+const showKnownIssuesBanner = true;
+const base = import.meta.env.BASE_URL;
+---
+{showKnownIssuesBanner && (
+<div class="alert alert-warning rounded-0 mb-0 py-2" role="note">
+    <div class="container-fluid d-flex align-items-center justify-content-between gap-2">
+        <span><strong>Known Issues:</strong> Click for workarounds and status updates.</span>
+        <a class="btn btn-sm btn-dark" href={`${base}known-issues`}>View details</a>
+    </div>
+</div>
+    )}

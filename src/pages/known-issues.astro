@@ -1,0 +1,312 @@
+---
+/**
+ * Known Issues page (site-wide)
+ * Route: /known-issues
+ *
+ * This page is intentionally NOT part of the docs collection so it can cover
+ * the entire app (Lab, Preview, Templates, Deploy, etc.).
+ */
+
+
+import AppLayout from "../ui/AppLayout.astro";
+const page = {
+  title: "Known Issues",
+  description: "A running list of known issues and limitations across MyOshi Theme Lab, plus workarounds and reporting tips.",
+  lastUpdated: "2026-02-27",
+};
+
+/**
+ * Severity guide:
+ * - "impacting": likely to block usage or cause major confusion
+ * - "annoying": annoying / inconsistent behavior but usually has a workaround
+ * - "note": FYI / expected behavior / documentation-only
+ */
+const issues = [
+  {
+    id: "audit-contrast-sandbox",
+    title: "Contrast checks may be unavailable depending on preview iframe sandboxing",
+    severity: "annoying",
+    areas: ["Audit", "Preview"],
+    status: "Known limitation",
+    details: [
+      "The optional contrast audit uses computed styles from the live preview. If the preview iframe is sandboxed without same-origin access, the app cannot read computed styles, so contrast checks may be skipped.",
+    ],
+    workaround: [
+      "Run the audit without contrast checks enabled.",
+      "If you control the preview iframe attributes, allow same-origin access (but keep scripts disabled):",
+    ],
+    snippet: '<iframe id="previewFrame" sandbox="allow-same-origin" ...></iframe>',
+  },
+  {
+    id: "preview-vs-live",
+    title: "Preview may differ from live MyOshi behavior after platform sanitizer updates",
+    severity: "note",
+    areas: ["Preview", "Audit"],
+    status: "Expected behavior",
+    details: [
+      "MyOshi sanitizes at display time (client-side) and may change behavior without requiring you to re-save. The Lab preview aims to match current behavior, but platform updates can temporarily cause differences until the Lab is updated.",
+    ],
+    workaround: [
+      "If something looks off, run the Audit and check for rule warnings (fixed → absolute, z-index caps, import/url restrictions, protected selectors, etc.).",
+      "When in doubt, test on a real MyOshi profile after making minimal changes.",
+    ],
+  },
+  {
+    id: "manual-scoping-prefixes",
+    title: "Manual .profile-page / .profile-custom-css selector prefixes can break with new scoping",
+    severity: "impacting",
+    areas: ["Custom CSS", "Audit"],
+    status: "Known behavior",
+    details: [
+      "MyOshi now scopes selectors automatically. Themes that were written to rely on the old scoping quirks (or that double-scope with .profile-page/.profile-custom-css) may behave incorrectly.",
+    ],
+    workaround: [
+      "Remove manual scoping prefixes and target elements inside your profile directly (e.g. .my-box, h2).",
+      "Re-run the Audit after simplifying selectors.",
+    ],
+  },
+  {
+    id: "font-import-allowlist",
+    title: "@import is restricted to whitelisted font hosts (non-font CSS imports will not work)",
+    severity: "impacting",
+    areas: ["Custom CSS", "Audit"],
+    status: "MyOshi restriction",
+    details: [
+      "MyOshi only allows @import from specific font CDNs (Google Fonts, Bunny Fonts, Typekit, cdnjs). Other stylesheet imports are blocked.",
+      "data: URIs inside @import are blocked as well.",
+    ],
+    workaround: [
+      "Paste non-font CSS directly into Custom CSS (up to 50,000 characters).",
+      "For fonts, use an allowed host (Google/Bunny/Typekit/cdnjs).",
+    ],
+  },
+  {
+    id: "fixed-to-absolute",
+    title: "position: fixed is converted to position: absolute on MyOshi",
+    severity: "impacting",
+    areas: ["Custom CSS", "Audit"],
+    status: "MyOshi restriction",
+    details: [
+      "MyOshi converts position: fixed to absolute to prevent overlays that cover navigation.",
+    ],
+    workaround: [
+      "Use position: absolute inside a relatively positioned container.",
+      "Use position: sticky for in-container sticky effects.",
+    ],
+  },
+  {
+    id: "zindex-cap",
+    title: "z-index values are capped to ±10000 on MyOshi",
+    severity: "annoying",
+    areas: ["Custom CSS", "Audit"],
+    status: "MyOshi restriction",
+    details: [
+      "Very large z-index values are capped to prevent stacking abuse outside your profile container.",
+      "MyOshi also applies isolation: isolate on your profile, so z-index cannot escape into site chrome.",
+    ],
+    workaround: [
+      "Keep z-index values reasonable and within [-10000, 10000].",
+    ],
+  },
+  {
+    id: "blur-cap",
+    title: "blur() is capped to 50px (filter and backdrop-filter)",
+    severity: "annoying",
+    areas: ["Custom CSS", "Audit"],
+    status: "MyOshi restriction",
+    details: [
+      "Extremely large blur values can cause GPU issues; MyOshi caps blur() to 50px.",
+    ],
+    workaround: [
+      "Reduce blur() to ≤ 50px.",
+      "Consider layered translucent panels or gradients instead of huge blur radii.",
+    ],
+  },
+  {
+    id: "url-protocol-allowlist",
+    title: "CSS url() only allows https: and data: protocols",
+    severity: "impacting",
+    areas: ["Custom CSS", "Audit"],
+    status: "MyOshi restriction",
+    details: [
+      "Any protocol other than https: and data: is blocked (including percent-encoded evasion attempts).",
+    ],
+    workaround: [
+      "Host assets over https:// or embed small assets as data: URIs.",
+    ],
+  },
+  {
+    id: "input-limits",
+    title: "Input limits: Custom CSS and Custom HTML are capped at 50,000 characters each",
+    severity: "impacting",
+    areas: ["Custom CSS", "Custom HTML", "Audit"],
+    status: "MyOshi restriction",
+    details: [
+      "MyOshi enforces field size limits at the API layer.",
+    ],
+    workaround: [
+      "Reduce repetition, remove unused rules/markup, and consolidate styles with variables/utilities.",
+    ],
+  },
+];
+
+const severityMeta = {
+  impacting: { label: "Impacting", badge: "text-bg-danger" },
+  annoying: { label: "Annoying", badge: "text-bg-warning" },
+  note: { label: "Note", badge: "text-bg-secondary" },
+};
+
+function join(arr) {
+  return (arr || []).join(", ");
+}
+---
+
+<AppLayout title="Known Issues" bodyClass="known-issues">
+    <main class="container py-4">
+      <header class="mb-4">
+        <h1 class="mb-2">{page.title}</h1>
+        <p class="text-muted mb-2">{page.description}</p>
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+          <span class="badge text-bg-dark">Last updated: {page.lastUpdated}</span>
+          <span class="badge text-bg-info">Total: {issues.length}</span>
+        </div>
+      </header>
+
+      <section class="mb-4">
+        <div class="alert alert-secondary" role="note">
+          If you’re seeing something that’s <strong>not</strong> listed here, please report it (steps below).
+          This page is for <em>confirmed</em> issues and platform limitations.
+        </div>
+      </section>
+
+      <section class="mb-4">
+        <h2 class="h4">Quick links</h2>
+        <div class="row g-2">
+          {issues.map((i) => (
+            <div class="col-12 col-md-6 col-lg-4">
+              <a class="d-block text-decoration-none border rounded p-2" href={`#${i.id}`}>
+                <div class="d-flex align-items-center justify-content-between gap-2">
+                  <span class="fw-semibold">{i.title}</span>
+                  <span class={`badge ${severityMeta[i.severity]?.badge ?? "text-bg-secondary"}`}>
+                    {severityMeta[i.severity]?.label ?? i.severity}
+                  </span>
+                </div>
+                <div class="small text-muted mt-1">
+                  {join(i.areas)} • {i.status}
+                </div>
+              </a>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section class="mb-5">
+        <h2 class="h4 mb-3">Issues</h2>
+
+        <div class="accordion" id="knownIssuesAccordion">
+          {issues.map((i, idx) => (
+            <div class="accordion-item" id={i.id}>
+              <h3 class="accordion-header" id={`heading-${i.id}`}>
+                <button
+                  class={`accordion-button ${idx === 0 ? "" : "collapsed"}`}
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target={`#collapse-${i.id}`}
+                  aria-expanded={idx === 0 ? "true" : "false"}
+                  aria-controls={`collapse-${i.id}`}
+                >
+                  <span class="me-2">{i.title}</span>
+                  <span class={`badge ms-auto ${severityMeta[i.severity]?.badge ?? "text-bg-secondary"}`}>
+                    {severityMeta[i.severity]?.label ?? i.severity}
+                  </span>
+                </button>
+              </h3>
+
+              <div
+                id={`collapse-${i.id}`}
+                class={`accordion-collapse collapse ${idx === 0 ? "show" : ""}`}
+                aria-labelledby={`heading-${i.id}`}
+                data-bs-parent="#knownIssuesAccordion"
+              >
+                <div class="accordion-body">
+                  <div class="mb-2">
+                    <span class="badge text-bg-dark me-2">Status: {i.status}</span>
+                    <span class="badge text-bg-secondary">Areas: {join(i.areas)}</span>
+                  </div>
+
+                  {i.details?.length ? (
+                    <>
+                      <h4 class="h6 mt-3">What’s happening</h4>
+                      <ul>
+                        {i.details.map((d) => <li>{d}</li>)}
+                      </ul>
+                    </>
+                  ) : null}
+
+                  {i.workaround?.length ? (
+                    <>
+                      <h4 class="h6 mt-3">Workaround</h4>
+                      <ul>
+                        {i.workaround.map((w) => <li>{w}</li>)}
+                      </ul>
+                    </>
+                  ) : null}
+
+                  {i.snippet ? (
+                    <>
+                      <h4 class="h6 mt-3">Snippet</h4>
+                      <pre class="bg-body-tertiary p-2 rounded"><code>{i.snippet}</code></pre>
+                    </>
+                  ) : null}
+
+                  <div class="mt-3">
+                    <a class="small" href="#top" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
+                      Back to top
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section class="mb-5">
+        <h2 class="h4">How to report an issue</h2>
+        <p class="text-muted">
+          If you encounter a bug that isn’t listed above, please include as much of the following as you can.
+          It saves a lot of back-and-forth and makes fixes faster.
+        </p>
+
+        <div class="row g-3">
+          <div class="col-12 col-lg-6">
+            <div class="border rounded p-3 h-100">
+              <h3 class="h6">Include</h3>
+              <ul class="mb-0">
+                <li>What you expected vs what happened</li>
+                <li>Steps to reproduce (click-by-click)</li>
+                <li>Your browser + version (Chrome/Firefox/Safari) and OS</li>
+                <li>A minimal CSS/HTML sample that triggers it (if possible)</li>
+                <li>Audit report JSON (use “Copy JSON” in the Audit tab)</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="col-12 col-lg-6">
+            <div class="border rounded p-3 h-100">
+              <h3 class="h6">Avoid sharing</h3>
+              <ul class="mb-0">
+                <li>Personal info (emails, private links)</li>
+                <li>Private tokens/keys</li>
+                <li>Unredacted DMs or private server info</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert-info mt-3" role="note">
+          Tip: When possible, reduce the theme to the smallest snippet that still reproduces the issue. It makes debugging dramatically easier.
+        </div>
+      </section>
+    </main>
+</AppLayout>
