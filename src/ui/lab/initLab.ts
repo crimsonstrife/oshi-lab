@@ -179,6 +179,11 @@ export async function initLab(root: HTMLElement | null): Promise<void> {
                       <input class="form-check-input" type="checkbox" role="switch" id="cssLintToggle" checked>
                       <label class="form-check-label small" for="cssLintToggle">Lint</label>
                     </div>
+                    <span class="badge text-bg-dark border" id="cssCharCount">0 / 50000</span>
+                    <div class="form-check form-switch m-0">
+                      <input class="form-check-input" type="checkbox" role="switch" id="cssHardCap" checked>
+                      <label class="form-check-label small" for="cssHardCap">Cap</label>
+                    </div>
                     <button class="btn btn-sm btn-outline-light secondary" id="btnCopyCSS" type="button">Copy CSS</button>
                     <span class="badge text-bg-dark border">Base available in Base Peek</span>
                   </div>
@@ -198,6 +203,11 @@ export async function initLab(root: HTMLElement | null): Promise<void> {
                     <div class="form-check form-switch m-0">
                       <input class="form-check-input" type="checkbox" role="switch" id="htmlLintToggle" checked>
                       <label class="form-check-label small" for="htmlLintToggle">Lint</label>
+                    </div>
+                    <span class="badge text-bg-dark border" id="htmlCharCount">0 / 50000</span>
+                    <div class="form-check form-switch m-0">
+                      <input class="form-check-input" type="checkbox" role="switch" id="htmlHardCap" checked>
+                      <label class="form-check-label small" for="htmlHardCap">Cap</label>
                     </div>
                     <button class="btn btn-sm btn-outline-light secondary" id="btnCopyHTML" type="button">Copy HTML</button>
                   </div>

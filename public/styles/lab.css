@@ -355,3 +355,7 @@ body.lab {
     height: 900px;
     overflow: scroll;
 }
+
+/* subtle warning when near/over */
+.badge.char-warn { outline: 1px solid rgba(255,193,7,.6); }
+.badge.char-over { outline: 2px solid rgba(220,53,69,.8); }
