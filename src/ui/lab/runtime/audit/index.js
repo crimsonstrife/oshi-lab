@@ -345,7 +345,18 @@ function auditCss(css) {
       hint: 'Remove expression(). Use standard CSS properties, variables, and animations.',
     });
   }
-  if (lowerAll.includes('javascript:')) {
+  let hasJsUrl = lowerAll.includes('javascript:');
+  if (!hasJsUrl) {
+    for (const m of text.matchAll(/\burl\(\s*(['"]?)([^'"\)]+)\1\s*\)/gi)) {
+      const raw = (m[2] ?? '').trim();
+      if (!raw) continue;
+      if (safeDecode(decodeCssEscapes(raw)).toLowerCase().includes('javascript:')) {
+        hasJsUrl = true;
+        break;
+      }
+    }
+  }
+  if (hasJsUrl) {
     issues.push({
       id: 'css-javascript-protocol',
       severity: 'error',
@@ -780,6 +791,18 @@ function* iterRuleHeaders(css) {
 /** @param {string} s */
 function safeDecode(s) {
   try { return decodeURIComponent(s); } catch { return s; }
+}
+
+/**
+ * Decode CSS hex escape sequences (e.g. \6a or \00006a) in a string value.
+ * CSS allows \<1-6 hex digits> optionally followed by a single whitespace.
+ * @param {string} s
+ * @returns {string}
+ */
+function decodeCssEscapes(s) {
+  return s.replace(/\\([0-9a-fA-F]{1,6})\s?/g, (_, hex) =>
+    String.fromCodePoint(parseInt(hex, 16))
+  );
 }
 
 /** @param {string} params */
