@@ -221,7 +221,7 @@ const x="modulepreload",w=function(e){return"/"+e},v={},C=function(c,n,i){let b=
   </div>
 </div>
     </div>
-  `,window.__MYOSHI_LAB_TEMPLATES__=r,await C(()=>import("./oshi-lab.XulKPOc4.js"),[])}const h=document.getElementById("lab-root");try{S(document.getElementById("lab-root")).catch(e=>{console.error("initLab failed:",e),h&&(h.innerHTML=`
+  `,window.__MYOSHI_LAB_TEMPLATES__=r,await C(()=>import("./oshi-lab.DJoAgilD.js"),[])}const h=document.getElementById("lab-root");try{S(document.getElementById("lab-root")).catch(e=>{console.error("initLab failed:",e),h&&(h.innerHTML=`
           <div class="alert alert-danger m-3" role="alert">
             <strong>Failed to load initLab.</strong><br>
             Check the browser console for details.
