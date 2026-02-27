@@ -147,6 +147,9 @@ export async function initLab(root: HTMLElement | null): Promise<void> {
                     <button type="button" class="tab nav-link active" data-tab="template">Template</button>
                     <button type="button" class="tab nav-link" data-tab="customCss">Custom CSS</button>
                     <button type="button" class="tab nav-link" data-tab="customHtml">Custom HTML</button>
+                    <button type="button" class="tab nav-link" data-tab="audit">
+                      Audit <span id="auditBadge" class="badge text-bg-danger ms-1 d-none">!</span>
+                    </button>
                     <button type="button" class="tab nav-link" data-tab="basePeek">Base Peek</button>
                   </div>
                 </div>
@@ -212,6 +215,35 @@ export async function initLab(root: HTMLElement | null): Promise<void> {
                     <button class="btn btn-sm btn-outline-light secondary" id="btnCopyHTML" type="button">Copy HTML</button>
                   </div>
                 </div></div>
+
+              <div class="editor-wrap" id="wrap-audit">
+                <div class="p-3 d-flex flex-column gap-3 min-h-0" style="height:100%">
+                  <div class="d-flex flex-wrap align-items-start justify-content-between gap-2">
+                    <div class="min-w-0">
+                      <div class="fw-semibold">Audit Report</div>
+                      <div class="text-muted small">Checks Custom CSS/HTML against common issues and the latest MyOshi sanitizer/scoping rules.</div>
+                    </div>
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                      <div class="form-check form-switch m-0">
+                        <input class="form-check-input" type="checkbox" role="switch" id="auditContrastToggle">
+                        <label class="form-check-label small" for="auditContrastToggle">Contrast</label>
+                      </div>
+                      <button class="btn btn-sm btn-outline-info secondary" id="btnRunAudit" type="button">Run Audit</button>
+                      <button class="btn btn-sm btn-outline-light secondary" id="btnCopyAuditJson" type="button">Copy JSON</button>
+                    </div>
+                  </div>
+
+                  <div id="auditSummary" class="d-flex flex-wrap gap-2"></div>
+
+                  <div class="border rounded bg-body-tertiary p-2 flex-grow-1 min-h-0 max-h-800" style="overflow:scroll;max-height: 800px;height: 100%;">
+                    <div id="auditOutput" class="list-group"></div>
+                  </div>
+
+                  <div class="text-muted small">
+                    Note: some checks reflect how MyOshi transforms your CSS at display time (e.g. <code>position: fixed</code> → <code>absolute</code>, caps on <code>z-index</code> and <code>blur()</code>, <code>@import</code> allowlist).
+                  </div>
+                </div>
+              </div>
 
               <div class="editor-wrap" id="wrap-basePeek">
                 <textarea id="basePeek" class="form-control rounded-0 border-0" spellcheck="false" readonly placeholder="After Extract Base, preview extracted CSS/body here."></textarea>

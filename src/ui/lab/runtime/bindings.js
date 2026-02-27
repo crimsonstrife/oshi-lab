@@ -19,6 +19,8 @@ import { quickFormatCss } from './utils/format.js';
 import { formatCss, formatHtml } from './scripts/format/prettier.js';
 import { syncEditorsFromTextareas } from './scripts/editors/index.js';
 
+import { runAudit, copyLastAuditJson } from './audit/index.js';
+
 import { saveSnapshot, deleteSelectedSnapshot, loadSnapshotById } from './snapshots/index.js';
 
 /**
@@ -174,6 +176,10 @@ export function bindUI() {
   on('btnSaveSnapshot', 'click', saveSnapshot);
   on('btnDeleteSnapshot', 'click', deleteSelectedSnapshot);
 
+  // Audit
+  on('btnRunAudit', 'click', runAudit);
+  on('btnCopyAuditJson', 'click', copyLastAuditJson);
+
   if (els.snapshotSelect) {
     els.snapshotSelect.addEventListener('change', () => {
       // @ts-ignore
@@ -203,6 +209,7 @@ export function bindUI() {
         template: 'wrap-template',
         customCss: 'wrap-customCss',
         customHtml: 'wrap-customHtml',
+        audit: 'wrap-audit',
         basePeek: 'wrap-basePeek',
       };
 

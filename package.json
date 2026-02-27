@@ -31,6 +31,9 @@
     "codemirror": "^6.0.2",
     "dompurify": "^3.3.1",
     "entities": "^7.0.1",
+    "postcss": "^8.5.6",
+    "postcss-selector-parser": "^7.1.1",
+    "postcss-value-parser": "^4.2.0",
     "prettier": "^3.8.1",
     "prettier-plugin-organize-attributes": "^1.0.0",
     "sharp": "^0.34.5"
