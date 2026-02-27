@@ -16,9 +16,18 @@ import { loadTemplateById } from './templates/index.js';
 import { copyToClipboard } from './utils/clipboard.js';
 import { downloadFile } from './utils/download.js';
 import { quickFormatCss } from './utils/format.js';
+import { formatCss, formatHtml } from './scripts/format/prettier.js';
+import { syncEditorsFromTextareas } from './scripts/editors/index.js';
 
 import { saveSnapshot, deleteSelectedSnapshot, loadSnapshotById } from './snapshots/index.js';
 
+/**
+ * Binds UI elements to their respective event handlers and initializes various interactive features
+ * of the application. This includes setting up button click listeners, input change handlers,
+ * custom rendering logic, and other UI-specific functionality.
+ *
+ * @return {void} Nothing is returned by this function. It sets up event bindings and configurations.
+ */
 export function bindUI() {
   on('btnExtract', 'click', extractBase);
   on('btnRenderNow', 'click', renderPreview);
@@ -45,6 +54,8 @@ export function bindUI() {
     if (els.customCss) els.customCss.value = '';
     if (els.customHtml) els.customHtml.value = '';
     if (els.appendInstead) els.appendInstead.checked = false;
+    // keep CodeMirror in sync if mounted
+    syncEditorsFromTextareas();
     setStatus('ok', 'Custom CSS/HTML reset.');
     if (els.autoUpdate?.checked) renderPreview();
   });
@@ -52,14 +63,16 @@ export function bindUI() {
   // Zoom / Height
   if (els.zoomRange) {
     els.zoomRange.addEventListener('input', () => {
-      state.previewScale = parseInt(els.zoomRange.value, 10) / 100;
+      // @ts-ignore
+        state.previewScale = parseInt(els.zoomRange.value, 10) / 100;
       applyPreviewSizing();
     });
   }
 
   if (els.heightRange) {
     els.heightRange.addEventListener('input', () => {
-      state.previewMinHeightPx = parseInt(els.heightRange.value, 10);
+      // @ts-ignore
+        state.previewMinHeightPx = parseInt(els.heightRange.value, 10);
       applyPreviewSizing();
     });
   }
@@ -100,9 +113,34 @@ export function bindUI() {
     setStatus('ok', `Downloaded: ${filename}`);
   });
 
-  on('btnFormatCss', 'click', () => {
-    if (els.customCss) els.customCss.value = quickFormatCss(els.customCss.value || '');
-    if (els.autoUpdate?.checked) renderPreview();
+  on('btnFormatCss', 'click', async () => {
+    if (!els.customCss) return;
+    try {
+      els.customCss.value = await formatCss(els.customCss.value || '');
+      syncEditorsFromTextareas();
+      if (els.autoUpdate?.checked) renderPreview();
+      setStatus('ok', 'Formatted CSS.');
+    } catch (e) {
+      // fallback to simple formatter
+      console.error(e);
+      els.customCss.value = quickFormatCss(els.customCss.value || '');
+      syncEditorsFromTextareas();
+      if (els.autoUpdate?.checked) renderPreview();
+      setStatus('warn', 'CSS format failed; applied quick format.');
+    }
+  });
+
+  on('btnFormatHtml', 'click', async () => {
+    if (!els.customHtml) return;
+    try {
+      els.customHtml.value = await formatHtml(els.customHtml.value || '');
+      syncEditorsFromTextareas();
+      if (els.autoUpdate?.checked) renderPreview();
+      setStatus('ok', 'Formatted HTML.');
+    } catch (e) {
+      console.error(e);
+      setStatus('warn', 'HTML format failed.');
+    }
   });
 
   on('btnCopyBaseCss', 'click', async () => {
@@ -138,7 +176,8 @@ export function bindUI() {
 
   if (els.snapshotSelect) {
     els.snapshotSelect.addEventListener('change', () => {
-      const encoded = els.snapshotSelect.value;
+      // @ts-ignore
+        const encoded = els.snapshotSelect.value;
       if (!encoded) return;
       loadSnapshotById(decodeURIComponent(encoded));
     });
@@ -168,7 +207,8 @@ export function bindUI() {
       };
 
       document.querySelectorAll('.editor-wrap').forEach((w) => w.classList.remove('active'));
-      const targetId = wrapMap[id];
+      // @ts-ignore
+        const targetId = wrapMap[id];
       const target = targetId ? document.getElementById(targetId) : null;
       if (target) target.classList.add('active');
     });

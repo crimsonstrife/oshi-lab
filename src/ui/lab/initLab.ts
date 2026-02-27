@@ -1,6 +1,44 @@
 // @ts-ignore
 import templateData from './data/templates.json';
 
+/**
+ * Represents a template for a laboratory setup, including styling and content defaults.
+ *
+ * @typedef {Object} LabTemplate
+ *
+ * @property {string} id
+ * A unique identifier for the lab template.
+ *
+ * @property {string} name
+ * The name of the lab template.
+ *
+ * @property {string} [description]
+ * A brief description of the lab template, optionally provided.
+ *
+ * @property {string} baseCss
+ * The base CSS styling applicable to the lab template.
+ *
+ * @property {string} baseBody
+ * The base HTML body content for the lab template.
+ *
+ * @property {Object} [mockDefaults]
+ * Optional default mock data for the lab template, used for display purposes.
+ *
+ * @property {string} [mockDefaults.displayName]
+ * The default display name for mock data.
+ *
+ * @property {string} [mockDefaults.username]
+ * The default username for mock data.
+ *
+ * @property {string} [mockDefaults.tagline]
+ * The default tagline for mock data.
+ *
+ * @property {string} [mockDefaults.avatar]
+ * The default avatar URL for mock data.
+ *
+ * @property {string} [mockDefaults.background]
+ * The default background image or color for mock data.
+ */
 type LabTemplate = {
   id: string;
   name: string;
@@ -16,18 +54,49 @@ type LabTemplate = {
   };
 };
 
+/**
+ * Represents the data shape for templates, including versioning and a collection of templates.
+ *
+ * @typedef {Object} TemplateDataShape
+ * @property {number} [version] - The optional version number for the template data.
+ * @property {LabTemplate[]} [templates] - An optional array of lab templates.
+ */
 type TemplateDataShape = {
   version?: number;
   templates?: LabTemplate[];
 };
 
-const templateStore = (templateData ?? {}) as TemplateDataShape;
+/**
+ * A variable that holds the template data mapped to the defined `TemplateDataShape`.
+ * The data is initialized to either the provided `templateData` or an empty object as a fallback.
+ *
+ * @type {TemplateDataShape}
+ */
+// @ts-ignore
+const templateStore: TemplateDataShape = (templateData ?? {}) as TemplateDataShape;
+/**
+ * A collection of lab templates derived from multiple possible data sources.
+ *
+ * If `templateStore.templates` is an array, it will assign its value to `templates`.
+ * Otherwise, if `templateData` is an array, it will cast `templateData` to a LabTemplate array
+ * and assign it to `templates`.
+ * If neither condition is met, it assigns an empty array as the default value.
+ *
+ * @type {LabTemplate[]}
+ */
 const templates: LabTemplate[] = Array.isArray(templateStore.templates)
   ? templateStore.templates
   : Array.isArray(templateData)
     ? (templateData as unknown as LabTemplate[])
     : [];
 
+/**
+ * Initializes the theme lab interface within the specified root element.
+ * Sets up the lab structure, including editor areas and live preview functionality, based on available templates.
+ *
+ * @param {HTMLElement | null} root - The root HTML element where the theme lab will be initialized. If null, the initialization will not proceed.
+ * @return {Promise<void>} A promise that resolves once the lab initialization is complete.
+ */
 export async function initLab(root: HTMLElement | null): Promise<void> {
   if (!root) return;
 
@@ -100,19 +169,29 @@ export async function initLab(root: HTMLElement | null): Promise<void> {
               </div>
 
               <div class="editor-wrap" id="wrap-customCss">
-                <textarea id="customCss" class="form-control rounded-0 border-0" spellcheck="false" placeholder="Your Custom CSS (paste into MyOshi Custom CSS)"></textarea>
+                <div id="cssEditor" class="code-editor"></div>
+                <textarea id="customCss" class="form-control rounded-0 border-0" spellcheck="false" placeholder="Your Custom CSS (paste into MyOshi Custom CSS)" hidden></textarea>
                 <div class="meta">
                   <div class="row"><span class="pill"><b>Custom CSS</b> appended after base CSS</span></div>
-                  <div class="row d-flex flex-wrap gap-2">
-                    <button class="btn btn-sm btn-outline-light secondary" id="btnFormatCss" type="button">Quick format</button>
+                  <div class="row d-flex flex-wrap gap-2 align-items-center">
+                    <button class="btn btn-sm btn-outline-light secondary" id="btnFormatCss" type="button">Format</button>
+                    <div class="form-check form-switch m-0">
+                      <input class="form-check-input" type="checkbox" role="switch" id="cssLintToggle" checked>
+                      <label class="form-check-label small" for="cssLintToggle">Lint</label>
+                    </div>
+                    <span class="badge text-bg-dark border" id="cssCharCount">0 / 50000</span>
+                    <div class="form-check form-switch m-0">
+                      <input class="form-check-input" type="checkbox" role="switch" id="cssHardCap" checked>
+                      <label class="form-check-label small" for="cssHardCap">Cap</label>
+                    </div>
                     <button class="btn btn-sm btn-outline-light secondary" id="btnCopyCSS" type="button">Copy CSS</button>
                     <span class="badge text-bg-dark border">Base available in Base Peek</span>
                   </div>
-                </div>
-              </div>
+                </div></div>
 
               <div class="editor-wrap" id="wrap-customHtml">
-                <textarea id="customHtml" class="form-control rounded-0 border-0" spellcheck="false" placeholder="Your Custom HTML (injected into .profile-custom-html)"></textarea>
+                <div id="htmlEditor" class="code-editor"></div>
+                <textarea id="customHtml" class="form-control rounded-0 border-0" spellcheck="false" placeholder="Your Custom HTML (injected into .profile-custom-html)" hidden></textarea>
                 <div class="meta">
                   <div class="row"><span class="pill"><b>Custom HTML</b> injected into .profile-custom-html</span></div>
                   <div class="row d-flex flex-wrap gap-3 align-items-center">
@@ -120,10 +199,19 @@ export async function initLab(root: HTMLElement | null): Promise<void> {
                       <input class="form-check-input m-0" type="checkbox" id="appendInstead">
                       <label for="appendInstead" class="m-0">Append to end</label>
                     </div>
+                    <button class="btn btn-sm btn-outline-light secondary" id="btnFormatHtml" type="button">Format</button>
+                    <div class="form-check form-switch m-0">
+                      <input class="form-check-input" type="checkbox" role="switch" id="htmlLintToggle" checked>
+                      <label class="form-check-label small" for="htmlLintToggle">Lint</label>
+                    </div>
+                    <span class="badge text-bg-dark border" id="htmlCharCount">0 / 50000</span>
+                    <div class="form-check form-switch m-0">
+                      <input class="form-check-input" type="checkbox" role="switch" id="htmlHardCap" checked>
+                      <label class="form-check-label small" for="htmlHardCap">Cap</label>
+                    </div>
                     <button class="btn btn-sm btn-outline-light secondary" id="btnCopyHTML" type="button">Copy HTML</button>
                   </div>
-                </div>
-              </div>
+                </div></div>
 
               <div class="editor-wrap" id="wrap-basePeek">
                 <textarea id="basePeek" class="form-control rounded-0 border-0" spellcheck="false" readonly placeholder="After Extract Base, preview extracted CSS/body here."></textarea>
