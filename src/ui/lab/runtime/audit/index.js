@@ -527,9 +527,23 @@ async function auditContrastBestEffort() {
     if (++count >= MAX_ELEMENTS) break;
   }
 
+  /**
+   * Returns true if the element has any non-whitespace direct text child nodes.
+   * This avoids re-checking descendant text on ancestor/container elements.
+   * @param {Element} el
+   */
+  const hasDirectText = (el) => {
+    for (const node of el.childNodes) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const content = (node.textContent || '').trim();
+        if (content) return true;
+      }
+    }
+    return false;
+  };
+
   for (const el of nodes) {
-    const text = (el.textContent || '').trim();
-    if (!text) continue;
+    if (!hasDirectText(el)) continue;
 
     const cs = win.getComputedStyle(el);
     if (!cs) continue;
@@ -688,7 +702,11 @@ function dedupeIssues(list) {
 
 /** @param {string} css */
 function stripCssComments(css) {
-  return String(css || '').replace(/\/\*[\s\S]*?\*\//g, '');
+  // Replace comment contents with spaces while preserving newlines and length,
+  // so that character indices and line/column locations remain aligned.
+  return String(css || '').replace(/\/\*[\s\S]*?\*\//g, (comment) =>
+    comment.replace(/[^\n\r]/g, ' ')
+  );
 }
 
 /** @param {string} text */
