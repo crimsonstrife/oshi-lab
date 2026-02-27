@@ -4,6 +4,7 @@ import { els } from '../dom.js';
 import { setStatus } from '../status.js';
 import { safeUUID } from '../utils/uuid.js';
 import { renderPreview } from '../preview/render.js';
+import { syncEditorsFromTextareas } from '../scripts/editors/index.js';
 
 const SNAP_KEY = 'myoshi_theme_lab_snapshots_v1';
 
@@ -90,6 +91,9 @@ export function loadSnapshotById(id) {
   if (els.mockTagline) els.mockTagline.value = snap.mock?.tagline || '';
   if (els.mockAvatar) els.mockAvatar.value = snap.mock?.avatar || '';
   if (els.mockBg) els.mockBg.value = snap.mock?.bg || '';
+
+  // keep CodeMirror in sync if mounted
+  syncEditorsFromTextareas();
 
   setStatus('ok', `Loaded snapshot: ${snap.name}`);
   if (els.autoUpdate?.checked) renderPreview();

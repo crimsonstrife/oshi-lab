@@ -1,14 +1,26 @@
 // @ts-check
 
+/**
+ * Clamps a given number to fit within the range of a byte (0 to 255).
+ * If the number is not finite, it will default to 0.
+ *
+ * @param {number} n The input number to be clamped.
+ * @return {number} The clamped value, which will be between 0 and 255.
+ */
 function clampByte(n) {
-  n = Number(n);
   if (!Number.isFinite(n)) return 0;
   return Math.max(0, Math.min(255, Math.round(n)));
 }
 
 /**
- * @param {string} input
- * @returns {{r:number,g:number,b:number,a:number}|null}
+ * Parses a color string into an object with r, g, b, and a properties.
+ * Supports hexadecimal format (#RGB, #RGBA, #RRGGBB, #RRGGBBAA) and
+ * rgb()/rgba() notations.
+ *
+ * @param {string} input - The string representing the color to parse.
+ * @return {{r: number, g: number, b: number, a: number} | null} An object with
+ * r, g, b, and a property if parsing is successful, or null if the input
+ * is invalid or unsupported.
  */
 export function parseColor(input) {
   if (!input) return null;
@@ -41,18 +53,43 @@ export function parseColor(input) {
   return null;
 }
 
+/**
+ * Converts a given number to its hexadecimal string representation,
+ * ensuring it is clamped to a byte (0-255) and always 2 characters long.
+ *
+ * @param {number} n - The number to be converted to a 2-character hexadecimal string.
+ * @return {string} The 2-character hexadecimal string representation of the number.
+ */
 function toHex2(n) {
   return clampByte(n).toString(16).padStart(2, '0');
 }
 
-/** @param {{r:number,g:number,b:number,a:number}} c */
+/**
+ * Formats color values into a hexadecimal string representation.
+ *
+ * @param {Object} color - The color object containing RGBA components.
+ * @param {number} color.r - The red component (0-255).
+ * @param {number} color.g - The green component (0-255).
+ * @param {number} color.b - The blue component (0-255).
+ * @param {number} [color.a] - The optional alpha component (0-1).
+ * @return {string} The formatted hexadecimal color string.
+ */
 export function formatHex({ r, g, b, a }) {
   const base = `#${toHex2(r)}${toHex2(g)}${toHex2(b)}`;
   if (a == null || a >= 1) return base;
   return `${base}${toHex2(a * 255)}`;
 }
 
-/** @param {{r:number,g:number,b:number,a:number}} c */
+/**
+ * Formats an RGBA color object into a CSS-compatible rgba() string.
+ *
+ * @param {Object} color - The RGBA color object.
+ * @param {number} color.r - The red component (0-255).
+ * @param {number} color.g - The green component (0-255).
+ * @param {number} color.b - The blue component (0-255).
+ * @param {number} [color.a] - The alpha component (0-1). Defaults to 1 if not provided.
+ * @return {string} The formatted rgba() string.
+ */
 export function formatRgba({ r, g, b, a }) {
   const alpha = a == null ? 1 : a;
   const aText = alpha >= 1 ? '1' : String(Math.round(alpha * 1000) / 1000);

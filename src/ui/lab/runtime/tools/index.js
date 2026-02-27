@@ -5,6 +5,12 @@ import { on } from '../dom.js';
 import { setStatus } from '../status.js';
 import { getTools } from './registry.js';
 
+/**
+ * Ensures the tools modal instance is initialized and available.
+ * If the modal is not already initialized, it instantiates a new modal using the Bootstrap Modal API.
+ *
+ * @return {Object|null} The initialized Bootstrap modal instance, or null if the modal element or Bootstrap Modal is not available.
+ */
 function ensureToolsModal() {
     const el = document.getElementById('toolsModal');
     const Modal = window.bootstrap?.Modal;
@@ -13,12 +19,20 @@ function ensureToolsModal() {
     return state.toolsModal;
 }
 
+/**
+ * Opens the tools modal if available. Ensures the tools modal is displayed
+ * and sets focus on the search input within the modal after a short delay.
+ * Displays a warning status if the tools modal is unavailable.
+ *
+ * @return {void} This function does not return a value.
+ */
 function openTools() {
     const modal = ensureToolsModal();
     if (!modal) {
         setStatus('warn', 'Tools modal unavailable (Bootstrap not loaded).');
         return;
     }
+    // @ts-ignore
     modal.show();
 
     setTimeout(() => {
@@ -27,6 +41,12 @@ function openTools() {
     }, 50);
 }
 
+/**
+ * Initializes tools functionality by setting up event listeners, rendering the panel and tool list,
+ * and managing the state of the active tool selection. Includes keyboard shortcut support and search filtering.
+ *
+ * @return {void} No value is returned from this function.
+ */
 export function initTools() {
     on('btnTools', 'click', openTools);
 
