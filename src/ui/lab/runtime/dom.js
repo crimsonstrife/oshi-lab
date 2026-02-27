@@ -83,6 +83,16 @@ export const els = {
   heightRange: null,
   /** @type {HTMLElement|null} */
   heightLabel: null,
+
+  // Audit
+  /** @type {HTMLInputElement|null} */
+  auditContrastToggle: null,
+  /** @type {HTMLElement|null} */
+  auditSummary: null,
+  /** @type {HTMLElement|null} */
+  auditOutput: null,
+  /** @type {HTMLElement|null} */
+  auditBadge: null,
 };
 
 /**
@@ -125,6 +135,12 @@ export function refreshEls() {
   els.zoomLabel = document.getElementById("zoomLabel");
   els.heightRange = /** @type {HTMLInputElement|null} */ (document.getElementById("heightRange"));
   els.heightLabel = document.getElementById("heightLabel");
+
+  // Audit
+  els.auditContrastToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('auditContrastToggle'));
+  els.auditSummary = document.getElementById('auditSummary');
+  els.auditOutput = document.getElementById('auditOutput');
+  els.auditBadge = document.getElementById('auditBadge');
 
   return els;
 }

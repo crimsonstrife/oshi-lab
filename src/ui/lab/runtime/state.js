@@ -31,4 +31,7 @@ export const state = {
 
   /** @type {number|null} */
   debounceTimer: null,
+
+  /** @type {any|null} */
+  lastAuditReport: null,
 };
