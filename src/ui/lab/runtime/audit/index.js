@@ -762,10 +762,13 @@ function makeLocator(text) {
 
 /**
  * Iterate rule headers (text before a "{"), best-effort, ignoring strings.
+ * Tracks brace depth so each yielded header is only the selector/at-rule
+ * prelude immediately preceding its "{", not any prior rule body content.
  * @param {string} css
  */
 function* iterRuleHeaders(css) {
   let start = 0;
+  let depth = 0;
   let inS = false;
   let inD = false;
   let esc = false;
@@ -779,10 +782,13 @@ function* iterRuleHeaders(css) {
     if (ch === '{') {
       const raw = css.slice(start, i);
       const trimmed = raw.trim();
-      // Skip empty / @keyframes frames like 0% { ... }
       if (trimmed) {
         yield { raw: trimmed, startIndex: start };
       }
+      depth++;
+      start = i + 1;
+    } else if (ch === '}') {
+      if (depth > 0) depth--;
       start = i + 1;
     }
   }
