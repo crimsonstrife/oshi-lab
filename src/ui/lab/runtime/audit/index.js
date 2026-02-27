@@ -835,7 +835,12 @@ function getAccessibleName(el, doc) {
 }
 
 function cssEscape(s) {
-  return s.replace(/"/g, '\\"');
+  // Use the standard CSS.escape when available for correct, comprehensive escaping.
+  if (typeof CSS !== 'undefined' && typeof CSS.escape === 'function') {
+    return CSS.escape(String(s));
+  }
+  // Fallback: escape backslashes first, then double quotes.
+  return String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 }
 
 // ---- contrast helpers ----
