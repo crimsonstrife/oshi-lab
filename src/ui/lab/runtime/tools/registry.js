@@ -1,13 +1,11 @@
 // @ts-check
 
 /**
- * @typedef {{
- *  id: string;
- *  name: string;
- *  keywords?: string;
- *  order?: number;
- *  render: (panel: HTMLElement) => void;
- * }} ToolDef
+ * Retrieves an array of tool definitions by importing modules from a specific directory.
+ * Each tool is validated to ensure it has the required properties and methods before inclusion.
+ * Tools are sorted by their `order` property (defaulting to 100 if not present), and then by `name` alphabetically.
+ *
+ * @return {ToolDef[]} An array of valid tool definitions, sorted by their defined order and name.
  */
 
 export function getTools() {

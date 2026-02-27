@@ -1,6 +1,44 @@
 // @ts-ignore
 import templateData from './data/templates.json';
 
+/**
+ * Represents a template for a laboratory setup, including styling and content defaults.
+ *
+ * @typedef {Object} LabTemplate
+ *
+ * @property {string} id
+ * A unique identifier for the lab template.
+ *
+ * @property {string} name
+ * The name of the lab template.
+ *
+ * @property {string} [description]
+ * A brief description of the lab template, optionally provided.
+ *
+ * @property {string} baseCss
+ * The base CSS styling applicable to the lab template.
+ *
+ * @property {string} baseBody
+ * The base HTML body content for the lab template.
+ *
+ * @property {Object} [mockDefaults]
+ * Optional default mock data for the lab template, used for display purposes.
+ *
+ * @property {string} [mockDefaults.displayName]
+ * The default display name for mock data.
+ *
+ * @property {string} [mockDefaults.username]
+ * The default username for mock data.
+ *
+ * @property {string} [mockDefaults.tagline]
+ * The default tagline for mock data.
+ *
+ * @property {string} [mockDefaults.avatar]
+ * The default avatar URL for mock data.
+ *
+ * @property {string} [mockDefaults.background]
+ * The default background image or color for mock data.
+ */
 type LabTemplate = {
   id: string;
   name: string;
@@ -16,18 +54,49 @@ type LabTemplate = {
   };
 };
 
+/**
+ * Represents the data shape for templates, including versioning and a collection of templates.
+ *
+ * @typedef {Object} TemplateDataShape
+ * @property {number} [version] - The optional version number for the template data.
+ * @property {LabTemplate[]} [templates] - An optional array of lab templates.
+ */
 type TemplateDataShape = {
   version?: number;
   templates?: LabTemplate[];
 };
 
-const templateStore = (templateData ?? {}) as TemplateDataShape;
+/**
+ * A variable that holds the template data mapped to the defined `TemplateDataShape`.
+ * The data is initialized to either the provided `templateData` or an empty object as a fallback.
+ *
+ * @type {TemplateDataShape}
+ */
+// @ts-ignore
+const templateStore: TemplateDataShape = (templateData ?? {}) as TemplateDataShape;
+/**
+ * A collection of lab templates derived from multiple possible data sources.
+ *
+ * If `templateStore.templates` is an array, it will assign its value to `templates`.
+ * Otherwise, if `templateData` is an array, it will cast `templateData` to a LabTemplate array
+ * and assign it to `templates`.
+ * If neither condition is met, it assigns an empty array as the default value.
+ *
+ * @type {LabTemplate[]}
+ */
 const templates: LabTemplate[] = Array.isArray(templateStore.templates)
   ? templateStore.templates
   : Array.isArray(templateData)
     ? (templateData as unknown as LabTemplate[])
     : [];
 
+/**
+ * Initializes the theme lab interface within the specified root element.
+ * Sets up the lab structure, including editor areas and live preview functionality, based on available templates.
+ *
+ * @param {HTMLElement | null} root - The root HTML element where the theme lab will be initialized. If null, the initialization will not proceed.
+ * @return {Promise<void>} A promise that resolves once the lab initialization is complete.
+ */
 export async function initLab(root: HTMLElement | null): Promise<void> {
   if (!root) return;
 

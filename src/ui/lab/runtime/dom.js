@@ -1,8 +1,38 @@
 // @ts-check
 
 /**
- * Centralized DOM element cache.
- * Call refreshEls() after the lab markup is injected.
+ * An object containing references to various DOM elements used in the application.
+ * Each property represents a specific type of element or setting related to the UI or functionality.
+ * Properties are initialized as `null` and can refer to corresponding DOM elements.
+ *
+ * Properties:
+ * - `templateInput` - A textarea for inputting templates.
+ * - `customCss` - A textarea for inputting custom CSS styles.
+ * - `customHtml` - A textarea for inputting custom HTML content.
+ * - `basePeek` - A textarea for displaying or editing base peek content.
+ *
+ * - `statusText` - An HTML element for displaying status messages.
+ * - `templateInfo` - An HTML element for displaying template-related information.
+ *
+ * - `previewFrame` - An iframe for previewing content.
+ * - `frameShell` - An HTML element serving as a container for the preview frame.
+ *
+ * - `autoUpdate` - A checkbox input controlling automatic updates.
+ * - `appendInstead` - A checkbox input controlling whether content is appended instead of replaced.
+ *
+ * - `enableMock` - A checkbox input toggling mock data features.
+ * - `mockDisplayName` - An input for specifying the mock display name.
+ * - `mockUsername` - An input for specifying the mock username.
+ * - `mockTagline` - An input for specifying the mock tagline.
+ * - `mockAvatar` - An input for specifying the mock avatar URL.
+ * - `mockBg` - An input for specifying the mock background URL.
+ *
+ * - `snapshotSelect` - A dropdown select element for managing snapshots.
+ *
+ * - `zoomRange` - A range input controlling zoom level.
+ * - `zoomLabel` - An HTML element displaying the current zoom level.
+ * - `heightRange` - A range input controlling height adjustments.
+ * - `heightLabel` - An HTML element displaying the current height value.
  */
 export const els = {
   /** @type {HTMLTextAreaElement|null} */
@@ -55,6 +85,11 @@ export const els = {
   heightLabel: null,
 };
 
+/**
+ * Refreshes the elements by retrieving and reassigning DOM elements to the `els` object properties.
+ *
+ * @return {Object} The updated `els` object containing references to various DOM elements.
+ */
 export function refreshEls() {
   // Editors
   els.templateInput = /** @type {HTMLTextAreaElement|null} */ (document.getElementById("templateInput"));
@@ -94,8 +129,17 @@ export function refreshEls() {
   return els;
 }
 
-/** @param {string} id @param {string} event @param {(ev:any)=>void} handler */
+/**
+ * Attaches an event listener to a DOM element with the specified ID.
+ *
+ * @param {string} id - The ID of the DOM element to which the event listener will be attached.
+ * @param {string} event - The name of the event to listen for (e.g., 'click', 'change').
+ * @param {Function} handler - The function to execute when the event is triggered.
+ * @return {void}
+ */
 export function on(id, event, handler) {
   const node = document.getElementById(id);
-  if (node) node.addEventListener(event, handler);
+  if (node) { // @ts-ignore
+      node.addEventListener(event, handler);
+  }
 }

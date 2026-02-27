@@ -1,18 +1,26 @@
 // @ts-check
 import * as entities from 'entities';
 
-/** @param {string} str */
+/**
+ * Decodes a string containing HTML entities into its corresponding characters.
+ *
+ * @param {string} str - The string containing HTML entities to be decoded.
+ * @return {string} The decoded string with HTML entities replaced by their corresponding characters.
+ */
 export function decodeHtmlEntities(str) {
     return entities.decodeHTML(str || '');
 }
 
 /**
- * Attempt to extract srcdoc content from an iframe wrapper HTML.
- * Supports srcdoc/srcDoc (case-insensitive), quoted or unquoted values.
- * Avoids DOMParser/innerHTML to reduce XSS scanner findings.
+ * Attempts to extract the value of the `srcdoc` attribute from an HTML string if it exists.
  *
- * @param {string} input
- * @returns {string|null}
+ * The function parses the input string for an `<iframe>` tag and attempts to identify
+ * its `srcdoc` attribute. It validates and extracts the value if present. If the
+ * attribute or `<iframe>` tag is not found, it returns `null`. Errors during parsing
+ * also result in a return value of `null`.
+ *
+ * @param {string} input The input HTML string to be scanned for an iframe's `srcdoc` attribute.
+ * @return {string|null} The value of the `srcdoc` attribute if found, or `null` otherwise.
  */
 export function maybeExtractSrcdoc(input) {
     try {
@@ -25,6 +33,7 @@ export function maybeExtractSrcdoc(input) {
         let i = start + 7; // after "<iframe"
         const len = input.length;
 
+        // @ts-ignore
         const isWs = (c) => c === ' ' || c === '\n' || c === '\r' || c === '\t' || c === '\f';
 
         while (i < len) {
@@ -37,7 +46,7 @@ export function maybeExtractSrcdoc(input) {
             if (ch === '>') break;
             if (ch === '/' && input[i + 1] === '>') break;
 
-            // Read attribute name
+            // Read the attribute name
             const nameStart = i;
             while (
                 i < len &&

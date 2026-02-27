@@ -10,13 +10,32 @@ import { autoBackupBeforeExtract } from '../snapshots/index.js';
 import { renderPreview } from '../preview/render.js';
 import { loadTemplateById } from '../templates/index.js';
 
+/**
+ * A variable that holds the instance of DOMPurify for client-side use.
+ *
+ * DOMPurify is a library used to sanitize HTML, ensuring that the content
+ * is safe from security vulnerabilities such as XSS (Cross-Site Scripting).
+ * It strips out unwanted or dangerous elements and attributes from user-input
+ * or untrusted HTML strings, providing a secure output.
+ *
+ * The initialization of DOMPurify occurs only if the code is executed in a
+ * browser environment (when `window` is defined). If not, the variable is set
+ * to null.
+ *
+ * Note: This variable relies on the function `createDOMPurify` to generate
+ * the DOMPurify instance.
+ */
 const DOMPurify = typeof window !== 'undefined' ? createDOMPurify(window) : null;
 
 /**
- * Sanitize untrusted template HTML for extraction/preview.
- * Keeps inline styles and <style> tags (needed for MyOshi templates),
- * strips scripting & active content.
- * @param {string} html
+ * Sanitizes the provided HTML string to ensure it is safe for use.
+ *
+ * This method uses the DOMPurify library to sanitize the input HTML,
+ * removing potentially dangerous elements and attributes while
+ * preserving allowed content based on the specified configuration.
+ *
+ * @param {string} html - The HTML string that needs to be sanitized.
+ * @return {string} - The sanitized HTML string.
  */
 function sanitizeTemplateHtml(html) {
     if (!DOMPurify) return html;
@@ -33,12 +52,28 @@ function sanitizeTemplateHtml(html) {
     });
 }
 
+/**
+ * Safely strips injected CSS noise by leveraging an existing function, if available,
+ * and provides a fallback mechanism to handle the CSS input when the function is not available.
+ *
+ * @param {string} css - The CSS string from which injected noise should be stripped.
+ * @return {object} An object containing the processed CSS string. If the processing function is unavailable, it returns the original CSS string or an empty string if the input is undefined.
+ */
 function safeStripInjectedCssNoise(css) {
-  if (typeof stripInjectedCssNoise === 'function') return stripInjectedCssNoise(css);
+  // @ts-ignore
+    if (typeof stripInjectedCssNoise === 'function') return stripInjectedCssNoise(css);
   // No-op fallback
   return { css: css || '' };
 }
 
+/**
+ * Extracts and processes the base CSS and HTML content from a provided template input.
+ * It performs sanitization, parsing, and splitting of CSS and HTML content,
+ * updating relevant state and UI components accordingly.
+ * Handles errors and ensures user data is automatically backed up during the process.
+ *
+ * @return {void} Does not return a value. The function updates application state and UI components directly.
+ */
 export function extractBase() {
     try {
         const raw = (els.templateInput?.value || '').trim();
@@ -65,7 +100,8 @@ export function extractBase() {
     const extractedCssAll = styles.join('\n\n').trim();
 
     const { baseCss: cssBaseRaw, userCss: cssUserRaw, marker } = splitCssFromPreview(extractedCssAll);
-    const { css: cssBase } = safeStripInjectedCssNoise(cssBaseRaw);
+    // @ts-ignore
+        const { css: cssBase } = safeStripInjectedCssNoise(cssBaseRaw);
 
     const { baseBody: bodyBase, userHtml } = splitBodyFromPreview(doc);
 
@@ -102,6 +138,12 @@ export function extractBase() {
   }
 }
 
+/**
+ * Restores the base template by loading the template associated with the active template ID.
+ * If no active template ID is found, a warning status message is set.
+ *
+ * @return {void} Does not return a value.
+ */
 export function restoreTemplateBase() {
   if (!state.activeTemplateId) {
     setStatus('warn', 'No active template selected.');

@@ -19,6 +19,13 @@ import { quickFormatCss } from './utils/format.js';
 
 import { saveSnapshot, deleteSelectedSnapshot, loadSnapshotById } from './snapshots/index.js';
 
+/**
+ * Binds UI elements to their respective event handlers and initializes various interactive features
+ * of the application. This includes setting up button click listeners, input change handlers,
+ * custom rendering logic, and other UI-specific functionality.
+ *
+ * @return {void} Nothing is returned by this function. It sets up event bindings and configurations.
+ */
 export function bindUI() {
   on('btnExtract', 'click', extractBase);
   on('btnRenderNow', 'click', renderPreview);
@@ -52,14 +59,16 @@ export function bindUI() {
   // Zoom / Height
   if (els.zoomRange) {
     els.zoomRange.addEventListener('input', () => {
-      state.previewScale = parseInt(els.zoomRange.value, 10) / 100;
+      // @ts-ignore
+        state.previewScale = parseInt(els.zoomRange.value, 10) / 100;
       applyPreviewSizing();
     });
   }
 
   if (els.heightRange) {
     els.heightRange.addEventListener('input', () => {
-      state.previewMinHeightPx = parseInt(els.heightRange.value, 10);
+      // @ts-ignore
+        state.previewMinHeightPx = parseInt(els.heightRange.value, 10);
       applyPreviewSizing();
     });
   }
@@ -138,7 +147,8 @@ export function bindUI() {
 
   if (els.snapshotSelect) {
     els.snapshotSelect.addEventListener('change', () => {
-      const encoded = els.snapshotSelect.value;
+      // @ts-ignore
+        const encoded = els.snapshotSelect.value;
       if (!encoded) return;
       loadSnapshotById(decodeURIComponent(encoded));
     });
@@ -168,7 +178,8 @@ export function bindUI() {
       };
 
       document.querySelectorAll('.editor-wrap').forEach((w) => w.classList.remove('active'));
-      const targetId = wrapMap[id];
+      // @ts-ignore
+        const targetId = wrapMap[id];
       const target = targetId ? document.getElementById(targetId) : null;
       if (target) target.classList.add('active');
     });

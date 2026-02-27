@@ -1,25 +1,12 @@
 // @ts-check
 
 /**
- * @typedef {{
- *  id: string;
- *  name: string;
- *  keywords?: string;
- *  description?: string;
- *  order?: number;
- *  html: string;
- *  css: string;
- *  fields?: Array<{
- *    id: string;
- *    label: string;
- *    type?: 'text'|'textarea';
- *    placeholder?: string;
- *    defaultValue?: string;
- *    allowHtml?: boolean;
- *  }>;
- * }} WidgetDef
+ * Retrieves and constructs a list of widget definitions from a specified folder.
+ * Each widget definition includes required properties such as id, name, html, and css.
+ * Widgets are filtered for validity, sorted based on their order attribute (or by name as a tiebreaker if order is not specified), and then returned as an array.
+ *
+ * @return {WidgetDef[]} An array of widget definitions, sorted by order and name.
  */
-
 export function getWidgets() {
     const mods = import.meta.glob('./defs/*.widget.js', { eager: true });
 
