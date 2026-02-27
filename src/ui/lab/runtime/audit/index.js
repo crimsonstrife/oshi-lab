@@ -263,7 +263,9 @@ function auditCss(css) {
   }
 
   // @import restrictions (fonts allowlist)
-  for (const m of text.matchAll(/@import\s+([^;]+);?/gi)) {
+  // The URL may contain semicolons in query strings (e.g. Google Fonts wght@500;700;800),
+  // so match url(...) or quoted strings in full rather than stopping at the first ';'.
+  for (const m of text.matchAll(/@import\s+(url\(\s*(?:'[^']*'|"[^"]*"|[^)]*)\s*\)|'[^']*'|"[^"]*")[^;]*;?/gi)) {
     const params = String(m[1] ?? '').trim();
     const url = extractImportUrl(params);
     if (!url) {
