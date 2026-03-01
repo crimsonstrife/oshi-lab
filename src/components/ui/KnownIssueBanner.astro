@@ -1,12 +1,48 @@
 ---
-const showKnownIssuesBanner = true;
+import { getCollection } from "astro:content";
+
 const base = import.meta.env.BASE_URL;
+
+// Props:
+// - show: force show/hide
+// - showWhenNoImpacting: still show banner if there are only "annoying"/"note" issues
+// - minSeverity: "impacting" | "annoying" | "note" (for count badge)
+const {
+  show = true,
+  showWhenNoImpacting = true,
+  minSeverity = "impacting",
+} = Astro.props;
+
+const severityOrder = { impacting: 0, annoying: 1, note: 2 };
+const minRank = severityOrder[minSeverity] ?? 0;
+
+const entries = await getCollection("known-issues");
+const open = entries.filter((e) => !e.data.resolved);
+
+const impactingCount = open.filter((e) => e.data.severity === "impacting").length;
+const matchingCount = open.filter((e) => (severityOrder[e.data.severity] ?? 99) <= minRank).length;
+
+const shouldShow = show && (showWhenNoImpacting ? open.length > 0 : impactingCount > 0);
 ---
-{showKnownIssuesBanner && (
-<div class="alert alert-warning rounded-0 mb-0 py-2" role="note">
+
+{shouldShow && (
+  <div class="alert alert-warning rounded-0 mb-0 py-2" role="note">
     <div class="container-fluid d-flex align-items-center justify-content-between gap-2">
-        <span><strong>Known Issues:</strong> Click for workarounds and status updates.</span>
+      <span>
+        <strong>Known Issues:</strong>{" "}
+        {impactingCount > 0
+          ? `${impactingCount} impacting issue${impactingCount === 1 ? "" : "s"} currently listed.`
+          : "Click for workarounds and status updates."}
+      </span>
+
+      <div class="d-flex align-items-center gap-2">
+        {matchingCount > 0 && (
+          <span class="badge text-bg-dark">
+            {minSeverity}+ : {matchingCount}
+          </span>
+        )}
         <a class="btn btn-sm btn-dark" href={`${base}known-issues`}>View details</a>
+      </div>
     </div>
-</div>
-    )}
+  </div>
+)}
