@@ -7,6 +7,13 @@ import { insertAtCursor } from '../../utils/textarea.js';
 import { renderPreview } from '../../preview/render.js';
 import { getCssBlocks } from '../cssBlocks/registry.js';
 
+/**
+ * Wraps a given CSS snippet with a header and footer that includes the provided title.
+ *
+ * @param {string} title - The title to include in the header and footer of the wrapped CSS snippet.
+ * @param {string} css - The CSS code snippet to wrap.
+ * @return {string} The wrapped CSS snippet with a header and footer containing the title.
+ */
 function wrapSnippet(title, css) {
     const header = `/* === CSS Block: ${title} === */\n`;
     const footer = `\n/* === /CSS Block: ${title} === */\n`;

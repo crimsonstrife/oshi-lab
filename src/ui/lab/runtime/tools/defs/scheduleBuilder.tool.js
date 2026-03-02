@@ -6,6 +6,12 @@ import { copyToClipboard } from '../../utils/clipboard.js';
 import { insertAtCursor } from '../../utils/textarea.js';
 import { renderPreview } from '../../preview/render.js';
 
+/**
+ * An array containing objects that represent the days of the week.
+ * Each object in the array includes:
+ * - `id`: A short identifier for the day (e.g., 'mon' for Monday).
+ * - `name`: The abbreviated name of the day (e.g., 'Mon' for Monday).
+ */
 const DAYS = [
     { id: 'mon', name: 'Mon' },
     { id: 'tue', name: 'Tue' },
@@ -16,9 +22,20 @@ const DAYS = [
     { id: 'sun', name: 'Sun' },
 ];
 
+/**
+ * Pads a given number to ensure it has at least two digits by adding a leading zero if necessary.
+ *
+ * @param {number|string} n The number or string to be padded.
+ * @return {string} A string representing the padded value, ensuring it has at least two characters.
+ */
 function pad2(n) { return String(n).padStart(2, '0'); }
 
-/** @param {string} hhmm */
+/**
+ * Converts a time string in "HH:mm" format to the total number of minutes past midnight.
+ *
+ * @param {string} hhmm - A string representing time in "HH:mm" format. Example: "14:30".
+ * @return {number|null} The total number of minutes past midnight, or null if the input is invalid.
+ */
 function toMinutes(hhmm) {
     const m = String(hhmm || '').match(/^(\d{1,2}):(\d{2})$/);
     if (!m) return null;
@@ -28,7 +45,12 @@ function toMinutes(hhmm) {
     return h * 60 + min;
 }
 
-/** @param {number} minutes */
+/**
+ * Converts a time in minutes since midnight to a 12-hour clock format with AM/PM notation.
+ *
+ * @param {number} minutes - The total number of minutes since midnight.
+ * @return {string} The time formatted as a 12-hour clock string (e.g., "hh:mm AM/PM").
+ */
 function fmt12(minutes) {
     const h24 = Math.floor(minutes / 60);
     const m = minutes % 60;
@@ -38,7 +60,12 @@ function fmt12(minutes) {
     return `${h12}:${pad2(m)} ${am ? 'AM' : 'PM'}`;
 }
 
-/** @param {string} s */
+/**
+ * Escapes special characters in a given string to their corresponding HTML entities.
+ *
+ * @param {string} s - The string to be escaped.
+ * @return {string} The escaped string with special characters replaced by HTML entities.
+ */
 function esc(s) {
     return String(s ?? '')
         .replaceAll('&', '&amp;')
@@ -48,6 +75,13 @@ function esc(s) {
         .replaceAll("'", '&#039;');
 }
 
+/**
+ * Generates a CSS stylesheet string for styling a schedule component.
+ *
+ * The returned CSS includes styles for various elements of a schedule component, such as headers, titles, pills, links, grid layouts, and individual day and slot elements. It defines CSS variables for customizable colors, borders, text styles, and spacing, and includes responsive grid configurations for larger screen sizes.
+ *
+ * @return {string} A string containing the CSS stylesheet for the schedule component.
+ */
 function scheduleCss() {
     return `
 .labw-schedule{

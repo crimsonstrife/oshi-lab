@@ -1,0 +1,12 @@
+/*
+  .notice-glow is styled in the base template.
+  These are minor typography adjustments scoped to this widget.
+*/
+
+.labw-notice-glow__title{
+  font-weight: 800;
+}
+
+.labw-notice-glow__body{
+  opacity: .9;
+}
