@@ -255,7 +255,6 @@ details {
     border: 1px solid var(--border);
     border-radius: 12px;
     overflow: hidden;
-    background: rgba(15, 22, 34, 0.55);
 }
 details > summary {
     cursor: pointer;

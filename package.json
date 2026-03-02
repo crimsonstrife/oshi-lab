@@ -1,7 +1,7 @@
 {
   "name": "oshi-lab",
   "type": "module",
-  "version": "0.5.7",
+  "version": "0.6.0",
   "scripts": {
     "sync:templates": "node scripts/sync-templates.mjs",
     "predev": "npm run sync:templates",
