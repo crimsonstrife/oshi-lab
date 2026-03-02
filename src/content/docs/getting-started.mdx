@@ -25,7 +25,7 @@ It gives you:
 
 ## Typical workflow
 
-1. Pick a **Template** (demo profile) to start with or paste your preview code from MyOshi.
+1. Pick a **Template** (demo profile) to start with or paste your preview code from MyOshi, you DO NOT need to paste your preview code if you use the template.
 2. Write **Custom CSS** until it looks right.
 3. Add **Custom HTML** if you need extra structure (widgets, badges, layout wrappers, etc.).
 4. Copy **Custom CSS** and **Custom HTML** into MyOshi.
@@ -61,13 +61,13 @@ That said, always be careful with third-party assets:
 ## Troubleshooting
 
 ### The preview looks different from MyOshi
-That’s currently expected unless you import an exact MyOshi preview HTML. The built-in templates aim to be *faithful enough* to develop styles comfortably.
+That’s currently expected unless you import an exact MyOshi preview HTML. The built-in templates aim to be *faithful enough* to develop styles comfortably, however MyOshi is still undergoing a lot of changes, and I may not be able to keep up with them.
 
 ### My CSS works in the Lab but not on MyOshi
-MyOshi may have additional wrappers, specificity, or different DOM structure.
+MyOshi may have additional wrappers, specificity, or different DOM structure.  This is especially true after a recent update started manually adding the `.profile-page.profile-custom-css` class selectors to any submitted CSS.
 
 Fixes:
-- Increase specificity (e.g. `.profile-page.profile-custom-css .card { ... }`)
+- Increase specificity (e.g. `div.card { ... }`)
 - Avoid relying on overly narrow selectors that only match the demo template
 - Use browser DevTools to confirm your selector matches what you think
 - Use the **Inspect** option in your browser to confirm the element is in the DOM
@@ -83,4 +83,4 @@ Fallback: manually select text, right-click → copy.
 ## Next steps
 
 - Read **Theme Lab** for feature details and power-user tips.
-- Read **Templates** if you want to add/modify demo templates.
+- Read **Templates** if you want to add/modify demo templates (This only works if you've downloaded the source code for this app and are running it locally.).

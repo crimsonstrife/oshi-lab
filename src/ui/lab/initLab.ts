@@ -120,7 +120,7 @@ export async function initLab(root: HTMLElement | null): Promise<void> {
       <div class="container-fluid py-3">
 
         <!-- Top Bar -->
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark border rounded-3 px-3 py-2 mb-3">
+        <nav class="navbar navbar-expand-lg border rounded-3 px-3 py-2 mb-3">
           <div class="container-fluid p-0 gap-2 align-items-start align-items-lg-center">
             <div class="d-flex flex-column min-w-0 me-auto">
               <div class="navbar-brand mb-0 fw-semibold">MyOshi Theme Lab</div>
@@ -217,7 +217,7 @@ export async function initLab(root: HTMLElement | null): Promise<void> {
                       <label class="form-check-label" for="cssLintToggle">Lint</label>
                     </div>
 
-                    <span class="badge text-bg-dark border" id="cssCharCount">0 / 50000</span>
+                    <span class="badge border" id="cssCharCount">0 / 50000</span>
 
                     <div class="form-check form-switch m-0">
                       <input class="form-check-input" type="checkbox" role="switch" id="cssHardCap" checked>
@@ -226,7 +226,7 @@ export async function initLab(root: HTMLElement | null): Promise<void> {
 
                     <button class="btn btn-sm btn-outline-light" id="btnCopyCSS" type="button">Copy CSS</button>
 
-                    <span class="badge text-bg-dark border">Base available in Base Peek</span>
+                    <span class="badge border">Base available in Base Peek</span>
                   </div>
                 </div>
               </div>
@@ -260,7 +260,7 @@ export async function initLab(root: HTMLElement | null): Promise<void> {
                       <label class="form-check-label" for="htmlLintToggle">Lint</label>
                     </div>
 
-                    <span class="badge text-bg-dark border" id="htmlCharCount">0 / 50000</span>
+                    <span class="badge border" id="htmlCharCount">0 / 50000</span>
 
                     <div class="form-check form-switch m-0">
                       <input class="form-check-input" type="checkbox" role="switch" id="htmlHardCap" checked>

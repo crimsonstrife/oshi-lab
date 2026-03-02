@@ -27,6 +27,8 @@ const toHref = (href) =>
     <title>{fullTitle}</title>
     <link rel="icon" href={`${base}favicon.svg`} />
     <link rel="stylesheet" href={`${base}styles/bootstrap.css`} />
+    <link rel="stylesheet" href={`${base}styles/global.css`} />
+    <link rel="stylesheet" href={`${base}styles/oshi-lab.css`} />
     <link rel="sitemap" href="${base}sitemap-index.xml" />
     {extraStyles.map((href) => <link rel="stylesheet" href={toHref(href)} />)}
     <script is:inline src={`${base}scripts/bootstrap.bundle.js`}></script>

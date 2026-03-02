@@ -19,7 +19,7 @@ function updateCharBadge(el, len) {
   if (!el) return;
   el.textContent = `${len} / ${MYOSHI_CHAR_LIMIT}`;
 
-  el.classList.remove("text-bg-dark", "text-bg-warning", "text-bg-danger");
+  el.classList.remove("text-bg-warning", "text-bg-danger");
   if (len > MYOSHI_CHAR_LIMIT) el.classList.add("text-bg-danger");
   else if (len > Math.floor(MYOSHI_CHAR_LIMIT * 0.9)) el.classList.add("text-bg-warning");
   else el.classList.add("text-bg-dark");

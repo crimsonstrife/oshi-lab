@@ -6,27 +6,65 @@ import { setStatus } from '../status.js';
 import { copyToClipboard } from '../utils/clipboard.js';
 
 /**
- * @typedef {'error'|'warn'|'info'} Severity
- * @typedef {{ line: number, column: number }} SourceLoc
- * @typedef {{
- *   id: string;
- *   severity: Severity;
- *   title: string;
- *   message: string;
- *   hint?: string;
- *   loc?: SourceLoc;
- *   selector?: string;
- *   elementPath?: string;
- *   meta?: Record<string, any>;
- * }} AuditIssue
- * @typedef {{ createdAt: string; summary: { error: number; warn: number; info: number }; issues: AuditIssue[] }} AuditReport
+ * The CSS_CHAR_LIMIT constant defines the maximum number of characters
+ * allowed in a CSS stylesheet. This limit helps ensure that style rules
+ * remain manageable and do not exceed browser processing capabilities or
+ * constraints, such as performance and memory handling.
+ *
+ * It is commonly used in scenarios where CSS is dynamically generated
+ * or manipulated, such as inline styles, style blocks, or when writing
+ * styles to the DOM. Exceeding this limit may result in incomplete or
+ * disregarded styles, depending on the implementation.
+ *
+ * The value is set to 50,000 characters as a practical upper boundary.
  */
 
 const CSS_CHAR_LIMIT = 50_000;
+/**
+ * Defines the maximum limit for the number of characters allowed in an HTML document or content.
+ *
+ * This constant is used to restrict the length of HTML content,
+ * ensuring that it does not exceed the specified character limit.
+ * It helps in maintaining performance and adhering to design constraints.
+ *
+ * Value: 50,000
+ */
 const HTML_CHAR_LIMIT = 50_000;
+/**
+ * Constant representing the capacity limit or maximum threshold, commonly used
+ * in scenarios that require an upper bound for processing, storage, or other
+ * capacity constraints.
+ *
+ * @constant {number} Z_CAP
+ * @default 10000
+ */
 const Z_CAP = 10_000;
+/**
+ * Represents the maximum allowed pixel value for a blur effect.
+ *
+ * This constant sets an upper limit on the intensity of a blur effect,
+ * typically used in graphical or UI components to restrict excessive blurring.
+ *
+ * Value: 50 pixels.
+ *
+ * @constant {number}
+ */
 const BLUR_CAP_PX = 50;
 
+/**
+ * A Set containing a predefined list of trusted hostnames for the import of external resources.
+ *
+ * The `IMPORT_HOST_ALLOWLIST` variable is used to specify and manage a collection of hostnames
+ * that are considered safe for importing external assets such as fonts or scripts. This is particularly
+ * useful in scenarios where ensuring the security and integrity of imported resources is critical.
+ *
+ * The hostnames in the allowlist include:
+ * - fonts.googleapis.com
+ * - fonts.gstatic.com
+ * - fonts.bunny.net
+ * - use.typekit.net
+ * - cdnjs.cloudflare.com
+ */
 const IMPORT_HOST_ALLOWLIST = new Set([
   'fonts.googleapis.com',
   'fonts.gstatic.com',
@@ -35,6 +73,22 @@ const IMPORT_HOST_ALLOWLIST = new Set([
   'cdnjs.cloudflare.com',
 ]);
 
+/**
+ * An array of CSS class names that are designated as protected and should not be altered,
+ * removed, or manipulated by certain operations in the application.
+ *
+ * This variable is used to identify elements in the DOM that require special handling
+ * or exclusion from certain actions, ensuring they retain their intended functionality
+ * and appearance.
+ *
+ * The protected classes include:
+ * - `header`: Represents the main header section of the page.
+ * - `header-nav-bar`: Represents the navigation bar within the header.
+ * - `star-nav`: Represents important navigation links or features.
+ * - `site-footer`: Represents the footer section of the website.
+ * - `notification-dropdown`: Represents the dropdown menu for notifications.
+ * - `profile-actions-dropdown`: Represents the dropdown for profile-related actions.
+ */
 const PROTECTED_CLASSES = [
   'header',
   'header-nav-bar',
@@ -45,8 +99,11 @@ const PROTECTED_CLASSES = [
 ];
 
 /**
- * Run an audit for the current Custom CSS/HTML.
- * Bound to the Audit tab button.
+ * Runs an audit process based on provided CSS and HTML input, optionally including a contrast check.
+ * Updates the application state with the audit report and displays the results.
+ * Handles and reports any errors encountered during execution.
+ *
+ * @return {Promise<void>} A promise that resolves when the audit is complete, with results processed and rendered.
  */
 export async function runAudit() {
   try {
@@ -71,6 +128,13 @@ export async function runAudit() {
   }
 }
 
+/**
+ * Copies the last audit report JSON to the clipboard in a formatted string.
+ * If no audit report is available, a warning status is set. If copying fails,
+ * an error status is set.
+ *
+ * @return {Promise<void>} A promise that resolves when the operation is complete.
+ */
 export async function copyLastAuditJson() {
   try {
     const report = state.lastAuditReport;
@@ -85,7 +149,17 @@ export async function copyLastAuditJson() {
   }
 }
 
-/** @param {{ css: string; html: string; doContrast: boolean }} input */
+/**
+ * Analyzes custom CSS and HTML inputs to identify potential issues, including size constraints,
+ * specific CSS or HTML violations, and optionally performs contrast checks. Returns a detailed report
+ * containing issue information and a summary of severities.
+ *
+ * @param {Object} input - The input parameters for the audit.
+ * @param {string} [input.css] - The raw CSS string to audit. Defaults to an empty string if not provided.
+ * @param {string} [input.html] - The raw HTML string to audit. Defaults to an empty string if not provided.
+ * @param {boolean} [input.doContrast=false] - Indicates whether contrast checks should be performed. Defaults to false.
+ * @return {Promise<AuditReport>} A promise resolving to an audit report that includes issue details and a severity summary.
+ */
 async function audit(input) {
   /** @type {AuditIssue[]} */
   const issues = [];
@@ -150,7 +224,17 @@ async function audit(input) {
   return report;
 }
 
-/** @param {string} css */
+/**
+ * Analyzes the provided CSS code for various issues related to its validity,
+ * security, and compatibility with the MyOshi platform. Identifies warnings
+ * and errors such as malformed syntax, disallowed properties, restricted
+ * patterns, and more. Returns a list of detected issues with detailed metadata.
+ *
+ * @param {string} css - The CSS code to be analyzed and audited for issues.
+ * @return {AuditIssue[]} An array of issues detected in the CSS, where each
+ * issue contains properties such as id, severity, title, message, hint, and
+ * optional locator or metadata for context.
+ */
 function auditCss(css) {
   /** @type {AuditIssue[]} */
   const issues = [];
@@ -371,7 +455,12 @@ function auditCss(css) {
   return dedupeIssues(issues);
 }
 
-/** @param {string} html */
+/**
+ * Analyzes a block of HTML for common issues related to accessibility, security, and best practices.
+ *
+ * @param {string} html - The HTML string to audit. Can be an empty string or malformed HTML.
+ * @return {AuditIssue[]} An array of issues found in the provided HTML, with each issue containing information such as severity, title, message, and suggestions for resolution.
+ */
 function auditHtml(html) {
   /** @type {AuditIssue[]} */
   const issues = [];
@@ -491,6 +580,22 @@ function auditHtml(html) {
   return dedupeIssues(issues);
 }
 
+/**
+ * Scans a document within a preview frame for text contrast issues, ensuring elements meet
+ * accessible contrast ratio requirements. Performs best-effort detection, considering preview
+ * frames, sandboxing, and large DOM structures.
+ *
+ * The function identifies elements containing directly visible text, retrieves their computed
+ * styles, and verifies their contrast ratio against their background. It considers both standard
+ * and large text when determining acceptable contrast thresholds.
+ *
+ * If the iframe is unavailable, sandboxed, or contains an excessively large DOM, a warning issue
+ * is returned, describing why the full check could not be completed.
+ *
+ * @return {Promise<AuditIssue[]>} A promise resolving to an array of audit issues detailing any
+ * contrast problems discovered, or reasons why a full scan wasn't possible. Each issue includes
+ * severity, title, message, and additional metadata when applicable.
+ */
 async function auditContrastBestEffort() {
   /** @type {AuditIssue[]} */
   const issues = [];
@@ -600,7 +705,30 @@ async function auditContrastBestEffort() {
   return issues;
 }
 
-/** @param {AuditReport} report */
+/**
+ * Renders an audit report by updating the user interface elements with
+ * summary information and detailed issue listings.
+ *
+ * @param {Object} report - The audit report object containing summary and issue details.
+ * @param {Object} report.summary - Summary of the audit including counts of errors, warnings, and information.
+ * @param {number} report.summary.error - Number of errors in the audit report.
+ * @param {number} report.summary.warn - Number of warnings in the audit report.
+ * @param {number} report.summary.info - Number of informational messages in the audit report.
+ * @param {string} report.createdAt - Timestamp of when the report was created.
+ * @param {Array} report.issues - Array of issue objects containing detailed issue information.
+ * @param {string} report.issues[].id - Unique identifier of the issue.
+ * @param {string} report.issues[].severity - Severity level of the issue ('error', 'warn', or 'info').
+ * @param {string} report.issues[].title - Title describing the issue.
+ * @param {string} report.issues[].message - Detailed message explaining the issue.
+ * @param {string} [report.issues[].hint] - Optional suggestion for fixing the issue.
+ * @param {string} [report.issues[].selector] - Optional DOM selector associated with the issue.
+ * @param {Object} [report.issues[].loc] - Optional location data for the issue in the source file.
+ * @param {number} report.issues[].loc.line - Line number where the issue occurs.
+ * @param {number} report.issues[].loc.column - Column number where the issue occurs.
+ * @param {string} [report.issues[].elementPath] - Optional string describing the issue's hierarchical element path.
+ *
+ * @return {void}
+ */
 function renderAuditReport(report) {
   if (!els.auditOutput || !els.auditSummary) return;
 
@@ -617,7 +745,7 @@ function renderAuditReport(report) {
   els.auditSummary.appendChild(mkPill(`Errors: ${report.summary.error}`, 'text-bg-danger'));
   els.auditSummary.appendChild(mkPill(`Warnings: ${report.summary.warn}`, 'text-bg-warning'));
   els.auditSummary.appendChild(mkPill(`Info: ${report.summary.info}`, 'text-bg-secondary'));
-  els.auditSummary.appendChild(mkPill(`Updated: ${new Date(report.createdAt).toLocaleString()}`, 'text-bg-dark'));
+  els.auditSummary.appendChild(mkPill(`Updated: ${new Date(report.createdAt).toLocaleString()}`));
 
   // Badge on tab
   if (els.auditBadge) {
@@ -698,7 +826,12 @@ function renderAuditReport(report) {
 // Helpers
 // -------------------------
 
-/** @param {AuditIssue[]} list */
+/**
+ * Removes duplicate issues from a list based on unique combination of properties.
+ *
+ * @param {Array} list - An array of issue objects to be deduplicated. Each object is expected to have properties such as `id`, `severity`, `title`, `message`, `loc`, `selector`, and `elementPath`.
+ * @return {Array} A new array containing only unique issue objects determined by their combination of properties.
+ */
 function dedupeIssues(list) {
   const key = (i) => `${i.id}|${i.severity}|${i.title}|${i.message}|${i.loc?.line ?? ''}:${i.loc?.column ?? ''}|${i.selector ?? ''}|${i.elementPath ?? ''}`;
   const seen = new Set();
@@ -713,7 +846,13 @@ function dedupeIssues(list) {
   return out;
 }
 
-/** @param {string} css */
+/**
+ * Removes CSS comments from a provided CSS string while preserving the newlines
+ * and the overall character positions for alignment purposes.
+ *
+ * @param {string} css - The CSS string from which comments need to be removed.
+ * @return {string} The CSS string with all comments stripped out, maintaining line and character alignment.
+ */
 function stripCssComments(css) {
   // Replace comment contents with spaces while preserving newlines and length,
   // so that character indices and line/column locations remain aligned.
@@ -722,7 +861,14 @@ function stripCssComments(css) {
   );
 }
 
-/** @param {string} text */
+/**
+ * Determines the balance of curly braces in a given text. Accounts for text and string literals within single or double quotes,
+ * and properly handles escaped characters to avoid misinterpreting braces inside string literals.
+ *
+ * @param {string} text - The input string to analyze for brace balance.
+ * @return {number} The net balance of opening and closing curly braces. A positive number indicates more opening braces,
+ * a negative number indicates more closing braces, and 0 indicates perfect balance.
+ */
 function braceBalance(text) {
   let bal = 0;
   let inS = false;
@@ -741,7 +887,13 @@ function braceBalance(text) {
   return bal;
 }
 
-/** @param {string} text */
+/**
+ * Creates a locator function that maps an index in the given text to a line and column number.
+ *
+ * @param {string} text - The input text used to determine line and column positions.
+ * @return {function(number): {line: number, column: number}} A function that takes an index (0-based)
+ * and returns an object with `line` (1-based) and `column` (1-based) properties indicating the position.
+ */
 function makeLocator(text) {
   /** @type {number[]} */
   const starts = [0];
@@ -763,10 +915,12 @@ function makeLocator(text) {
 }
 
 /**
- * Iterate rule headers (text before a "{"), best-effort, ignoring strings.
- * Tracks brace depth so each yielded header is only the selector/at-rule
- * prelude immediately preceding its "{", not any prior rule body content.
- * @param {string} css
+ * Iterates over the headers of CSS rules in a given CSS string.
+ * The method identifies the raw text (header) preceding each '{' character,
+ * while properly handling escape sequences, single quotes, and double quotes.
+ *
+ * @param {string} css - The CSS string to parse and extract rule headers from.
+ * @return {Generator<{raw: string, startIndex: number}, void, unknown>} A generator yielding objects containing the raw header string and its starting index in the input CSS.
  */
 function* iterRuleHeaders(css) {
   let start = 0;
@@ -796,16 +950,21 @@ function* iterRuleHeaders(css) {
   }
 }
 
-/** @param {string} s */
+/**
+ * Safely decodes a URI component. If decoding fails due to an error, the original string is returned.
+ *
+ * @param {string} s - The encoded URI component to decode.
+ * @return {string} - The decoded URI component if successful, otherwise the original string.
+ */
 function safeDecode(s) {
   try { return decodeURIComponent(s); } catch { return s; }
 }
 
 /**
- * Decode CSS hex escape sequences (e.g. \6a or \00006a) in a string value.
- * CSS allows \<1-6 hex digits> optionally followed by a single whitespace.
- * @param {string} s
- * @returns {string}
+ * Decodes CSS escape sequences in a string into their corresponding Unicode characters.
+ *
+ * @param {string} s - The input string containing CSS escape sequences to decode.
+ * @return {string} The decoded string with escape sequences replaced by Unicode characters.
  */
 function decodeCssEscapes(s) {
   return s.replace(/\\([0-9a-fA-F]{1,6})\s?/g, (_, hex) =>
@@ -813,7 +972,12 @@ function decodeCssEscapes(s) {
   );
 }
 
-/** @param {string} params */
+/**
+ * Extracts the URL from a given string, typically from a CSS import or a quoted URL string.
+ *
+ * @param {string} params - A string containing a URL in the format `url("...")` or quoted URL `"..."`.
+ * @return {string|null} The extracted URL if found, otherwise null.
+ */
 function extractImportUrl(params) {
   // url("...") or "..."
   const m1 = params.match(/url\(\s*(['"]?)([^'")\s]+)\1\s*\)/i);
@@ -823,17 +987,33 @@ function extractImportUrl(params) {
   return null;
 }
 
-/** @param {string} url */
+/**
+ * Extracts and returns the host from a given URL string. If the URL is invalid, returns null.
+ *
+ * @param {string} url - The URL string to extract the host from.
+ * @return {string|null} The host of the URL if valid, otherwise null.
+ */
 function safeHost(url) {
   try { return new URL(url).host; } catch { return null; }
 }
 
-/** @param {string} s */
+/**
+ * Escapes special characters in a given string to safely use it in a regular expression.
+ *
+ * @param {string} s - The input string to be escaped.
+ * @return {string} A new string with special characters escaped.
+ */
 function escapeRe(s) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-/** @param {Element} el */
+/**
+ * Constructs a CSS-like path string for a given DOM element by traversing its ancestors
+ * up to a maximum depth of 6 levels, including details like tag names, IDs, and class names.
+ *
+ * @param {Element} el - The DOM element for which to generate the path string.
+ * @return {string} The constructed path string representing the element and its hierarchy.
+ */
 function elementToPath(el) {
   const parts = [];
   let cur = el;
@@ -850,7 +1030,15 @@ function elementToPath(el) {
   return parts.join(' > ');
 }
 
-/** @param {Element} el @param {Document} doc */
+/**
+ * Retrieves the accessible name of an HTML element based on various attributes and relationships
+ * such as `aria-label`, `aria-labelledby`, associated `label` elements, `textContent`, `title`,
+ * and `placeholder`.
+ *
+ * @param {Element} el The HTML element for which the accessible name is to be determined.
+ * @param {Document} doc The document object used to query and retrieve related elements.
+ * @return {string} The accessible name of the element, or an empty string if no name can be determined.
+ */
 function getAccessibleName(el, doc) {
   const aria = el.getAttribute('aria-label');
   if (aria && aria.trim()) return aria.trim();
@@ -883,6 +1071,14 @@ function getAccessibleName(el, doc) {
   return '';
 }
 
+/**
+ * Escapes a string for use in CSS, ensuring that special characters are properly encoded.
+ * If the `CSS.escape` method is available in the environment, it uses that for comprehensive escaping.
+ * Otherwise, it falls back to a basic escaping implementation.
+ *
+ * @param {string} s - The input string to be escaped for CSS compatibility.
+ * @return {string} The CSS-escaped string.
+ */
 function cssEscape(s) {
   // Use the standard CSS.escape when available for correct, comprehensive escaping.
   if (typeof CSS !== 'undefined' && typeof CSS.escape === 'function') {
@@ -894,13 +1090,37 @@ function cssEscape(s) {
 
 // ---- contrast helpers ----
 
-/** @param {string} s */
+/**
+ * Parses an RGBA or RGB color string and returns an object with red, green, blue, and alpha properties.
+ *
+ * @param {string} s - The RGBA or RGB color string to parse, formatted as `rgba(r, g, b, a)` or `rgb(r, g, b)`.
+ * @return {Object|null} An object containing the `r`, `g`, `b`, and `a` properties if parsing is successful, or null if the input string is invalid.
+ */
 function parseRgba(s) {
   const m = String(s).match(/rgba?\(\s*(\d+)[,\s]+(\d+)[,\s]+(\d+)(?:[,\s/]+([\d.]+))?\s*\)/i);
   if (!m) return null;
   return { r: +m[1], g: +m[2], b: +m[3], a: m[4] == null ? 1 : +m[4] };
 }
 
+/**
+ * Blends two colors with alpha compositing.
+ *
+ * @param {Object} fg - The foreground color, represented as an object with r, g, b, and a properties.
+ * @param {number} fg.r - The red component of the foreground color (0-255).
+ * @param {number} fg.g - The green component of the foreground color (0-255).
+ * @param {number} fg.b - The blue component of the foreground color (0-255).
+ * @param {number} fg.a - The alpha component (opacity) of the foreground color (0-1).
+ * @param {Object} bg - The background color, represented as an object with r, g, b, and a properties.
+ * @param {number} bg.r - The red component of the background color (0-255).
+ * @param {number} bg.g - The green component of the background color (0-255).
+ * @param {number} bg.b - The blue component of the background color (0-255).
+ * @param {number} bg.a - The alpha component (opacity) of the background color (0-1).
+ * @return {Object} The resulting blended color as an object with r, g, b, and a properties.
+ * @return {number} return.r - The blended red component (0-255).
+ * @return {number} return.g - The blended green component (0-255).
+ * @return {number} return.b - The blended blue component (0-255).
+ * @return {number} return.a - The blended alpha component (opacity) (0-1).
+ */
 function blend(fg, bg) {
   const a = fg.a + bg.a * (1 - fg.a);
   const r = (fg.r * fg.a + bg.r * bg.a * (1 - fg.a)) / (a || 1);
@@ -909,6 +1129,17 @@ function blend(fg, bg) {
   return { r, g, b, a };
 }
 
+/**
+ * Calculates the relative luminance of a color based on its RGB components.
+ * The calculation uses the formula defined in the WCAG 2.0 specifications.
+ *
+ * @param {Object} c An object representing the color with RGB components.
+ *                   It should have the properties `r`, `g`, and `b`, each being a number between 0 and 255.
+ * @param {number} c.r The red component of the color.
+ * @param {number} c.g The green component of the color.
+ * @param {number} c.b The blue component of the color.
+ * @return {number} The calculated relative luminance as a number between 0 and 1.
+ */
 function relLum(c) {
   const srgb = [c.r, c.g, c.b].map((v) => {
     const x = v / 255;
@@ -917,6 +1148,13 @@ function relLum(c) {
   return 0.2126 * srgb[0] + 0.7152 * srgb[1] + 0.0722 * srgb[2];
 }
 
+/**
+ * Calculates the contrast ratio between two colors based on their relative luminance.
+ *
+ * @param {string} a The first color in a valid format (e.g., HEX, RGB).
+ * @param {string} b The second color in a valid format (e.g., HEX, RGB).
+ * @return {number} The contrast ratio as a decimal value, where a higher value indicates greater contrast.
+ */
 function contrastRatio(a, b) {
   const L1 = relLum(a);
   const L2 = relLum(b);
@@ -925,6 +1163,16 @@ function contrastRatio(a, b) {
   return (hi + 0.05) / (lo + 0.05);
 }
 
+/**
+ * Determines the effective background color of a given element by traversing
+ * up its DOM hierarchy and considering its computed styles.
+ *
+ * @param {Element} el - The DOM element whose background color is to be determined.
+ * @param {Window} win - The window object to access the computed styles of the element.
+ * @return {Object|null} An object representing the RGBA color of the effective background,
+ * or null if a background image is detected. The color object contains properties `r`, `g`, `b` (integers between 0-255),
+ * and `a` (alpha channel as a number between 0-1).
+ */
 function findEffectiveBackground(el, win) {
   let cur = el;
   while (cur) {
@@ -934,7 +1182,8 @@ function findEffectiveBackground(el, win) {
     const hasBgImage = cs.backgroundImage && cs.backgroundImage !== 'none';
     if (hasBgImage) return null;
     if (bgc && bgc.a > 0) return bgc;
-    cur = cur.parentElement;
+    // @ts-ignore
+      cur = cur.parentElement;
   }
   return { r: 255, g: 255, b: 255, a: 1 };
 }
