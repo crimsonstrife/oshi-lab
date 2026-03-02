@@ -1,0 +1,52 @@
+---
+title: Tool - Theme Variables
+description: Generate scoped --vs-* overrides for the base template’s design system.
+---
+
+
+The base template is built around a set of CSS custom properties (variables) prefixed with `--vs-`.  
+This tool generates a scoped block of overrides so you can theme the base template without rewriting a ton of selectors.
+
+## Where to find it
+
+Open **Tools** (Ctrl/Cmd+K) → search **Theme Variables**.
+
+## Use it
+
+1. Confirm the **Scope selector** (default is the MyOshi theme wrapper):
+   - `.profile-page.profile-custom-css`
+2. (Optional) Set **Wrapper** if you want to prepend a parent selector before the scope.
+   - Example: wrapper `.theme-dark` + default scope generates selectors like:
+
+```css
+.theme-dark .profile-page.profile-custom-css { /* vars */ }
+```
+
+   - This is useful when your preview/page toggles a theme class outside the MyOshi wrapper.
+3. Choose a **Preset** as your starting palette.
+4. Adjust variables in the accordion groups.
+5. Copy or insert the **Generated CSS**.
+
+### Output behavior
+
+- By default, the tool outputs **only changed variables** vs the selected preset.
+- Enable **Output all variables** if you want a complete block (useful for sharing).
+
+## Variable groups
+
+- **Core palette**: `--vs-blue`, `--vs-blue-dark`, `--vs-blue-light`, `--vs-orange`, `--vs-orange-light`, `--glow-cyan`, `--glow-pink`, `--glow-purple`
+- **Surfaces & borders**: `--vs-bg-light`, `--vs-bg-white`, `--vs-bg-muted`, `--vs-bg-subtle`, `--vs-bg-dim`, `--vs-input-bg`, `--vs-border`, `--vs-border-light`, `--vs-border-lighter`
+- **Text & links**: `--vs-text-dark`, `--vs-text-medium`, `--vs-text-light`, `--vs-link`, `--vs-link-hover`, `--vs-link-bg`, `--vs-footer-link`
+- **Status & highlights**: `--vs-success`, `--vs-success-bg`, `--vs-success-text`, `--vs-error`, `--vs-error-bg`, `--vs-warning`, `--vs-warning-bg`, `--vs-info-bg`, `--vs-info-accent`, `--vs-highlight-bg`, `--vs-highlight-strong`, `--vs-highlight-border`
+- **Decorative surfaces**: `--soft-pink`, `--soft-pink-mid`, `--soft-pink-border`, `--soft-pink-text`, `--soft-gold`, `--soft-gold-border`, `--vs-btn-danger-bg`, `--vs-btn-danger-hover`
+
+## Buttons
+
+- **Reset to preset** — discard edits and restore the preset values.
+- **Auto-derive** — generates a cohesive set of related colors based on your current choices (good for quick palette building).
+- **Load from Custom CSS** — attempts to read existing `--vs-*` overrides from your Custom CSS so you can continue editing them.
+
+## Tips
+
+- Prefer variable overrides over “deep selector” CSS whenever possible — it’s easier to maintain and less brittle against MyOshi markup changes.
+- If you’re doing dark mode, put dark variables under a wrapper class (e.g. `.theme-dark`) and toggle that class in your HTML.

@@ -7,6 +7,12 @@ import { insertAtCursor } from '../../utils/textarea.js';
 import { renderPreview } from '../../preview/render.js';
 import { getWidgets } from '../widgets/registry.js';
 
+/**
+ * Escapes special HTML characters in a string to their corresponding HTML entities.
+ *
+ * @param {string} s - The input string to be escaped.
+ * @return {string} The escaped string with HTML entities replacing special characters.
+ */
 function escapeHtml(s) {
     return String(s ?? '')
         .replaceAll('&', '&amp;')
@@ -16,18 +22,33 @@ function escapeHtml(s) {
         .replaceAll("'", '&#039;');
 }
 
+/**
+ * Wraps the provided code snippet in a formatted header and footer.
+ *
+ * @param {string} title - The title for the code snippet.
+ * @param {string} code - The code to be wrapped.
+ * @param {string} lang - The programming language of the code snippet.
+ * @return {string} The formatted code snippet with a header and footer.
+ */
 function wrapSnippet(title, code, lang) {
     const header = `/* === ${title} (${lang}) === */\n`;
     const footer = `\n/* === /${title} === */\n`;
     return header + code.trimEnd() + footer;
 }
 
-/** @param {any} widget @param {Record<string,string>} values */
+/**
+ * Applies dynamic values to a widget's template by replacing placeholders with their corresponding values or defaults.
+ * This method processes both HTML and CSS templates of the widget, ensuring proper handling of tokens and escaping when necessary.
+ *
+ * @param {Object} widget The widget containing the templates and fields.
+ * @param {Object.<string, string | number>} values An object mapping field identifiers to their respective values.
+ * @return {Object} An object containing the processed HTML and CSS strings.
+ */
 function applyTemplate(widget, values) {
     const fields = widget.fields || [];
-    const getVal = (id) => values[id] ?? fields.find((f) => f.id === id)?.defaultValue ?? '';
+    const getVal = (/** @type {string | number} */ id) => values[id] ?? fields.find((f) => f.id === id)?.defaultValue ?? '';
 
-    const replaceTokens = (tpl) =>
+    const replaceTokens = (/** @type {any} */ tpl) =>
         String(tpl).replaceAll(/\{\{\s*([a-zA-Z0-9_-]+)\s*\}\}/g, (_, id) => {
             const field = fields.find((f) => f.id === id);
             const raw = getVal(id);
@@ -85,7 +106,7 @@ export default {
         const detailEl = /** @type {HTMLElement|null} */ (panel.querySelector('#widgetDetail'));
         if (!searchEl || !listEl || !detailEl) return;
 
-        const matches = (w, q) => {
+        const matches = (/** @type {{ name: any; keywords: any; description: any; }} */ w, /** @type {string} */ q) => {
             if (!q) return true;
             const hay = `${w.name} ${w.keywords || ''} ${w.description || ''}`.toLowerCase();
             return hay.includes(q.toLowerCase());
@@ -182,7 +203,7 @@ export default {
             const btnRow = document.createElement('div');
             btnRow.className = 'd-flex flex-wrap gap-2 mt-2';
 
-            const mkBtn = (text, cls) => {
+            const mkBtn = (/** @type {string | null} */ text, /** @type {string} */ cls) => {
                 const b = document.createElement('button');
                 b.type = 'button';
                 b.className = cls;

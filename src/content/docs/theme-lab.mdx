@@ -10,8 +10,11 @@ It is intentionally split into:
 - **Base Template** (demo profile HTML/CSS)
 - **Custom CSS** (what you paste into MyOshi)
 - **Custom HTML** (what you paste into MyOshi)
+- **Preview** (iframe, sandbox to view your work)
+- **Snapshots** (what you save to your browser)
+- **Auditing** (check your work for errors)
 
-This makes it easier to keep templates maintainable while your theme stays portable.
+This makes it easier to keep the app maintainable and avoid conflicts.
 
 ---
 
@@ -20,7 +23,7 @@ This makes it easier to keep templates maintainable while your theme stays porta
 ### Base Template
 A template supplies:
 
-- A CSS baseline resembling MyOshi’s styling patterns
+- A CSS baseline resembling MyOshi’s styling patterns as closely as possible.
 - A realistic body structure (cards, headers, sections, etc.)
 - A `.profile-custom-html` mount point where your Custom HTML is injected
 
@@ -32,9 +35,9 @@ Your Custom CSS is appended after the template’s base CSS, so it can override 
 Recommended patterns:
 
 - Prefer CSS variables for theme colors
-- Use a top-level namespace selector to avoid collisions:
-- `.profile-page.profile-custom-css { ... }`
-- Use progressive enhancement:
+- Do not manually include `.profile-page.profile-custom-css { ... }` in your Custom CSS, as that is now applied automatically by MyOshi.
+- Use CSS nesting to avoid specificity issues
+- Use `!important` sparingly
 - Accessibility Tip! Your theme should still be readable if images fail to load, avoid replacing text with images.
 
 ### Custom HTML
@@ -88,10 +91,12 @@ Snapshots store your current work in your browser (LocalStorage):
 - Any toggles (append/replace behavior, mock data settings, etc.)
 
 Snapshots do **not** include:
-- the entire base template
+- the entire base template, they can be applied to any template however
 - imported MyOshi preview HTML (if used)
 
 This keeps snapshots small and portable.
+
+Snapshots are also ONLY stored in your local browser, you will not be able to share them with others or access them from another device.
 
 ---
 
@@ -111,7 +116,7 @@ This is the safest workflow for MyOshi usage.
 A good starting point is to define variables and a few core surfaces:
 
 ```css
-.profile-page.profile-custom-css {
+root: {
   --theme-bg: #0b0f17;
   --theme-panel: rgba(18, 24, 36, 0.85);
   --theme-border: rgba(40, 60, 90, 0.55);

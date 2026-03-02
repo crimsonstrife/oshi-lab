@@ -27,6 +27,8 @@ const toHref = (href) =>
     <title>{fullTitle}</title>
     <link rel="icon" href={`${base}favicon.svg`} />
     <link rel="stylesheet" href={`${base}styles/bootstrap.css`} />
+    <link rel="stylesheet" href={`${base}styles/global.css`} />
+    <link rel="stylesheet" href={`${base}styles/oshi-lab.css`} />
     <link rel="sitemap" href="${base}sitemap-index.xml" />
     {extraStyles.map((href) => <link rel="stylesheet" href={toHref(href)} />)}
     <script is:inline src={`${base}scripts/bootstrap.bundle.js`}></script>
@@ -67,6 +69,8 @@ const toHref = (href) =>
                             <div class="list-group">
                                 <a class="list-group-item list-group-item-action" href={`${base}lab/`}>Open the Lab</a>
                                 <a class="list-group-item list-group-item-action" href={`${base}docs/getting-started/`}>Getting Started</a>
+                                <a class="list-group-item list-group-item-action" href={`${base}docs/tools/`}>Tools</a>
+                                <a class="list-group-item list-group-item-action" href={`${base}docs/widgets/`}>Widgets</a>
                                 <a class="list-group-item list-group-item-action" href={`${base}docs/`}>All Docs</a>
                             </div>
                         </div>

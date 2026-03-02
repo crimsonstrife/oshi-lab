@@ -1,0 +1,52 @@
+---
+title: Tool - Accessibility Audit
+description: Audit your theme for common accessibility issues (alt text, accessible names, contrast).
+---
+
+Accessibility Audit scans your preview and reports common issues. It also provides a couple of “quick fix” actions.
+
+## Where to find it
+
+Open **Tools** (Ctrl/Cmd+K) → search **Accessibility Audit**.
+
+## What it checks
+
+### 1) Custom HTML semantics (only inside `.profile-custom-html`)
+
+- **Images without `alt`**
+  - Missing `alt` is reported as an error
+  - Empty `alt=""` is warned (OK for decorative images)
+- **Clickable elements without an accessible name**
+  - Icon-only links/buttons with no text and no `aria-label` / `aria-labelledby`
+
+### 2) Contrast (page-wide)
+
+- Checks visible text against the computed background color.
+- Reports low contrast based on the selected WCAG target:
+  - **AA** (default)
+  - **AAA**
+
+## Contrast reporting options
+
+- **Only issues introduced/worsened by Custom CSS (diff vs baseline)** (default)
+  - Runs contrast checks twice: once with **no custom CSS**, then again with your custom CSS.
+  - Reports only issues that you introduced or made worse.
+- **Include pre-existing base issues**
+  - Include contrast issues that exist even without your custom CSS.
+
+## Actions
+
+- **Run Audit**
+  - Runs all checks and populates the results list.
+- **Add `alt=""` to missing `<img>` in Custom HTML**
+  - Adds empty alt attributes to images that are missing `alt`.
+  - Important: empty alt is correct only for *decorative* images. Add descriptive alt text for content images.
+- **Copy Report**
+  - Copies a text report of the current results.
+- **Insert Suggested CSS Fixes**
+  - Inserts suggested CSS snippets for contrast issues (when available).
+
+## Limitations (read this)
+
+- Contrast is best-effort. If an element is over a background image/gradient, the tool may flag it as “can’t be verified reliably”.
+- Automated “fixes” are suggestions — always double-check in preview and consider real user testing.

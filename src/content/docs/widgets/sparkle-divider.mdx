@@ -1,0 +1,35 @@
+---
+title: Widget - Sparkle Divider (native)
+description: A themed horizontal divider that matches the base template’s “sparkle” styling.
+---
+
+## Fields
+
+| Field | Label | Default |
+|---|---|---|
+| `margin` | Vertical margin (CSS) | `12px 0` |
+
+    ## Template HTML
+
+    ```html
+    <hr class="sparkle-divider labw-sparkle-divider" />
+    ```
+
+    ## Template CSS
+
+    ```css
+    /*
+  .sparkle-divider is already defined in the base template.
+  This lets users customize spacing without touching global styles.
+*/
+
+.labw-sparkle-divider{
+  margin: {{margin}};
+}
+    ```
+
+
+## “Native” widget note
+
+This widget intentionally reuses base-template/MyOshi classes for its look.  
+If you switch templates or remove the base template styles, you may need to add your own styling.

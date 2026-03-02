@@ -1,0 +1,42 @@
+---
+title: Tools
+description: What the Tools modal is, where to find it, and what each tool does.
+---
+
+
+The lab includes a **Tools** modal that can generate snippets, audit your theme, and help you patch common MyOshi quirks without hand-editing everything.
+
+## Open the Tools modal
+
+- Click **Tools** in the header (if visible), or
+- Press **Ctrl/Cmd + K**
+
+From there you can search tools by name and click one to open it in the right panel.
+
+## How tool outputs work
+
+Most tools will do one (or more) of the following:
+
+- **Copy** output to your clipboard.
+- **Insert** output at your cursor in **Custom HTML** or **Custom CSS**.
+- **Replace** content (only when the tool offers a replace button — use carefully).
+
+If **Auto Update** is enabled in the lab, tools that insert into editors will usually trigger an immediate preview refresh.
+
+## Tool list
+
+- **Color Converter** — convert between HEX/RGBA and insert a `--var: ...;` snippet.
+- **CSS Scope Fixer** — rewrite pasted CSS so it plays nicely with MyOshi’s automatic scoping.
+- **Schedule Builder** — generate an HTML+CSS streaming schedule block from simple “slots”.
+- **Theme Variables** — generate scoped `--vs-*` overrides for the base template.
+- **Component Styler** — generate scoped CSS for common components (cards, navbar, tabs, links).
+- **Widget Inserter** — insert pre-made widgets (HTML+CSS) with customizable fields.
+- **CSS Blocks** — insert ready-to-go CSS chunks (glass cards, background overlay, etc.).
+- **Accessibility Audit** — scan for common a11y issues (alt text, accessible names, contrast).
+
+## Developer notes
+
+Tools are auto-registered from `tools/defs/*.tool.js` via `import.meta.glob()`. To add a new tool, export a default object with:
+
+- `id`, `name`, `keywords` (optional), `order` (optional)
+- `render(panel)` — build the tool UI inside the provided element

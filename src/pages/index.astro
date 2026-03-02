@@ -7,11 +7,15 @@ const base = import.meta.env.BASE_URL;
 const docs = await getCollection('docs', ({ data }) => !data.sidebar?.hidden);
 docs.sort((a, b) => (a.data.sidebar?.order ?? a.data.order ?? 9999) - (b.data.sidebar?.order ?? b.data.order ?? 9999));
 const popular = docs.slice(0, 5);
+
+// Highlight tools/widgets docs on the homepage (keeps homepage in sync with docs)
+const toolsDocs = docs.filter((d) => d.slug.startsWith('tools/') && !d.slug.endsWith('/index') && d.slug !== 'tools').slice(0, 6);
+const widgetDocs = docs.filter((d) => d.slug.startsWith('widgets/') && !d.slug.endsWith('/index') && d.slug !== 'widgets').slice(0, 6);
 ---
 
 <AppLayout title="Home" bodyClass="home">
     <link rel="stylesheet" href="/styles/homepage.css" />
-    <section class="bg-dark text-light border-bottom">
+    <section class="border-bottom">
         <div class="container py-5">
             <h1 class="display-5 fw-semibold mb-2">MyOshi Theme Lab</h1>
             <p class="lead text-body-secondary mb-4">
@@ -33,7 +37,7 @@ const popular = docs.slice(0, 5);
     <section id="how-it-works" class="container py-5">
         <div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-3">
             <h2 class="h4 fw-semibold mb-0">How it works</h2>
-            <a class="small link-secondary" href={`${base}docs/getting-started/`}>Read the full guide →</a>
+            <a class="small link-secondary" href={`${base}docs/getting-started/`}>Read the guide →</a>
         </div>
 
         <ol class="how-timeline">
@@ -43,7 +47,7 @@ const popular = docs.slice(0, 5);
                     <div class="card-body">
                         <div class="fw-semibold mb-1">Choose a starting point</div>
                         <div class="text-body-secondary mb-2">
-                            Start from a built-in scaffold or paste MyOshi preview HTML.
+                            Start from a built-in scaffold OR paste MyOshi preview HTML.
                         </div>
                         <div class="d-flex flex-wrap gap-2">
                             <span class="badge text-bg-secondary">Template scaffold</span>
@@ -71,7 +75,7 @@ const popular = docs.slice(0, 5);
                     <div class="card-body">
                         <div class="fw-semibold mb-1">Export + ship</div>
                         <div class="text-body-secondary">
-                            Copy/paste into MyOshi or download a bundle when you’re ready.
+                            Copy/paste into MyOshi when you’re ready.
                         </div>
                     </div>
                 </div>
@@ -86,8 +90,7 @@ const popular = docs.slice(0, 5);
                     <div class="card-header fw-semibold">Quickstart</div>
                     <div class="card-body">
                         <ol class="mb-0">
-                            <li class="mb-2">Open the Lab → choose a template.</li>
-                            <li class="mb-2">Paste preview HTML → click <b>Extract Base</b>.</li>
+                            <li class="mb-2">Open the Lab → choose a template OR Paste preview HTML → click <b>Extract Base</b>.</li>
                             <li class="mb-2">Edit <b>Custom CSS</b>/<b>Custom HTML</b> and preview.</li>
                             <li class="mb-2">Use snapshots to checkpoint changes.</li>
                             <li>Copy/paste into MyOshi or download your bundle.</li>
@@ -111,10 +114,74 @@ const popular = docs.slice(0, 5);
             </div>
         </div>
 
-        <div class="alert alert-secondary mt-4 mb-0">
-            <div class="fw-semibold mb-1">Coming soon</div>
-            <div class="text-body-secondary">
-                Lab Tools palette (color converter, gradient builder, snippet inserter, accessibility checks).
+        <div class="row g-3 mt-4">
+            <div class="col-12 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-header fw-semibold">Tools Palette</div>
+                    <div class="card-body">
+                        <div class="text-body-secondary small mb-3">
+                            In the Lab, open <b>Tools</b> (or press <b>Ctrl/Cmd + K</b>) to generate safer CSS/HTML faster.
+                        </div>
+
+                        <ul class="small mb-3">
+                            <li><b>CSS Scope Fixer</b> (MyOshi auto-scope safe)</li>
+                            <li><b>Accessibility Audit</b> (alt/labels  contrast checks)</li>
+                            <li><b>Theme Variables</b> (quick palette presets)</li>
+                            <li><b>Component Styler</b> (cards/nav/tabs/link styling)</li>
+                            <li><b>Schedule Builder</b> (stream schedule markup)</li>
+                            <li><b>Color Converter</b> (HEX/RGBA snippets)</li>
+                        </ul>
+
+                        <a class="btn btn-sm btn-outline-primary" href={`${base}docs/tools/`}>Browse tool docs</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-header fw-semibold">Widgets</div>
+                    <div class="card-body">
+                        <div class="text-body-secondary small mb-3">
+                            Insert pre-made HTML + CSS widgets (callouts, cards, Twitch buttons, schedule grids).
+                        </div>
+
+                        {widgetDocs.length ? (
+                            <div class="list-group list-group-flush small mb-3">
+                                    {widgetDocs.map((d) => (
+                                        <a class="list-group-item list-group-item-action px-0" href={`${base}docs/${d.slug}/`}>
+                                                <div class="fw-semibold">{d.data.sidebar?.label ?? d.data.title}</div>
+                                                {d.data.description ? <div class="text-body-secondary">{d.data.description}</div> : null}
+                                            </a>
+                                    ))}
+                                </div>
+                        ) : (
+                            <div class="small text-body-secondary mb-3">
+                                    See the widgets library in the docs.
+                                </div>
+                        )}
+
+                        <a class="btn btn-sm btn-outline-primary" href={`${base}docs/widgets/`}>Browse widget docs</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-header fw-semibold">CSS Blocks</div>
+                    <div class="card-body">
+                        <div class="text-body-secondary small mb-3">
+                            Drop in CSS chunks for common patterns.
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <span class="badge text-bg-secondary">Glassmorphism cards</span>
+                            <span class="badge text-bg-secondary">Background overlay</span>
+                            <span class="badge text-bg-secondary">Merge blurb borders</span>
+                        </div>
+
+                        <a class="btn btn-sm btn-outline-primary" href={`${base}docs/tools/css-blocks/`}>How to use CSS Blocks</a>
+                    </div>
+                </div>
             </div>
         </div>
     </section>

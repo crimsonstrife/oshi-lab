@@ -1,0 +1,39 @@
+---
+title: Tool - Schedule Builder
+description: Generate a responsive streaming schedule block (HTML + CSS).
+---
+
+
+**Schedule Builder** is a form-driven generator for a responsive weekly schedule. It outputs both **HTML** and **CSS** so you can paste it straight into MyOshi.
+
+## Where to find it
+
+Open **Tools** (Ctrl/Cmd+K) → search **Schedule Builder**.
+
+## Use it
+
+1. Set the **Title** (e.g., “Stream Schedule”).
+2. Set the **Timezone label** (e.g., “ET”, “UTC”, “JST”).
+3. (Optional) Set **Twitch username** to add a “View on Twitch” link.
+4. Click **Add slot**.
+5. For each slot, fill:
+   - **Day**
+   - **Start time**
+   - **End time**
+   - **Title** (e.g., “Variety”, “Collab”, “Horror…”)
+   - Optional **note** (e.g., “Members only”, “Subject to change”)
+6. Click **Generate**.
+
+### Inserting output
+
+Use the buttons under the output boxes:
+
+- **Insert both** — inserts HTML into **Custom HTML** and CSS into **Custom CSS**
+- **Insert HTML / Insert CSS** — insert only one side
+- **Copy HTML / Copy CSS** — copy to clipboard
+
+## Notes & limitations
+
+- **Sort** reorders slots by day + time to keep your schedule tidy.
+- The generated block is intentionally class-scoped to avoid interfering with the rest of the page.
+- If you prefer a “fill in the slots manually” approach, you can use the **Streaming Schedule (Grid)** widget instead (see **Widgets**).

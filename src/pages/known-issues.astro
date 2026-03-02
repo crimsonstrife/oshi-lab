@@ -74,7 +74,7 @@ const lastUpdatedText = lastUpdated ? fmtDate(new Date(lastUpdated)) : "—";
       <p class="text-muted mb-2">{page.description}</p>
 
       <div class="d-flex flex-wrap gap-2 align-items-center">
-        <span class="badge text-bg-dark">Last updated: {lastUpdatedText}</span>
+        <span class="badge">Last updated: {lastUpdatedText}</span>
         <span class="badge text-bg-info">Total open: {issues.length}</span>
       </div>
     </header>
@@ -140,7 +140,7 @@ const lastUpdatedText = lastUpdated ? fmtDate(new Date(lastUpdated)) : "—";
               >
                 <div class="accordion-body">
                   <div class="mb-2 d-flex flex-wrap gap-2">
-                    <span class="badge text-bg-dark">Status: {i.status}</span>
+                    <span class="badge">Status: {i.status}</span>
                     <span class="badge text-bg-secondary">Areas: {join(i.areas)}</span>
                     {i.updated ? <span class="badge text-bg-light text-dark">Updated: {fmtDate(new Date(i.updated))}</span> : null}
                   </div>

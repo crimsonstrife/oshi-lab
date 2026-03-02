@@ -7,22 +7,12 @@ import { insertAtCursor } from '../../utils/textarea.js';
 import { renderPreview } from '../../preview/render.js';
 
 /**
- * @typedef {{ r:number; g:number; b:number; a:number }} RGBA
- * @typedef {{
- *  type: 'contrast'|'img-alt'|'aria-label';
- *  level: 'error'|'warn'|'info';
- *  scope: 'custom-html'|'page';
- *  message: string;
- *  selector?: string;
- *  sample?: string;
- *  ratio?: number;
- *  required?: number;
- *  baselineRatio?: number;
- *  delta?: number;
- *  cause?: 'introduced'|'worsened'|'preexisting'|'unknown';
- *  fixCss?: string;
- *  imgSrc?: string;
- * }} Issue
+ * Retrieves the source document (srcdoc) content of the preview iframe element.
+ *
+ * This function targets an iframe element with the ID 'previewFrame' and attempts to access its `srcdoc` property
+ * or its `srcdoc` attribute, returning the content as a string. If neither is available, an empty string is returned.
+ *
+ * @return {string} The srcdoc content of the iframe, or an empty string if it is not available.
  */
 
 function getPreviewSrcdoc() {
@@ -30,6 +20,15 @@ function getPreviewSrcdoc() {
     return String(frame?.srcdoc || frame?.getAttribute?.('srcdoc') || '');
 }
 
+/**
+ * Parses a string representing an RGBA or RGB color and converts it into an object containing
+ * red, green, blue, and alpha channel values. If the input is invalid or "transparent",
+ * a default object with zero values for all channels is returned.
+ *
+ * @param {string} input - The input string in RGBA or RGB format, e.g., "rgba(255, 0, 0, 0.5)".
+ * @return {{r: number, g: number, b: number, a: number} | null} An object containing the red, green,
+ * blue, and alpha channel values, or null if the input is not a valid color string.
+ */
 function parseRGBA(input) {
     const s = String(input || '').trim().toLowerCase();
     if (!s || s === 'transparent') return { r: 0, g: 0, b: 0, a: 0 };
@@ -47,6 +46,25 @@ function parseRGBA(input) {
     return { r, g, b, a };
 }
 
+/**
+ * Blends two RGBA colors together using alpha compositing.
+ *
+ * @param {Object} top - The top color to blend, represented as an object with r, g, b, and a properties.
+ * @param {number} top.r - The red component of the top color (0-255).
+ * @param {number} top.g - The green component of the top color (0-255).
+ * @param {number} top.b - The blue component of the top color (0-255).
+ * @param {number} top.a - The alpha (opacity) value of the top color (0-1).
+ * @param {Object} bottom - The bottom color to blend, represented as an object with r, g, b, and a properties.
+ * @param {number} bottom.r - The red component of the bottom color (0-255).
+ * @param {number} bottom.g - The green component of the bottom color (0-255).
+ * @param {number} bottom.b - The blue component of the bottom color (0-255).
+ * @param {number} bottom.a - The alpha (opacity) value of the bottom color (0-1).
+ * @return {Object} The resulting blended color as an object with r, g, b, and a properties.
+ * @return {number} return.r - The red component of the blended color (0-255).
+ * @return {number} return.g - The green component of the blended color (0-255).
+ * @return {number} return.b - The blue component of the blended color (0-255).
+ * @return {number} return.a - The alpha (opacity) value of the blended color (0-1).
+ */
 function blend(top, bottom) {
     const a = top.a + bottom.a * (1 - top.a);
     if (a <= 0) return { r: 0, g: 0, b: 0, a: 0 };
@@ -56,11 +74,26 @@ function blend(top, bottom) {
     return { r, g, b, a };
 }
 
+/**
+ * Converts a sRGB color value to its linear color space equivalent.
+ *
+ * @param {number} u8 - The sRGB color value as a number between 0 and 255.
+ * @return {number} The linear color space equivalent of the input sRGB value.
+ */
 function srgbToLinear(u8) {
     const v = u8 / 255;
     return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
 }
 
+/**
+ * Calculates the relative luminance of a color based on its RGB components.
+ *
+ * @param {Object} c - An object representing the RGB color channels.
+ * @param {number} c.r - The red component of the color, typically in the range [0, 1].
+ * @param {number} c.g - The green component of the color, typically in the range [0, 1].
+ * @param {number} c.b - The blue component of the color, typically in the range [0, 1].
+ * @return {number} The relative luminance of the color, a value between 0 and 1.
+ */
 function luminance(c) {
     const r = srgbToLinear(c.r);
     const g = srgbToLinear(c.g);
@@ -68,6 +101,15 @@ function luminance(c) {
     return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
 
+/**
+ * Calculates the contrast ratio between two colors.
+ * The contrast ratio is computed based on the luminance values of the colors,
+ * following the WCAG (Web Content Accessibility Guidelines) formula.
+ *
+ * @param {string} fg - The foreground color in hexadecimal format (e.g., #RRGGBB).
+ * @param {string} bg - The background color in hexadecimal format (e.g., #RRGGBB).
+ * @return {number} The contrast ratio as a number, where higher values indicate better contrast.
+ */
 function contrastRatio(fg, bg) {
     const L1 = luminance(fg);
     const L2 = luminance(bg);
@@ -76,6 +118,13 @@ function contrastRatio(fg, bg) {
     return (hi + 0.05) / (lo + 0.05);
 }
 
+/**
+ * Determines if a text is considered large based on its font size and font weight.
+ *
+ * @param {string|number} fontSizePx - The font size of the text in pixels. Can be a string or number.
+ * @param {string|number} fontWeight - The font weight of the text. Can be a string ('bold', 'normal', etc.) or a numerical value.
+ * @return {boolean} Returns true if the text is considered large, otherwise false.
+ */
 function isLargeText(fontSizePx, fontWeight) {
     const size = Number(fontSizePx) || 0;
     const weight =
@@ -88,18 +137,40 @@ function isLargeText(fontSizePx, fontWeight) {
     return size >= 24 || (size >= 19 && weight >= 700);
 }
 
+/**
+ * Trims the input text, replaces multiple spaces with a single space, and ensures the
+ * result is at most 60 characters long. If the text exceeds 60 characters, it appends
+ * an ellipsis ("…") to indicate truncation.
+ *
+ * @param {string} text - The input text to process.
+ * @return {string} The processed text, either trimmed, truncated, or returned as an empty string if invalid.
+ */
 function safeSample(text) {
     const t = String(text || '').replace(/\s+/g, ' ').trim();
     if (!t) return '';
     return t.length > 60 ? t.slice(0, 60) + '…' : t;
 }
 
+/**
+ * Escapes a given string to ensure it is a valid CSS identifier.
+ * This method uses `CSS.escape` if available, otherwise falls back to
+ * a custom implementation that escapes invalid characters.
+ *
+ * @param {string} s - The string to be escaped for use as a CSS identifier.
+ * @return {string} The escaped string, suitable to use as a CSS identifier.
+ */
 function cssEscapeIdent(s) {
     // @ts-ignore
     if (typeof CSS !== 'undefined' && typeof CSS.escape === 'function') return CSS.escape(s);
     return String(s).replace(/[^a-zA-Z0-9_-]/g, '\\$&');
 }
 
+/**
+ * Generates a simple CSS selector for a given DOM element.
+ *
+ * @param {Element} el - The DOM element for which the selector is to be generated.
+ * @return {string} A CSS selector string uniquely identifying the input element.
+ */
 function simpleSelector(el) {
     if (el.id) return `#${cssEscapeIdent(el.id)}`;
     const tag = el.tagName.toLowerCase();
@@ -117,6 +188,13 @@ function simpleSelector(el) {
     return tag;
 }
 
+/**
+ * Builds a CSS selector string for a DOM element relative to a given scope root element.
+ *
+ * @param {Element} el - The DOM element for which the selector is being generated.
+ * @param {Element|null} scopeRoot - The root element that defines the scope for the selector, or null for global scope.
+ * @return {string} The generated CSS selector string for the DOM element.
+ */
 function buildSelector(el, scopeRoot) {
     const parts = [];
     let cur = el;
@@ -135,6 +213,14 @@ function buildSelector(el, scopeRoot) {
     return prefix + parts.join(' > ');
 }
 
+/**
+ * Resolves the effective background of a specified DOM element, taking into account its background color,
+ * background image, and the computed styles of its ancestor elements.
+ *
+ * @param {Element} el The DOM element for which the effective background should be calculated.
+ * @return {{bg: RGBA, hasImage: boolean}} An object containing the resolved background color (`bg`) as an RGBA object
+ * and a boolean (`hasImage`) indicating whether a background image is present.
+ */
 function resolveEffectiveBackground(el) {
     /** @type {RGBA[]} */
     const layers = [];
@@ -160,6 +246,15 @@ function resolveEffectiveBackground(el) {
     return { bg: base, hasImage };
 }
 
+/**
+ * Ensures an iframe is set up and loads the provided HTML content as its document.
+ * This method creates an invisible iframe if it does not already exist,
+ * assigns the provided HTML content (`srcdoc`) to it, and waits for the content to load.
+ *
+ * @param {string} srcdoc The HTML content to load into the audit iframe.
+ * @return {Promise<Document>} A promise that resolves to the document of the iframe after it has loaded the provided content.
+ * @throws {Error} If the iframe fails to load the document.
+ */
 async function ensureAuditDoc(srcdoc) {
     let frame = /** @type {HTMLIFrameElement|null} */ (document.getElementById('a11yAuditFrame'));
     if (!frame) {
@@ -191,8 +286,13 @@ async function ensureAuditDoc(srcdoc) {
 }
 
 /**
- * Best-effort baseline: remove custom CSS from the srcdoc so we can diff.
- * Works best if your renderPreview wraps custom css with sentinel comments.
+ * Removes specified custom CSS from a given `srcdoc`.
+ * This function attempts to strip custom CSS either by searching for sentinel markers,
+ * matching exact CSS content, or parsing the HTML to find and modify `style` elements.
+ *
+ * @param {string} srcdoc - The HTML source document as a string. It may include inline CSS in `<style>` blocks.
+ * @param {string} customCss - The custom CSS content that should be removed from the `srcdoc`.
+ * @return {string} The modified `srcdoc` with the custom CSS removed, or unchanged if no matches are found.
  */
 function stripCustomCssFromSrcdoc(srcdoc, customCss) {
     const raw = String(srcdoc || '');
@@ -229,7 +329,14 @@ function stripCustomCssFromSrcdoc(srcdoc, customCss) {
     }
 }
 
-/** ---------- Semantics audit: only inside custom HTML ---------- */
+/**
+ * Analyzes a document for semantic accessibility issues within elements specified
+ * under the '.profile-custom-html' container. Checks for missing or empty alt attributes
+ * in images and accessible name issues in clickable elements like links and buttons.
+ *
+ * @param {Document} doc - The document to be audited for semantics issues.
+ * @return {Issue[]} An array of identified semantic issues with detailed information.
+ */
 function auditSemanticsCustom(doc) {
     /** @type {Issue[]} */
     const issues = [];
@@ -323,7 +430,15 @@ function auditSemanticsCustom(doc) {
     return issues;
 }
 
-/** ---------- Contrast audit: page-wide ---------- */
+/**
+ * Performs an audit of text contrast levels in a document to ensure accessibility standards are met.
+ * Checks against specified WCAG contrast levels (AA or AAA) and identifies issues where the required contrast ratio is not achieved.
+ * Attempts to provide a suggested CSS fix for elements with insufficient contrast.
+ *
+ * @param {Document} doc The document to be audited for contrast issues.
+ * @param {string} level The WCAG level to check against. Acceptable values are 'AA' or 'AAA'.
+ * @return {Issue[]} A list of issues found during the contrast audit, including details about each issue and potential fixes.
+ */
 function auditContrast(doc, level) {
     /** @type {Issue[]} */
     const issues = [];
@@ -444,6 +559,14 @@ function auditContrast(doc, level) {
     return issues;
 }
 
+/**
+ * Adds a default empty alt attribute to <img> tags in the given HTML string that do not already have one.
+ *
+ * This function ensures that all <img> tags in the provided HTML string include an alt attribute.
+ *
+ * @param {string} html - The HTML string to process. If null or undefined, it will default to an empty string.
+ * @return {string} The modified HTML string with <img> tags updated to include an alt attribute where missing.
+ */
 function addAltToMissingImgs(html) {
     return String(html || '').replace(/<img\b(?![^>]*\balt\s*=)([^>]*?)(\/?)>/gi, (m, attrs, slash) => {
         const cleaned = attrs || '';
@@ -451,7 +574,19 @@ function addAltToMissingImgs(html) {
     });
 }
 
-/** Diff contrast issues (introduced/worsened/preexisting) */
+/**
+ * Compares the contrast issues between a main set and a baseline set, annotating each issue in the main set
+ * with details about its cause and derived metrics such as baseline contrast ratio and delta.
+ *
+ * @param {Array<Object>} mainIssues - An array of objects representing the main set of contrast issues.
+ * Each object must include properties such as `selector`, `sample`, `required`, and `ratio`.
+ * Additional properties like `baselineRatio`, `delta`, and `cause` may be added or modified.
+ *
+ * @param {Array<Object>} baseIssues - An array of objects representing the baseline set of contrast issues.
+ * Each object must include properties such as `selector`, `sample`, `required`, and `ratio`.
+ *
+ * @return {void} This function does not return a value; instead, it modifies the `mainIssues` array in place.
+ */
 function diffContrast(mainIssues, baseIssues) {
     const baseMap = new Map();
     for (const b of baseIssues) {

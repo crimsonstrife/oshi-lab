@@ -1,0 +1,14 @@
+/*
+  This widget intentionally reuses MyOshi's built-in styles.
+  Only tiny spacing tweaks are applied, scoped to .labw-myoshi-card.
+*/
+
+.labw-myoshi-card{
+  margin-bottom: 10px;
+}
+
+/* Optional: keep long content from breaking layout */
+.labw-myoshi-card .card-body{
+  overflow-wrap: break-word;
+  word-break: break-word;
+}

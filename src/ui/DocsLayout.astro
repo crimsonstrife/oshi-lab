@@ -10,7 +10,7 @@ const { title, currentSlug } = Astro.props;
     <div class="container-fluid py-3">
         <div class="row g-3">
             <aside class="col-12 col-lg-3">
-                <div class="sticky-top" style="top: 72px;">
+                <div class="sticky-top docs-sidebar" style="top: 72px;z-index: 99;">
                     <DocsSidebar currentSlug={currentSlug} />
                 </div>
             </aside>

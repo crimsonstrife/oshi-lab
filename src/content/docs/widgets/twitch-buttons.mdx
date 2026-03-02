@@ -1,0 +1,67 @@
+---
+title: Widget - Twitch Buttons
+description: Three CTA buttons for Twitch. Delete any you don’t want.
+---
+
+## Fields
+
+| Field | Label | Default |
+|---|---|---|
+| `twitchUser` | Twitch username | `yourname` |
+| `labelWatch` | Watch label | `Watch Live` |
+| `labelSchedule` | Schedule label | `Schedule` |
+| `labelVods` | VODs label | `VODs` |
+
+    ## Template HTML
+
+    ```html
+    <div class="labw-btnrow">
+    <a class="labw-btn labw-btn--primary" href="https://twitch.tv/{{twitchUser}}" target="_blank" rel="noopener noreferrer">{{labelWatch}}</a>
+    <a class="labw-btn" href="https://twitch.tv/{{twitchUser}}/schedule" target="_blank" rel="noopener noreferrer">{{labelSchedule}}</a>
+    <a class="labw-btn" href="https://twitch.tv/{{twitchUser}}/videos" target="_blank" rel="noopener noreferrer">{{labelVods}}</a>
+</div>
+    ```
+
+    ## Template CSS
+
+    ```css
+    .labw-btnrow{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.labw-btn{
+    --labw-btn-bg: rgba(255,255,255,.06);
+    --labw-btn-border: rgba(255,255,255,.14);
+    --labw-btn-text: rgba(255,255,255,.92);
+    --labw-btn-accent: #a970ff; /* twitch-ish */
+
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--labw-btn-border);
+    background: var(--labw-btn-bg);
+    color: var(--labw-btn-text);
+    text-decoration:none;
+    font-weight: 800;
+    letter-spacing: .2px;
+}
+
+.labw-btn:hover{
+    transform: translateY(-1px);
+}
+
+.labw-btn--primary{
+    border-color: color-mix(in srgb, var(--labw-btn-accent) 55%, var(--labw-btn-border));
+    background: color-mix(in srgb, var(--labw-btn-accent) 25%, var(--labw-btn-bg));
+}
+    ```
+
+
+## Customizing buttons
+
+The widget ships with three buttons (Watch Live, Schedule, VODs).  
+You can safely delete any `<a class="labw-btn">…</a>` you don’t want after inserting.

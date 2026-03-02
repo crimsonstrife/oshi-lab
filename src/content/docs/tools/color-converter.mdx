@@ -1,0 +1,40 @@
+---
+title: Tool - Color Converter
+description: Convert colors to HEX/RGBA and insert variable snippets into Custom CSS.
+---
+
+
+The **Color Converter** tool helps you normalize colors (HEX ↔︎ RGBA) and quickly insert a CSS variable declaration.
+
+## Where to find it
+
+Open **Tools** (Ctrl/Cmd+K) → search **Color Converter**.
+
+## What it does
+
+- Accepts common CSS color formats:
+  - `#ff3366`, `#f36`
+  - `rgb(255, 51, 102)`
+  - `rgba(255, 51, 102, .8)`
+- Outputs:
+  - **HEX** (normalized)
+  - **RGBA** (normalized)
+- Shows a live swatch.
+
+## Use it
+
+1. Paste a color into **Input**.
+2. Click **Copy** next to **HEX** or **RGBA** as needed.
+3. To insert a variable:
+   - Set **var** to something like `--accent` (or any valid custom property name).
+   - Click **Insert** to add:
+
+```css
+--accent: #ff3366;
+```
+
+That snippet is inserted **at your cursor** in **Custom CSS**.
+
+## Tips
+
+- If you’re working with the base template, you’ll usually want to override `--vs-*` variables (see **Theme Variables**) rather than inventing new ones.

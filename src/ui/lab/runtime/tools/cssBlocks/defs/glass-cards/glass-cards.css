@@ -1,0 +1,21 @@
+/*
+  Glass cards (scoped)
+  - Tweak the selector prefix if your custom CSS is scoped differently.
+*/
+
+.card{
+  background: rgba(255,255,255,.78);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.theme-dark .card,
+.theme-dark .card{
+  background: rgba(26,26,46,.78);
+}
+
+/* Optional: keep headers slightly more opaque */
+.card-header{
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
