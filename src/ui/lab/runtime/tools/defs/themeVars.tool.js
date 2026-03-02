@@ -436,6 +436,7 @@ export default {
           <div class="d-flex flex-wrap gap-2 mt-2">
             <button id="tvReset" class="btn btn-sm btn-outline-light" type="button">Reset to preset</button>
             <button id="tvDerive" class="btn btn-sm btn-outline-secondary" type="button">Auto-derive</button>
+            <button id="tvLoad" class="btn btn-sm btn-outline-warning" type="button">Load from Custom CSS</button>
           </div>
 
           <hr class="my-3" />
@@ -464,9 +465,10 @@ export default {
         const elOut = /** @type {HTMLTextAreaElement|null} */ (panel.querySelector('#tvOut'));
         const btnReset = /** @type {HTMLButtonElement|null} */ (panel.querySelector('#tvReset'));
         const btnDerive = /** @type {HTMLButtonElement|null} */ (panel.querySelector('#tvDerive'));
+        const btnLoad = /** @type {HTMLButtonElement|null} */ (panel.querySelector('#tvLoad'));
         const btnInsert = /** @type {HTMLButtonElement|null} */ (panel.querySelector('#tvInsert'));
         const btnCopy = /** @type {HTMLButtonElement|null} */ (panel.querySelector('#tvCopy'));
-        if (!elScope || !elWrapper || !elPreset || !elAllVars || !elAcc || !elOut || !btnReset || !btnDerive || !btnInsert || !btnCopy) return;
+        if (!elScope || !elWrapper || !elPreset || !elAllVars || !elAcc || !elOut || !btnReset || !btnDerive || !btnLoad || !btnInsert || !btnCopy) return;
 
         /** @type {Record<string,string>} */
         let values = {};
@@ -635,7 +637,288 @@ export default {
             setStatus('ok', 'Derived a few variables from Primary + Accent.');
         };
 
-        elPreset.addEventListener('change', setFromPreset);
+        
+
+        // ---- Load variables back from Custom CSS (round-trip) ----
+        /** @type {Set<string>} */
+        const ALLOWED_VARS = new Set();
+        for (const g of VAR_GROUPS) for (const [n] of g.vars) ALLOWED_VARS.add(n);
+
+        /** @param {string} s */
+        const _escapeRe = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+        /**
+         * @param {string} css
+         * @param {number} openIdx
+         */
+        const _findBrace = (css, openIdx) => {
+            let i = openIdx + 1;
+            let depth = 1;
+            let inStr = null;
+            let inComment = false;
+
+            while (i < css.length) {
+                const ch = css[i];
+                const next = css[i + 1];
+
+                if (inComment) {
+                    if (ch === '*' && next === '/') {
+                        inComment = false;
+                        i += 2;
+                        continue;
+                    }
+                    i += 1;
+                    continue;
+                }
+
+                if (inStr) {
+                    if (ch === '\\') {
+                        i += 2;
+                        continue;
+                    }
+                    if (ch === inStr) inStr = null;
+                    i += 1;
+                    continue;
+                }
+
+                if (ch === '/' && next === '*') {
+                    inComment = true;
+                    i += 2;
+                    continue;
+                }
+
+                if (ch === '"' || ch === "'") {
+                    inStr = ch;
+                    i += 1;
+                    continue;
+                }
+
+                if (ch === '{') depth += 1;
+                else if (ch === '}') {
+                    depth -= 1;
+                    if (depth === 0) return i;
+                }
+
+                i += 1;
+            }
+            return -1;
+        };
+
+        /**
+         * @param {string} header
+         */
+        const _atName = (header) => {
+            const m = String(header || '').trimStart().match(/^@([a-zA-Z-]+)/);
+            return (m?.[1] || '').toLowerCase();
+        };
+
+        /**
+         * @param {string} css
+         * @param {number} start
+         */
+        const _nextTop = (css, start) => {
+            const n = css.length;
+            let i = start;
+            while (i < n && /\s/.test(css[i])) i += 1;
+            if (i >= n) return null;
+
+            // comment
+            if (css[i] === '/' && css[i + 1] === '*') {
+                const end = css.indexOf('*/', i + 2);
+                const endIdx = end === -1 ? n : end + 2;
+                return { kind: 'comment', startIdx: i, endIdx };
+            }
+
+            let inStr = null;
+            let inComment = false;
+            let paren = 0;
+
+            let headerEnd = -1;
+            let isBlock = false;
+
+            for (let j = i; j < n; j++) {
+                const ch = css[j];
+                const next = css[j + 1];
+
+                if (inComment) {
+                    if (ch === '*' && next === '/') {
+                        inComment = false;
+                        j += 1;
+                    }
+                    continue;
+                }
+
+                if (inStr) {
+                    if (ch === '\\') {
+                        j += 1;
+                        continue;
+                    }
+                    if (ch === inStr) inStr = null;
+                    continue;
+                }
+
+                if (ch === '/' && next === '*') {
+                    inComment = true;
+                    j += 1;
+                    continue;
+                }
+
+                if (ch === '"' || ch === "'") {
+                    inStr = ch;
+                    continue;
+                }
+
+                if (ch === '(') paren += 1;
+                else if (ch === ')') paren = Math.max(0, paren - 1);
+
+                if (paren === 0 && ch === '{') {
+                    headerEnd = j;
+                    isBlock = true;
+                    break;
+                }
+                if (paren === 0 && ch === ';') {
+                    headerEnd = j;
+                    isBlock = false;
+                    break;
+                }
+            }
+
+            if (headerEnd === -1) return { kind: 'raw', startIdx: i, endIdx: n };
+
+            const header = css.slice(i, headerEnd).trimEnd();
+            if (!isBlock) return { kind: 'stmt', startIdx: i, endIdx: headerEnd + 1, header };
+
+            const openIdx = headerEnd;
+            const closeIdx = _findBrace(css, openIdx);
+            if (closeIdx === -1) return { kind: 'raw', startIdx: i, endIdx: n };
+
+            return {
+                kind: header.trimStart().startsWith('@') ? 'at' : 'qualified',
+                startIdx: i,
+                header,
+                openIdx,
+                closeIdx,
+                endIdx: closeIdx + 1,
+            };
+        };
+
+        /**
+         * @param {string} selectorText
+         * @param {string} scope
+         * @param {string} wrapper
+         */
+        const _selectorMatches = (selectorText, scope, wrapper) => {
+            const s = String(selectorText || '');
+            const scopeRx = new RegExp(`(^|[\\s>+~,(])${_escapeRe(scope)}(?=([\\s>+~),{]|$))`);
+            const hasScope = scopeRx.test(s);
+            if (!hasScope) return false;
+
+            if (!wrapper) return true;
+
+            const wrapperRx = new RegExp(`(^|[\\s>+~,(])${_escapeRe(wrapper)}(?=([\\s>+~),{]|$))`);
+            return wrapperRx.test(s);
+        };
+
+        /**
+         * Extract CSS variables from Custom CSS that are scoped to the current selector.
+         *
+         * @param {string} css
+         * @param {string} scope
+         * @param {string} wrapper
+         */
+        const _extractVarsFromCss = (css, scope, wrapper) => {
+            /** @type {Record<string,string>} */
+            const out = {};
+
+            const RECURSE = new Set(['media', 'supports', 'container', 'layer', 'document', 'scope']);
+
+            const walk = (/** @type {string} */ text) => {
+                let i = 0;
+                while (i < text.length) {
+                    const part = _nextTop(text, i);
+                    if (!part) break;
+
+                    if (part.kind === 'comment') {
+                        i = part.endIdx;
+                        continue;
+                    }
+
+                    if (part.kind === 'raw' || part.kind === 'stmt') {
+                        i = part.endIdx;
+                        continue;
+                    }
+
+                    if (part.kind === 'qualified') {
+                        if (_selectorMatches(part.header, scope, wrapper)) {
+                            const body = text.slice(part.openIdx + 1, part.closeIdx);
+                            const rx = /--([a-zA-Z0-9_-]+)\s*:\s*([^;]+);/g;
+                            let m;
+                            while ((m = rx.exec(body))) {
+                                const name = m[1];
+                                const val = String(m[2] || '').trim();
+                                if (!ALLOWED_VARS.has(name)) continue;
+                                out[name] = val;
+                            }
+                        }
+                        i = part.endIdx;
+                        continue;
+                    }
+
+                    if (part.kind === 'at') {
+                        const name = _atName(part.header);
+                        const body = text.slice(part.openIdx + 1, part.closeIdx);
+                        if (RECURSE.has(name)) walk(body);
+                        i = part.endIdx;
+                        continue;
+                    }
+
+                    i = part.endIdx;
+                }
+            };
+
+            walk(css);
+            return out;
+        };
+
+        btnLoad.addEventListener('click', () => {
+            if (!els.customCss) {
+                setStatus('warn', 'Custom CSS textarea unavailable.');
+                return;
+            }
+
+            const scope = elScope.value.trim() || '.profile-page.profile-custom-css';
+            const wrapper = elWrapper.value.trim();
+            const cssText = String(els.customCss.value || '');
+
+            const found = _extractVarsFromCss(cssText, scope, wrapper);
+            const keys = Object.keys(found);
+
+            if (!keys.length && wrapper) {
+                // Fallback: if wrapper-specific match found nothing, try scope-only.
+                const found2 = _extractVarsFromCss(cssText, scope, '');
+                const keys2 = Object.keys(found2);
+                if (!keys2.length) {
+                    setStatus('warn', `No theme variables found for ${wrapper} ${scope}.`);
+                    return;
+                }
+                values = { ...values, ...found2 };
+                renderInputs();
+                updateOutput();
+                setStatus('ok', `Loaded ${keys2.length} variables from Custom CSS (scope-only fallback).`);
+                return;
+            }
+
+            if (!keys.length) {
+                setStatus('warn', `No theme variables found for ${scope}.`);
+                return;
+            }
+
+            values = { ...values, ...found };
+            renderInputs();
+            updateOutput();
+            setStatus('ok', `Loaded ${keys.length} variables from Custom CSS.`);
+        });
+elPreset.addEventListener('change', setFromPreset);
         elScope.addEventListener('input', updateOutput);
         elWrapper.addEventListener('input', updateOutput);
         elAllVars.addEventListener('change', updateOutput);
