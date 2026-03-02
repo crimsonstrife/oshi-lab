@@ -16,7 +16,6 @@ html, body { height: 100%; }
 body {
     margin: 0;
     font-family: var(--sans);
-    background: radial-gradient(1200px 900px at 20% 10%, #13213b 0%, var(--bg) 50%, #05070c 100%);
     color: var(--text);
 }
 
@@ -37,7 +36,11 @@ header {
     backdrop-filter: blur(8px);
     position: sticky;
     top: 0;
-    z-index: 10;
+    z-index: 100;
+}
+
+.navbar-nav .dropdown-menu {
+    z-index: 1021;
 }
 
 .title {
@@ -66,7 +69,6 @@ header {
 button, select, input[type="text"] {
     font: inherit;
     border: 1px solid var(--border);
-    background: linear-gradient(#152136, #0f1727);
     color: var(--text);
     padding: 8px 10px;
     border-radius: 10px;
@@ -78,9 +80,6 @@ button:hover, select:hover, input[type="text"]:hover {
     box-shadow: 0 0 0 2px rgba(109, 223, 255, 0.12);
 }
 button:active { transform: translateY(1px); }
-button.secondary { background: linear-gradient(#10192a, #0b1220); }
-button.danger { background: linear-gradient(#2a1117, #17090d); border-color: #5a2a35; }
-button.good { background: linear-gradient(#102a1a, #08160f); border-color: #215a3a; }
 
 .main {
     display: grid;
@@ -256,7 +255,6 @@ details {
     border: 1px solid var(--border);
     border-radius: 12px;
     overflow: hidden;
-    background: rgba(15, 22, 34, 0.55);
 }
 details > summary {
     cursor: pointer;
