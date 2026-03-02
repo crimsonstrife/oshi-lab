@@ -17,7 +17,7 @@ const isDocs = path.startsWith(`${baseN}docs/`);
 
 <a class="visually-hidden-focusable" href="#main">Skip to content</a>
 
-<header class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom sticky-top">
+<header class="navbar navbar-expand-lg bg-body-tertiary border-bottom sticky-top">
     <div class="container-fluid">
         <a class="navbar-brand fw-semibold d-flex align-items-center gap-2" href={baseN}>
             <Icon name="fa-solid fa-flask" title="Theme Lab" />
@@ -50,7 +50,7 @@ const isDocs = path.startsWith(`${baseN}docs/`);
                     </a>
                 </li>
 
-                {/* Docs can stay as a single link OR become a dropdown */}
+                {/* Docs dropdown */}
                 <li class="nav-item dropdown">
                     <a
                             class={`nav-link dropdown-toggle ${isDocs ? "active" : ""}`}
@@ -62,10 +62,9 @@ const isDocs = path.startsWith(`${baseN}docs/`);
                     >
                         Docs
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-dark">
+                    <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href={`${baseN}docs/`}>Overview</a></li>
-                        {/* Add these only if the routes exist */}
-                        {/* <li><a class="dropdown-item" href={`${baseN}docs/getting-started/`}>Getting Started</a></li> */}
+                        <li><a class="dropdown-item" href={`${baseN}docs/getting-started/`}>Getting Started</a></li>
                         {/* <li><a class="dropdown-item" href={`${baseN}docs/components/`}>Components</a></li> */}
                         <li><hr class="dropdown-divider" /></li>
                         <li>
@@ -77,7 +76,7 @@ const isDocs = path.startsWith(`${baseN}docs/`);
                 </li>
             </ul>
 
-            {/* Search (optional): send to docs with ?q=... */}
+            {/* Search : send to docs with ?q=... */}
             <form class="d-flex me-lg-2 mb-2 mb-lg-0" role="search" action={`${baseN}docs/`} method="get">
                 <input
                         class="form-control form-control-sm me-2"
