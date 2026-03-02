@@ -1,0 +1,77 @@
+---
+title: Extending Tools & Widgets
+description: Developer reference for adding new tool, widget, or CSS block definitions.
+---
+
+
+This page is for contributors maintaining the lab’s built-in tools and widget library.
+
+## Adding a new tool
+
+Tools are auto-registered from:
+
+- `tools/defs/*.tool.js`
+
+A tool module should `export default` an object with:
+
+- `id` (unique)
+- `name`
+- `keywords` (optional)
+- `order` (optional)
+- `render(panel)` — render the tool UI into the provided element
+
+The tools modal reads definitions via `import.meta.glob('./defs/*.tool.js', { eager: true })`.
+
+## Adding a new widget
+
+Widgets are auto-registered from:
+
+- `tools/widgets/defs/*.widget.js`
+
+A widget definition should include:
+
+- `id` (unique)
+- `name`
+- `description` (optional)
+- `keywords` (optional)
+- `order` (optional)
+- `html` (string)
+- `css` (string)
+- `fields` (optional array)
+
+Most widgets load raw files:
+
+```js
+import html from './your-widget/your-widget.html?raw';
+import css from './your-widget/your-widget.css?raw';
+```
+
+### Field schema
+
+Each field supports:
+
+- `id`
+- `label`
+- `defaultValue`
+- `type` (optional, e.g. `textarea`)
+- `allowHtml` (optional boolean)
+- `placeholder` (optional)
+
+The Widget Inserter replaces `{{fieldId}}` placeholders in `html`/`css`.
+
+## Adding a new CSS block
+
+CSS blocks are auto-registered from:
+
+- `tools/cssBlocks/defs/*.block.js`
+
+A block definition should include:
+
+- `id` (unique)
+- `name`
+- `description` (optional)
+- `keywords` (optional)
+- `order` (optional)
+- `css` (string), usually imported from a raw `.css` file
+
+The CSS Blocks tool reads definitions via `import.meta.glob('./defs/*.block.js', { eager: true })`.

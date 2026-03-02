@@ -1,0 +1,60 @@
+---
+title: Tool - Component Styler
+description: Generate scoped CSS for common components (cards, navbar, tabs, links).
+---
+
+
+Component Styler generates small “intent-driven” CSS snippets so you can style common components without hunting down selectors.
+
+## Where to find it
+
+Open **Tools** (Ctrl/Cmd+K) → search **Component Styler**.
+
+## Use it
+
+1. Set **Scope selector** (default `.profile-page.profile-custom-css`).
+2. Choose a **Component**:
+   - Cards
+   - Navbar
+   - Tabs
+   - Links
+3. Configure the component-specific fields.
+4. Click **Generate**.
+5. Use **Insert into Custom CSS** or **Copy**.
+
+## Component options
+
+### Cards
+
+- Card background
+- Border color
+- Border width
+- Radius preset
+- Shadow preset
+- Optional hover state
+
+### Navbar
+
+- Navbar background
+- Link color
+- Optional bottom border
+
+### Tabs
+
+- Active tab background
+- Active tab text
+- Tab border
+- Radius preset
+- Underline behavior (hover / always / never)
+
+### Links
+
+- Link color
+- Hover color
+- Underline behavior (hover / always / never)
+- Optional accessible focus ring
+
+## Notes
+
+- This tool is designed to be **selector-light** and safe. It targets typical MyOshi component classes (cards, nav, etc.) under your selected scope.
+- If you need deeper control, use the generated snippet as a starting point and refine it manually.

@@ -1,0 +1,69 @@
+---
+title: Tool - CSS Scope Fixer
+description: Rewrite pasted CSS so it works with MyOshi’s automatic selector scoping.
+---
+
+
+MyOshi automatically **scopes** Custom CSS so it only applies inside the profile theme wrapper. If you paste CSS that already includes wrapper selectors, you can end up with duplicated selectors like `.scope .scope .card`.
+
+**CSS Scope Fixer** rewrites your CSS to avoid those problems.
+
+## Where to find it
+
+Open **Tools** (Ctrl/Cmd+K) → search **CSS Scope Fixer**.
+
+## Key concepts
+
+- **Scope selector**: the wrapper MyOshi uses for custom themes.
+  - Default: `.profile-page.profile-custom-css`
+- **MyOshi auto-scopes mode**: strips explicit wrappers so the platform can safely add them once.
+
+### Example: why duplication happens
+
+If you paste:
+
+```css
+.profile-page.profile-custom-css .card { border-radius: 12px; }
+```
+
+MyOshi may auto-scope it again, resulting in:
+
+```css
+.profile-page.profile-custom-css .profile-page.profile-custom-css .card { ... }
+```
+
+Scope Fixer can remove the explicit wrapper so the final selector is correct.
+
+## Options
+
+- **MyOshi auto-scopes** (recommended)
+  - Strips explicit wrapper prefixes and makes selectors “prepender-safe”.
+- **Convert `:root` / `html` / `body`**
+  - Converts global selectors to the wrapper target (so variables/backgrounds affect the theme area).
+- **Skip selectors that are already scoped**
+  - Avoids rewriting selectors that already start with your scope.
+- **Treat selectors that contain the scope anywhere as already scoped**
+  - Useful if the scope appears later in compound selectors.
+- **Keep comments**
+  - Preserve comments during rewrite.
+
+## Use it
+
+1. Set **Scope selector** (leave the default unless you know you need a different wrapper).
+2. Paste CSS into **Input CSS**.
+3. Click **Fix CSS**.
+4. Use **Insert into Custom CSS**, **Replace Custom CSS**, or **Copy**.
+
+### Handy buttons
+
+- **Load from Custom CSS**: pulls your current Custom CSS into the input box.
+- **Clear**: resets the input box.
+
+## What it will not change
+
+The tool intentionally does **not** rewrite:
+
+- `@keyframes`
+- `@font-face`
+
+Those rules should remain global within the theme context.

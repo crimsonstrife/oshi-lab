@@ -1,0 +1,52 @@
+---
+title: Widget - MyOshi Card (native-looking)
+description: A native-looking card that reuses MyOshi’s built-in .card / .card-header / .card-body styles.
+---
+
+## Fields
+
+| Field | Label | Default |
+|---|---|---|
+| `title` | Title | `My Card Title` |
+| `headerClass` | Header style class | `starred` |
+| `headerRight` | Header right (optional HTML) (textarea, HTML allowed) | `<a href="#">View All</a>` |
+| `body` | Body (HTML allowed) (textarea, HTML allowed) | `Drop your content here. You can use <b>bold</b>, <i>italics</i>, an...` |
+
+    ## Template HTML
+
+    ```html
+    <div class="card labw-myoshi-card">
+  <div class="card-header {{headerClass}}">
+    <span>{{title}}</span>
+    {{headerRight}}
+  </div>
+  <div class="card-body">
+    {{body}}
+  </div>
+</div>
+    ```
+
+    ## Template CSS
+
+    ```css
+    /*
+  This widget intentionally reuses MyOshi's built-in styles.
+  Only tiny spacing tweaks are applied, scoped to .labw-myoshi-card.
+*/
+
+.labw-myoshi-card{
+  margin-bottom: 10px;
+}
+
+/* Optional: keep long content from breaking layout */
+.labw-myoshi-card .card-body{
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+    ```
+
+
+## “Native” widget note
+
+This widget intentionally reuses base-template/MyOshi classes for its look.  
+If you switch templates or remove the base template styles, you may need to add your own styling.

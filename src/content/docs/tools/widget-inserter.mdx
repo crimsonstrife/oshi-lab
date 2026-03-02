@@ -1,0 +1,45 @@
+---
+title: Tool - Widget Inserter
+description: Insert pre-made widgets (HTML + CSS) into your theme with customizable fields.
+---
+
+
+Widgets are small, reusable UI blocks (HTML + CSS) that you can insert into your theme and then customize.
+
+## Where to find it
+
+Open **Tools** (Ctrl/Cmd+K) → search **Widget Inserter**.
+
+## Use it
+
+1. Select a widget from the list (or use search).
+2. Fill out the widget’s fields (some fields allow HTML).
+3. Click:
+   - **Insert both** — inserts HTML into **Custom HTML** and CSS into **Custom CSS**
+   - **Insert HTML / Insert CSS**
+   - **Copy HTML / Copy CSS**
+
+When inserting, the tool wraps snippets in comment markers like:
+
+```css
+/* === Widget Name (css) === */
+...
+/* === /Widget Name === */
+```
+
+This makes it easy to find/remove later.
+
+## Included widgets
+
+- **Callout Box** — A title + body callout with an optional link. Fully scoped to .labw-callout.
+- **Info Card** — Simple heading & content card. Great for “About”, “Rules”, “Credits”, etc.
+- **MyOshi Card (native-looking)** — A native-looking card that reuses MyOshi’s built-in .card / .card-header / .card-body styles.
+- **Notice Glow (native)** — A native-looking “notice” strip that reuses the base template’s .notice-glow style.
+- **Sparkle Divider (native)** — A themed horizontal divider that matches the base template’s “sparkle” styling.
+- **Streaming Schedule (Grid)** — Responsive 7-day schedule grid. Fill each day with slots using the provided markup.
+- **Twitch Buttons** — Three CTA buttons for Twitch. Delete any you don’t want.
+
+## Notes
+
+- Most widgets are scoped with `labw-*` class names to avoid collisions.
+- “Native” widgets intentionally reuse MyOshi/base-template classes like `.card`, `.notice-glow`, or `.sparkle-divider`.

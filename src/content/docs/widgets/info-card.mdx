@@ -1,0 +1,46 @@
+---
+title: Widget - Info Card
+description: Simple heading & content card. Great for “About”, “Rules”, “Credits”, etc.
+---
+
+## Fields
+
+| Field | Label | Default |
+|---|---|---|
+| `title` | Title | `About Me` |
+| `body` | Body (textarea, HTML allowed) | `Hi! I’m a VTuber who streams variety + cozy games.<br/>Catch me liv...` |
+
+    ## Template HTML
+
+    ```html
+    <section class="labw-card">
+    <h3 class="labw-card__title">{{title}}</h3>
+    <div class="labw-card__body">{{body}}</div>
+</section>
+    ```
+
+    ## Template CSS
+
+    ```css
+    .labw-card{
+    --labw-bg: rgba(255,255,255,.06);
+    --labw-border: rgba(255,255,255,.14);
+    --labw-radius: 14px;
+
+    border: 1px solid var(--labw-border);
+    background: var(--labw-bg);
+    border-radius: var(--labw-radius);
+    padding: 14px;
+}
+
+.labw-card__title{
+    margin: 0 0 8px 0;
+    font-weight: 900;
+    letter-spacing: .2px;
+}
+
+.labw-card__body{
+    opacity: .92;
+    line-height: 1.35;
+}
+    ```

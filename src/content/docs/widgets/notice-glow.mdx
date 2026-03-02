@@ -1,0 +1,45 @@
+---
+title: Widget - Notice Glow (native)
+description: A native-looking “notice” strip that reuses the base template’s .notice-glow style.
+---
+
+## Fields
+
+| Field | Label | Default |
+|---|---|---|
+| `title` | Title | `Announcement` |
+| `body` | Body (HTML allowed) (textarea, HTML allowed) | `New schedule starting next week — check the details below! ✨` |
+
+    ## Template HTML
+
+    ```html
+    <div class="notice-glow labw-notice-glow">
+  <div>
+    <div class="labw-notice-glow__title">{{title}}</div>
+    <div class="labw-notice-glow__body">{{body}}</div>
+  </div>
+</div>
+    ```
+
+    ## Template CSS
+
+    ```css
+    /*
+  .notice-glow is styled in the base template.
+  These are minor typography adjustments scoped to this widget.
+*/
+
+.labw-notice-glow__title{
+  font-weight: 800;
+}
+
+.labw-notice-glow__body{
+  opacity: .9;
+}
+    ```
+
+
+## “Native” widget note
+
+This widget intentionally reuses base-template/MyOshi classes for its look.  
+If you switch templates or remove the base template styles, you may need to add your own styling.

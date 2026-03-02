@@ -1,0 +1,58 @@
+---
+title: Widget - Callout Box
+description: A title + body callout with an optional link. Fully scoped to .labw-callout.
+---
+
+## Fields
+
+| Field | Label | Default |
+|---|---|---|
+| `title` | Title | `Heads up!` |
+| `body` | Body (textarea, HTML allowed) | `This is a callout you can customize.` |
+| `linkUrl` | Link URL | `#` |
+| `linkText` | Link Text | `Learn more` |
+
+    ## Template HTML
+
+    ```html
+    <div class="labw-callout">
+    <div class="labw-callout__title">{{title}}</div>
+    <div class="labw-callout__body">{{body}}</div>
+    <a class="labw-callout__link" href="{{linkUrl}}" target="_blank" rel="noopener noreferrer">{{linkText}}</a>
+</div>
+    ```
+
+    ## Template CSS
+
+    ```css
+    .labw-callout{
+    --labw-bg: rgba(255,255,255,.06);
+    --labw-border: rgba(255,255,255,.18);
+    --labw-accent: #6ea8fe;
+    --labw-radius: 12px;
+
+    border: 1px solid var(--labw-border);
+    background: var(--labw-bg);
+    border-radius: var(--labw-radius);
+    padding: 12px 14px;
+}
+
+.labw-callout__title{
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.labw-callout__body{
+    opacity: .95;
+    line-height: 1.35;
+}
+
+.labw-callout__link{
+    display: inline-block;
+    margin-top: 10px;
+    color: var(--labw-accent);
+    text-decoration: none;
+    font-weight: 600;
+}
+.labw-callout__link:hover{ text-decoration: underline; }
+    ```

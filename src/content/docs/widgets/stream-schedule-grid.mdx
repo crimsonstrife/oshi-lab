@@ -1,0 +1,168 @@
+---
+title: Widget - Streaming Schedule (Grid)
+description: Responsive 7-day schedule grid. Fill each day with slots using the provided markup.
+---
+
+## Fields
+
+| Field | Label | Default |
+|---|---|---|
+| `title` | Title | `Stream Schedule` |
+| `tz` | Timezone label | `ET` |
+| `twitchUser` | Twitch username | `yourname` |
+| `mon` | Monday slots (textarea, HTML allowed) | `<div class="labw-slot"><span class="labw-time">7:00 PM</span><span ...` |
+| `tue` | Tuesday slots (textarea, HTML allowed) | `<div class="labw-slot"><span class="labw-time">8:00 PM</span><span ...` |
+| `wed` | Wednesday slots (textarea, HTML allowed) | `<div class="labw-slot"><span class="labw-time">OFF</span><span clas...` |
+| `thu` | Thursday slots (textarea, HTML allowed) | `<div class="labw-slot"><span class="labw-time">7:30 PM</span><span ...` |
+| `fri` | Friday slots (textarea, HTML allowed) | `<div class="labw-slot"><span class="labw-time">9:00 PM</span><span ...` |
+| `sat` | Saturday slots (textarea, HTML allowed) | `<div class="labw-slot"><span class="labw-time">2:00 PM</span><span ...` |
+| `sun` | Sunday slots (textarea, HTML allowed) | `<div class="labw-slot"><span class="labw-time">OFF</span><span clas...` |
+
+    ## Template HTML
+
+    ```html
+    <div class="labw-schedule">
+    <div class="labw-schedule__header">
+        <div class="labw-schedule__title">{{title}}</div>
+        <div class="labw-schedule__meta">
+            <span class="labw-pill">Times in {{tz}}</span>
+            <a class="labw-link" href="https://twitch.tv/{{twitchUser}}" target="_blank" rel="noopener noreferrer">
+                View on Twitch
+            </a>
+        </div>
+    </div>
+
+    <div class="labw-schedule__grid">
+        <div class="labw-day">
+            <div class="labw-day__name">Mon</div>
+            <div class="labw-day__slots">{{mon}}</div>
+        </div>
+
+        <div class="labw-day">
+            <div class="labw-day__name">Tue</div>
+            <div class="labw-day__slots">{{tue}}</div>
+        </div>
+
+        <div class="labw-day">
+            <div class="labw-day__name">Wed</div>
+            <div class="labw-day__slots">{{wed}}</div>
+        </div>
+
+        <div class="labw-day">
+            <div class="labw-day__name">Thu</div>
+            <div class="labw-day__slots">{{thu}}</div>
+        </div>
+
+        <div class="labw-day">
+            <div class="labw-day__name">Fri</div>
+            <div class="labw-day__slots">{{fri}}</div>
+        </div>
+
+        <div class="labw-day">
+            <div class="labw-day__name">Sat</div>
+            <div class="labw-day__slots">{{sat}}</div>
+        </div>
+
+        <div class="labw-day">
+            <div class="labw-day__name">Sun</div>
+            <div class="labw-day__slots">{{sun}}</div>
+        </div>
+    </div>
+
+    <div class="labw-schedule__footer small">
+        Tip: duplicate <code>&lt;div class="labw-slot"&gt;…&lt;/div&gt;</code> lines to add multiple slots per day.
+    </div>
+</div>
+    ```
+
+    ## Template CSS
+
+    ```css
+    .labw-schedule{
+    --labw-bg: rgba(255,255,255,.06);
+    --labw-border: rgba(255,255,255,.14);
+    --labw-text: rgba(255,255,255,.92);
+    --labw-muted: rgba(255,255,255,.70);
+    --labw-accent: #8aa9ff;
+    --labw-radius: 14px;
+
+    border: 1px solid var(--labw-border);
+    background: var(--labw-bg);
+    border-radius: var(--labw-radius);
+    padding: 14px;
+    color: var(--labw-text);
+}
+
+.labw-schedule__header{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom: 12px;
+}
+
+.labw-schedule__title{
+    font-weight: 800;
+    letter-spacing: .2px;
+}
+
+.labw-schedule__meta{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+}
+
+.labw-pill{
+    display:inline-flex;
+    align-items:center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--labw-border);
+    background: rgba(0,0,0,.18);
+    font-size: 12px;
+    color: var(--labw-muted);
+}
+
+.labw-link{
+    font-size: 12px;
+    color: var(--labw-accent);
+    text-decoration: none;
+    font-weight: 700;
+}
+.labw-link:hover{ text-decoration: underline; }
+
+.labw-schedule__grid{
+    display:grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+/* … (truncated in docs) … */
+    ```
+
+
+> The Widget Inserter inserts the full CSS. This excerpt is for reference.
+
+
+## Adding multiple slots per day
+
+Each day field is inserted into the `{{mon}}`, `{{tue}}`, etc placeholders.  
+To add multiple slots, repeat this markup:
+
+```html
+<div class="labw-slot">
+  <span class="labw-time">7:00 PM</span>
+  <span class="labw-what">Variety</span>
+</div>
+```
+
+You can also add an optional note:
+
+```html
+<div class="labw-slot">
+  <span class="labw-time">7:00 PM</span>
+  <span class="labw-what">Collab Night</span>
+  <span class="labw-note">Subject to change</span>
+</div>
+```
