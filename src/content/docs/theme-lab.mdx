@@ -3,7 +3,7 @@ title: Theme Lab
 description: How the lab works, previews, snapshots, exporting, and recommended patterns.
 ---
 
-The Theme Lab is an editor and live preview built for experimenting with MyOshi themes.
+The Theme Lab is an editor + live preview built for experimenting with MyOshi themes.
 
 It is intentionally split into:
 
@@ -11,116 +11,105 @@ It is intentionally split into:
 - **Custom CSS** (what you paste into MyOshi)
 - **Custom HTML** (what you paste into MyOshi)
 - **Preview** (iframe, sandbox to view your work)
-- **Snapshots** (what you save to your browser)
+- **Snapshots** (saved locally in your browser)
 - **Auditing** (check your work for errors)
-
-This makes it easier to keep the app maintainable and avoid conflicts.
 
 ---
 
-## Core concepts
+## Editors
 
-### Base Template
-A template supplies:
+The CSS/HTML editors include:
 
-- A CSS baseline resembling MyOshi’s styling patterns as closely as possible.
+- Syntax highlighting
+- Optional linting
+- A **Format** action (Prettier-powered) for cleaning up pasted code
+
+The underlying preview stays sandboxed (no scripts execute), matching how MyOshi treats custom content.
+
+---
+
+## Templates
+
+Templates provide a realistic “profile” DOM so you can style immediately.
+
+A template usually includes:
+
+- Base CSS that mirrors MyOshi’s default styling as closely as possible.
 - A realistic body structure (cards, headers, sections, etc.)
 - A `.profile-custom-html` mount point where your Custom HTML is injected
 
 Templates are stored as files (see **Templates**).
 
 ### Custom CSS
+
 Your Custom CSS is appended after the template’s base CSS, so it can override defaults.
 
 Recommended patterns:
 
 - Prefer CSS variables for theme colors
-- Do not manually include `.profile-page.profile-custom-css { ... }` in your Custom CSS, as that is now applied automatically by MyOshi.
-- Use CSS nesting to avoid specificity issues
+- Avoid overly-specific selectors unless you need them
 - Use `!important` sparingly
-- Accessibility Tip! Your theme should still be readable if images fail to load, avoid replacing text with images.
+- Accessibility tip: Your theme should still be readable if images fail to load (avoid replacing text with images)
 
 ### Custom HTML
+
 Custom HTML is inserted into the first `.profile-custom-html` element found in the base template.
 
 Use Custom HTML when you need:
+
 - a consistent wrapper for layout grids
 - badges / link cards / “now playing” style blocks
 - a custom header section
 
-Avoid Custom HTML for:
-- things that require JavaScript (preview blocks scripts anyway)
-
 ---
 
-## Preview modes
+## Preview
 
-### Embedded preview
-The preview panel renders your template + custom CSS/HTML in an iframe.
+The Preview is an `<iframe>` with a restrictive sandbox:
 
-### Pop-out preview
-The **Pop out preview** button opens a dedicated preview page that can be:
-
-- full height
-- easier to inspect
-- shown on a second monitor
-
-Currently the pop-out preview does not update automatically when you make changes to your Custom CSS/HTML, you'll need to close and reopen the preview panel.
-
----
-
-## Preview scaling
-The preview area supports scaling:
-
-- Use the **Scale** slider to zoom the iframe content.
-- Scaling should not affect what you copy into MyOshi — it’s just for comfort while editing.
-
-If you’re authoring mobile-first styles:
-- Use the **Mobile** width toggle if provided
-- Use responsive media queries:
-- `@media (max-width: 640px) { ... }`
+- Scripts do not run
+- This reduces risk and helps keep previews consistent
 
 ---
 
 ## Snapshots
 
-Snapshots store your current work in your browser (LocalStorage):
+Snapshots are stored in your browser (localStorage). They’re meant for quick iteration:
 
-- Custom CSS
-- Custom HTML
-- Any toggles (append/replace behavior, mock data settings, etc.)
-
-Snapshots do **not** include:
-- the entire base template, they can be applied to any template however
-- imported MyOshi preview HTML (if used)
-
-This keeps snapshots small and portable.
-
-Snapshots are also ONLY stored in your local browser, you will not be able to share them with others or access them from another device.
+- Save before trying something risky
+- Save “milestones” as you polish a theme
+- Load older snapshots if you want to revert
 
 ---
 
-## Exporting
+## Theme bundles (Import / Export)
 
-When you click **Copy Custom CSS** or **Copy Custom HTML**:
+Theme bundles let you move work between browsers/machines and share a theme as a single file.
 
-- only your custom content is copied
-- no base template content is included
+### Export Theme
 
-This is the safest workflow for MyOshi usage.
+Click **Export Theme** to download a JSON bundle that includes:
+
+- Template selection (if applicable)
+- Custom CSS + Custom HTML
+- Mock profile settings (name, avatar, background, etc.)
+- Lab toggles like Auto Update (when included)
+
+**Include extracted base (optional):**  
+If you’re using an extracted base (copied from a real MyOshi preview), you may also enable **Include extracted base** to embed that extracted base in the export (larger file).
+
+### Import Theme
+
+Click **Import Theme** to load a previously exported bundle.
+
+Advanced: the import also accepts compatible theme export JSON produced by other tools in the same ecosystem (for example, OshiForge v1 exports). It will be converted into a Theme Lab bundle automatically.
 
 ---
 
-## Recommended “starter theme” structure
+## Recommended workflow
 
-A good starting point is to define variables and a few core surfaces:
-
-```css
-root: {
-  --theme-bg: #0b0f17;
-  --theme-panel: rgba(18, 24, 36, 0.85);
-  --theme-border: rgba(40, 60, 90, 0.55);
-  --theme-text: #e7eefc;
-  --theme-muted: rgba(231, 238, 252, 0.75);
-  --theme-accent: #6df;
-}
+1. Start with **Quick Theme Builder** or **Theme Variables** to get a cohesive base.
+2. Use **CSS Blocks** for common patterns (glass cards, background overlay, etc.).
+3. Add **Widgets** / **Schedule Builder** output in Custom HTML if you need extra structure.
+4. Run **Audit** + **Accessibility Audit** before sharing.
+5. Export a theme bundle when you want to back up or share.

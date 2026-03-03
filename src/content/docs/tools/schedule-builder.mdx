@@ -3,7 +3,6 @@ title: Tool - Schedule Builder
 description: Generate a responsive streaming schedule block (HTML + CSS).
 ---
 
-
 **Schedule Builder** is a form-driven generator for a responsive weekly schedule. It outputs both **HTML** and **CSS** so you can paste it straight into MyOshi.
 
 ## Where to find it
@@ -28,9 +27,17 @@ Open **Tools** (Ctrl/Cmd+K) → search **Schedule Builder**.
 
 Use the buttons under the output boxes:
 
-- **Insert both** — inserts HTML into **Custom HTML** and CSS into **Custom CSS**
-- **Insert HTML / Insert CSS** — insert only one side
+- **Insert HTML / Insert CSS** — inserts (or updates) only one side
 - **Copy HTML / Copy CSS** — copy to clipboard
+
+### Marked snippets (no duplication)
+
+Insert actions upsert these blocks:
+
+- `schedule-builder/html`
+- `schedule-builder/css`
+
+So if you change your slots later and generate again, reinserting will **update in place** instead of duplicating the schedule.
 
 ## Notes & limitations
 

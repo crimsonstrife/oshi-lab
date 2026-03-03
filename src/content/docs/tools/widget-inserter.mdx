@@ -3,7 +3,6 @@ title: Tool - Widget Inserter
 description: Insert pre-made widgets (HTML + CSS) into your theme with customizable fields.
 ---
 
-
 Widgets are small, reusable UI blocks (HTML + CSS) that you can insert into your theme and then customize.
 
 ## Where to find it
@@ -15,26 +14,35 @@ Open **Tools** (Ctrl/Cmd+K) → search **Widget Inserter**.
 1. Select a widget from the list (or use search).
 2. Fill out the widget’s fields (some fields allow HTML).
 3. Click:
-   - **Insert both** — inserts HTML into **Custom HTML** and CSS into **Custom CSS**
-   - **Insert HTML / Insert CSS**
-   - **Copy HTML / Copy CSS**
+   - **Insert HTML** (or **Insert CSS**) to add/update only one side, or
+   - Use the combined insert option (when available) to add/update both.
 
-When inserting, the tool wraps snippets in comment markers like:
+### Marked snippets (no duplication)
 
-```css
-/* === Widget Name (css) === */
+When you insert, the lab wraps the widget output in **stable markers** so reinserting updates the existing widget block:
+
+```html
+<!-- oshilab:begin block=widget/<id>/html v=1 -->
+<!-- Widget: <Widget Name> -->
 ...
-/* === /Widget Name === */
+<!-- oshilab:end block=widget/<id>/html -->
 ```
 
-This makes it easy to find/remove later.
+```css
+/* oshilab:begin block=widget/<id>/css v=1 */
+/* Widget: <Widget Name> */
+...
+/* oshilab:end block=widget/<id>/css */
+```
+
+If you delete the markers, the next insert will create a new copy.
 
 ## Included widgets
 
-- **Callout Box** — A title + body callout with an optional link. Fully scoped to .labw-callout.
+- **Callout Box** — A title + body callout with an optional link. Fully scoped to `.labw-callout`.
 - **Info Card** — Simple heading & content card. Great for “About”, “Rules”, “Credits”, etc.
-- **MyOshi Card (native-looking)** — A native-looking card that reuses MyOshi’s built-in .card / .card-header / .card-body styles.
-- **Notice Glow (native)** — A native-looking “notice” strip that reuses the base template’s .notice-glow style.
+- **MyOshi Card (native-looking)** — A native-looking card that reuses MyOshi’s built-in `.card` / `.card-header` / `.card-body` styles.
+- **Notice Glow (native)** — A native-looking “notice” strip that reuses the base template’s `.notice-glow` style.
 - **Sparkle Divider (native)** — A themed horizontal divider that matches the base template’s “sparkle” styling.
 - **Streaming Schedule (Grid)** — Responsive 7-day schedule grid. Fill each day with slots using the provided markup.
 - **Twitch Buttons** — Three CTA buttons for Twitch. Delete any you don’t want.
