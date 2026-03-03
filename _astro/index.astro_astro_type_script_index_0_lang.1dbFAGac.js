@@ -1,4 +1,4 @@
-const x="modulepreload",w=function(t){return"/"+t},v={},k=function(r,i,n){let b=Promise.resolve();if(i&&i.length>0){let l=function(e){return Promise.all(e.map(o=>Promise.resolve(o).then(d=>({status:"fulfilled",value:d}),d=>({status:"rejected",reason:d}))))};document.getElementsByTagName("link");const s=document.querySelector("meta[property=csp-nonce]"),u=s?.nonce||s?.getAttribute("nonce");b=l(i.map(e=>{if(e=w(e),e in v)return;v[e]=!0;const o=e.endsWith(".css"),d=o?'[rel="stylesheet"]':"";if(document.querySelector(`link[href="${e}"]${d}`))return;const a=document.createElement("link");if(a.rel=o?"stylesheet":x,o||(a.as="script"),a.crossOrigin="",a.href=e,u&&a.setAttribute("nonce",u),document.head.appendChild(a),o)return new Promise((g,y)=>{a.addEventListener("load",g),a.addEventListener("error",()=>y(new Error(`Unable to preload CSS for ${e}`)))})}))}function p(l){const s=new Event("vite:preloadError",{cancelable:!0});if(s.payload=l,window.dispatchEvent(s),!s.defaultPrevented)throw l}return b.then(l=>{for(const s of l||[])s.status==="rejected"&&p(s.reason);return r().catch(p)})};const C=[{id:"myoshi-classic",name:"MyOshi Classic",description:"Classic MyOshi profile as accurate as possible.",baseCssFile:"templates/myoshi-classic/base.css",baseBodyFile:"templates/myoshi-classic/base.html",mockDefaults:{displayName:"Username",username:"@username",tagline:"I'm a tagline!",avatar:"https://placehold.co/128x128/png",background:"https://placehold.co/1600x900/png"}},{id:"myoshi-core",name:"MyOshi Core (approx)",description:"A close-enough approximation of MyOshi profile structure (cards, groups, custom HTML mount).",baseCssFile:"templates/myoshi-core/base.css",baseBodyFile:"templates/myoshi-core/base.html",mockDefaults:{displayName:"CrimsonStrife",username:"@crimsonstrife",tagline:"",avatar:"https://placehold.co/128x128/png",background:"https://placehold.co/1600x900/png"}},{id:"minimal",name:"Minimal Mount Only",description:"Bare minimum markup with .profile-page + .profile-custom-html mount for quick experiments.",baseCssFile:"templates/minimal/base.css",baseBodyFile:"templates/minimal/base.html",mockDefaults:{displayName:"Demo User",username:"@demo",tagline:"",avatar:"",background:""}}],m={version:3,templates:C},f=m??{},c=Array.isArray(f.templates)?f.templates:Array.isArray(m)?m:[];async function S(t){if(!t)return;if(!c.length){t.innerHTML=`
+const x="modulepreload",w=function(t){return"/"+t},v={},k=function(r,i,n){let m=Promise.resolve();if(i&&i.length>0){let l=function(e){return Promise.all(e.map(o=>Promise.resolve(o).then(d=>({status:"fulfilled",value:d}),d=>({status:"rejected",reason:d}))))};document.getElementsByTagName("link");const s=document.querySelector("meta[property=csp-nonce]"),u=s?.nonce||s?.getAttribute("nonce");m=l(i.map(e=>{if(e=w(e),e in v)return;v[e]=!0;const o=e.endsWith(".css"),d=o?'[rel="stylesheet"]':"";if(document.querySelector(`link[href="${e}"]${d}`))return;const a=document.createElement("link");if(a.rel=o?"stylesheet":x,o||(a.as="script"),a.crossOrigin="",a.href=e,u&&a.setAttribute("nonce",u),document.head.appendChild(a),o)return new Promise((g,y)=>{a.addEventListener("load",g),a.addEventListener("error",()=>y(new Error(`Unable to preload CSS for ${e}`)))})}))}function p(l){const s=new Event("vite:preloadError",{cancelable:!0});if(s.payload=l,window.dispatchEvent(s),!s.defaultPrevented)throw l}return m.then(l=>{for(const s of l||[])s.status==="rejected"&&p(s.reason);return r().catch(p)})};const C=[{id:"myoshi-classic",name:"MyOshi Classic",description:"Classic MyOshi profile as accurate as possible.",baseCssFile:"templates/myoshi-classic/base.css",baseBodyFile:"templates/myoshi-classic/base.html",mockDefaults:{displayName:"Username",username:"@username",tagline:"I'm a tagline!",avatar:"https://placehold.co/128x128/png",background:"https://placehold.co/1600x900/png"}},{id:"myoshi-core",name:"MyOshi Core (approx)",description:"A close-enough approximation of MyOshi profile structure (cards, groups, custom HTML mount).",baseCssFile:"templates/myoshi-core/base.css",baseBodyFile:"templates/myoshi-core/base.html",mockDefaults:{displayName:"CrimsonStrife",username:"@crimsonstrife",tagline:"",avatar:"https://placehold.co/128x128/png",background:"https://placehold.co/1600x900/png"}},{id:"minimal",name:"Minimal Mount Only",description:"Bare minimum markup with .profile-page + .profile-custom-html mount for quick experiments.",baseCssFile:"templates/minimal/base.css",baseBodyFile:"templates/minimal/base.html",mockDefaults:{displayName:"Demo User",username:"@demo",tagline:"",avatar:"",background:""}}],b={version:3,templates:C},f=b??{},c=Array.isArray(f.templates)?f.templates:Array.isArray(b)?b:[];async function S(t){if(!t)return;if(!c.length){t.innerHTML=`
       <div class="alert alert-danger m-3">
         <strong>No templates found.</strong><br>
         Check <code>templates.json</code> format.
@@ -18,6 +18,7 @@ const x="modulepreload",w=function(t){return"/"+t},v={},k=function(r,i,n){let b=
             </div>
 
             <div class="d-flex flex-wrap gap-2 justify-content-end">
+              <button class="btn btn-sm btn-outline-secondary" id="btnOnboarding" type="button" title="Show the new theme onboarding chooser">Start</button>
               <button class="btn btn-sm btn-outline-info" id="btnDocs" type="button">Docs</button>
               <button class="btn btn-sm btn-outline-primary" id="btnTools" type="button">Tools</button>
               <div class="vr d-none d-lg-block opacity-50"></div>
@@ -25,10 +26,27 @@ const x="modulepreload",w=function(t){return"/"+t},v={},k=function(r,i,n){let b=
               <button class="btn btn-sm btn-outline-light" id="btnExtract" type="button">Extract Base</button>
               <button class="btn btn-sm btn-outline-light" id="btnRestoreTemplate" type="button">Restore Template</button>
               <button class="btn btn-sm btn-outline-warning" id="btnResetCustom" type="button">Reset Custom</button>
-              <button class="btn btn-sm btn-outline-success" id="btnDownload" type="button">Download Bundle</button>
+
+              <div class="vr d-none d-lg-block opacity-50"></div>
+
+              <button class="btn btn-sm btn-outline-success" id="btnExportTheme" type="button">Export Theme</button>
+              <button class="btn btn-sm btn-outline-success" id="btnImportTheme" type="button">Import Theme</button>
+              <button class="btn btn-sm btn-outline-light" id="btnDownload" type="button">Download Preview</button>
+
+              <input id="themeImportInput" type="file" accept="application/json,.json" class="d-none" />
             </div>
           </div>
         </nav>
+
+        <div class="d-flex flex-wrap align-items-center justify-content-between mb-2 gap-2">
+          <div id="bundleInfo" class="small text-body-secondary"></div>
+          <div class="form-check form-switch small m-0">
+            <input class="form-check-input" type="checkbox" id="includeExtractedBase" disabled />
+            <label class="form-check-label" for="includeExtractedBase" title="Optional: include extracted base CSS/body in the exported bundle (larger file). Only available when using an extracted base.">
+              Include extracted base
+            </label>
+          </div>
+        </div>
 
         <div class="row g-3 m-0">
           <!-- Editors -->
@@ -367,9 +385,67 @@ const x="modulepreload",w=function(t){return"/"+t},v={},k=function(r,i,n){let b=
           </div>
         </div>
 
+        <!-- New Theme Onboarding -->
+        <div class="modal fade" id="onboardingModal" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <div class="d-flex flex-column">
+                  <h5 class="modal-title mb-0">Start a New Theme</h5>
+                  <div class="small text-body-secondary">Pick a path for faster time-to-result. You can always change later.</div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+
+              <div class="modal-body">
+                <div class="row g-3">
+                  <div class="col-12 col-md-4">
+                    <div class="border rounded p-3 h-100 d-flex flex-column">
+                      <div class="fw-semibold">Start from a Template</div>
+                      <div class="small text-body-secondary mt-1 flex-grow-1">
+                        Load a built-in MyOshi template and start customizing from a known-good base.
+                      </div>
+                      <button class="btn btn-sm btn-outline-primary mt-2" type="button" data-onboard="template">Use Template</button>
+                    </div>
+                  </div>
+
+                  <div class="col-12 col-md-4">
+                    <div class="border rounded p-3 h-100 d-flex flex-column">
+                      <div class="fw-semibold">Use Quick Theme Builder</div>
+                      <div class="small text-body-secondary mt-1 flex-grow-1">
+                        Pick a preset or tweak a palette + a few style knobs to generate a full starter theme.
+                      </div>
+                      <button class="btn btn-sm btn-outline-primary mt-2" type="button" data-onboard="builder">Open Builder</button>
+                    </div>
+                  </div>
+
+                  <div class="col-12 col-md-4">
+                    <div class="border rounded p-3 h-100 d-flex flex-column">
+                      <div class="fw-semibold">Paste Existing CSS/HTML</div>
+                      <div class="small text-body-secondary mt-1 flex-grow-1">
+                        Bring your current theme in, then run Scope Fixer + Audit suggestions to align with the latest MyOshi rules.
+                      </div>
+                      <button class="btn btn-sm btn-outline-primary mt-2" type="button" data-onboard="paste">Paste & Fix</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="alert alert-secondary mt-3 mb-0 small">
+                  Tip: If you close this, it won't show again automatically — use the <b>Start</b> button in the header to reopen.
+                </div>
+              </div>
+
+              <div class="modal-footer justify-content-between">
+                <div class="small text-body-secondary">You can reopen this anytime.</div>
+                <button type="button" class="btn btn-sm btn-outline-light" data-bs-dismiss="modal">Not now</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
-  `,window.__MYOSHI_LAB_TEMPLATES__=c,await k(()=>import("./oshi-lab.ayoXGrZ6.js"),[])}const h=document.getElementById("lab-root");try{S(document.getElementById("lab-root")).catch(t=>{console.error("initLab failed:",t),h&&(h.innerHTML=`
+  `,window.__MYOSHI_LAB_TEMPLATES__=c,await k(()=>import("./oshi-lab.e6f-KHX1.js"),[])}const h=document.getElementById("lab-root");try{S(document.getElementById("lab-root")).catch(t=>{console.error("initLab failed:",t),h&&(h.innerHTML=`
           <div class="alert alert-danger m-3" role="alert">
             <strong>Failed to load initLab.</strong><br>
             Check the browser console for details.
