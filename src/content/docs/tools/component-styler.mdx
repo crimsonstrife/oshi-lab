@@ -3,7 +3,6 @@ title: Tool - Component Styler
 description: Generate scoped CSS for common components (cards, navbar, tabs, links).
 ---
 
-
 Component Styler generates small “intent-driven” CSS snippets so you can style common components without hunting down selectors.
 
 ## Where to find it
@@ -21,6 +20,10 @@ Open **Tools** (Ctrl/Cmd+K) → search **Component Styler**.
 3. Configure the component-specific fields.
 4. Click **Generate**.
 5. Use **Insert into Custom CSS** or **Copy**.
+
+### Marked snippets (update-in-place)
+
+Generated snippets are wrapped with `oshilab` begin/end markers. If you generate the same component again and click **Insert**, the tool will **update the existing block** instead of duplicating it.
 
 ## Component options
 
@@ -56,5 +59,5 @@ Open **Tools** (Ctrl/Cmd+K) → search **Component Styler**.
 
 ## Notes
 
-- This tool is designed to be **selector-light** and safe. It targets typical MyOshi component classes (cards, nav, etc.) under your selected scope.
-- If you need deeper control, use the generated snippet as a starting point and refine it manually.
+- This tool is designed to be **selector-light** and safe. It targets typical MyOshi component classes (cards, nav, etc.) under your chosen scope.
+- In general, avoid manually prefixing every selector with MyOshi’s wrapper in hand-written CSS — MyOshi already applies automatic scoping.

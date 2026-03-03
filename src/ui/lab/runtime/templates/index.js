@@ -223,6 +223,8 @@ export async function loadTemplateById(id) {
     state.activeTemplateId = id;
     localStorage.setItem('myoshi_theme_lab_template_id', id);
 
+    state.baseMode = 'template';
+
     state.baseCss = (template.baseCss || '').trim();
     state.baseBody = (template.baseBody || '').trim();
 

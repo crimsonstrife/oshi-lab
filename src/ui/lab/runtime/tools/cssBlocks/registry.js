@@ -4,6 +4,7 @@
  * @typedef {{
  *  id: string;
  *  name: string;
+ *  version?: number;
  *  keywords?: string;
  *  description?: string;
  *  order?: number;

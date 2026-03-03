@@ -1,10 +1,11 @@
 // @ts-check
 
 import { els } from '../../dom.js';
+import { state } from '../../state.js';
 import { setStatus } from '../../status.js';
 import { copyToClipboard } from '../../utils/clipboard.js';
-import { insertAtCursor } from '../../utils/textarea.js';
 import { renderPreview } from '../../preview/render.js';
+import { buildMarkedSnippet, upsertMarkedSnippet } from '../../utils/snippets.js';
 import { parseColor, formatHex } from '../color.js';
 
 /**
@@ -392,6 +393,95 @@ function darken(hex, amt) {
     return mixHex(hex, '#000000', amt);
 }
 
+/**
+ * Convert HSL to hex. h in [0,360), s/l in [0,100].
+ * @param {number} h
+ * @param {number} s
+ * @param {number} l
+ * @returns {string}
+ */
+function hslToHex(h, s, l) {
+    const hh = ((h % 360) + 360) % 360;
+    const ss = Math.max(0, Math.min(100, s)) / 100;
+    const ll = Math.max(0, Math.min(100, l)) / 100;
+
+    const c = (1 - Math.abs(2 * ll - 1)) * ss;
+    const x = c * (1 - Math.abs(((hh / 60) % 2) - 1));
+    const m = ll - c / 2;
+
+    let r = 0, g = 0, b = 0;
+    if (hh < 60) { r = c; g = x; b = 0; }
+    else if (hh < 120) { r = x; g = c; b = 0; }
+    else if (hh < 180) { r = 0; g = c; b = x; }
+    else if (hh < 240) { r = 0; g = x; b = c; }
+    else if (hh < 300) { r = x; g = 0; b = c; }
+    else { r = c; g = 0; b = x; }
+
+    const to255 = (n) => Math.max(0, Math.min(255, Math.round((n + m) * 255)));
+    const rr = to255(r);
+    const gg = to255(g);
+    const bb = to255(b);
+
+    return formatHex({ r: rr, g: gg, b: bb, a: 1 }).slice(0, 7).toLowerCase();
+}
+
+const _randInt = (min, max) => Math.floor(min + Math.random() * (max - min + 1));
+
+/**
+ * Generate a cohesive palette using a base hue and an accent offset.
+ * @param {'light'|'dark'} mode
+ * @returns {{baseHue:number, primary:string, accent:string, bg:string, card:string, text:string}}
+ */
+function generateCohesivePalette(mode) {
+    const baseHue = _randInt(0, 359);
+    const accentOffset = _randInt(150, 210);
+    const primaryHue = baseHue;
+    const accentHue = (primaryHue + accentOffset) % 360;
+
+    if (mode === 'dark') {
+        const primary = hslToHex(primaryHue, _randInt(60, 85), _randInt(56, 70));
+        const accent = hslToHex(accentHue, _randInt(65, 90), _randInt(56, 72));
+        const bg = hslToHex(primaryHue, _randInt(14, 26), _randInt(7, 12));
+        const card = hslToHex(primaryHue, _randInt(12, 24), _randInt(12, 16));
+        const text = hslToHex(primaryHue, _randInt(6, 14), _randInt(90, 96));
+        return { baseHue, primary, accent, bg, card, text };
+    }
+
+    const primary = hslToHex(primaryHue, _randInt(55, 80), _randInt(40, 56));
+    const accent = hslToHex(accentHue, _randInt(60, 88), _randInt(45, 62));
+    const bg = hslToHex(primaryHue, _randInt(8, 18), _randInt(94, 98));
+    const card = hslToHex(primaryHue, _randInt(6, 14), _randInt(98, 100));
+    const text = hslToHex(primaryHue, _randInt(10, 22), _randInt(12, 18));
+    return { baseHue, primary, accent, bg, card, text };
+}
+
+/**
+ * Upsert the Theme Variables block into Custom CSS by replacing the first existing block,
+ * or appending a new one if not found.
+ * @param {string} css
+ * @param {string} block
+ * @returns {string}
+ */
+function upsertThemeVarsBlock(css, block) {
+    const startToken = '/* === Theme Variables';
+    const endToken = '/* === /Theme Variables === */';
+    const start = css.indexOf(startToken);
+    if (start !== -1) {
+        const end = css.indexOf(endToken, start);
+        if (end !== -1) {
+            const endIdx = end + endToken.length;
+            let after = endIdx;
+            while (after < css.length && (css[after] === '\n' || css[after] === '\r')) after += 1;
+            const before = css.slice(0, start);
+            const tail = css.slice(after);
+            const mid = block.trimEnd() + '\n';
+            return before + mid + tail;
+        }
+    }
+
+    const prefix = css && css.trim().length ? css.trimEnd() + '\n\n' : '';
+    return prefix + block.trimEnd() + '\n';
+}
 export default {
     id: 'theme-vars',
     name: 'Theme Variables',
@@ -435,9 +525,11 @@ export default {
 
           <div class="d-flex flex-wrap gap-2 mt-2">
             <button id="tvReset" class="btn btn-sm btn-outline-light" type="button">Reset to preset</button>
+            <button id="tvShuffle" class="btn btn-sm btn-outline-info" type="button" title="Generate a cohesive palette and apply it">Shuffle palette</button>
             <button id="tvDerive" class="btn btn-sm btn-outline-secondary" type="button">Auto-derive</button>
             <button id="tvLoad" class="btn btn-sm btn-outline-warning" type="button">Load from Custom CSS</button>
           </div>
+          <div class="form-text">Shuffle updates the palette inputs and (by default) upserts the Theme Variables block into Custom CSS for instant preview.</div>
 
           <hr class="my-3" />
 
@@ -464,11 +556,12 @@ export default {
         const elAcc = /** @type {HTMLElement|null} */ (panel.querySelector('#tvAcc'));
         const elOut = /** @type {HTMLTextAreaElement|null} */ (panel.querySelector('#tvOut'));
         const btnReset = /** @type {HTMLButtonElement|null} */ (panel.querySelector('#tvReset'));
+        const btnShuffle = /** @type {HTMLButtonElement|null} */ (panel.querySelector('#tvShuffle'));
         const btnDerive = /** @type {HTMLButtonElement|null} */ (panel.querySelector('#tvDerive'));
         const btnLoad = /** @type {HTMLButtonElement|null} */ (panel.querySelector('#tvLoad'));
         const btnInsert = /** @type {HTMLButtonElement|null} */ (panel.querySelector('#tvInsert'));
         const btnCopy = /** @type {HTMLButtonElement|null} */ (panel.querySelector('#tvCopy'));
-        if (!elScope || !elWrapper || !elPreset || !elAllVars || !elAcc || !elOut || !btnReset || !btnDerive || !btnLoad || !btnInsert || !btnCopy) return;
+        if (!elScope || !elWrapper || !elPreset || !elAllVars || !elAcc || !elOut || !btnReset || !btnShuffle || !btnDerive || !btnLoad || !btnInsert || !btnCopy) return;
 
         /** @type {Record<string,string>} */
         let values = {};
@@ -637,7 +730,84 @@ export default {
             setStatus('ok', 'Derived a few variables from Primary + Accent.');
         };
 
-        
+        const applyGeneratedToCustomCss = () => {
+            if (!els.customCss) return false;
+            const block = (elOut.value || '').trim();
+            if (!block) return false;
+
+            const current = els.customCss.value || '';
+            const next = upsertThemeVarsBlock(current, block);
+
+            // Prefer CodeMirror if present to keep UI in sync
+            // @ts-ignore
+            const cssEd = state.editors?.css;
+            if (cssEd && typeof cssEd.setValue === 'function') cssEd.setValue(next);
+            else {
+                els.customCss.value = next;
+                try { els.customCss.dispatchEvent(new Event('input')); } catch {}
+            }
+            return true;
+        };
+
+        const shufflePalette = () => {
+            const mode = (String(elPreset.value) === 'dark') ? 'dark' : 'light';
+            const p = generateCohesivePalette(mode);
+
+            // Required minimum set: primary / secondary / accent / bg / text
+            values['vs-blue'] = p.primary;                 // primary
+            values['vs-orange'] = p.accent;               // accent
+            values['vs-bg-light'] = p.bg;                 // background
+            values['vs-bg-white'] = p.card;               // card background
+            values['vs-text-dark'] = p.text;              // text (strong)
+
+            // Derive related values (secondary + links + borders)
+            const pLight = lighten(p.primary, mode === 'dark' ? 0.10 : 0.18) || values['vs-blue-light'];
+            const pDark = darken(p.primary, mode === 'dark' ? 0.35 : 0.28) || values['vs-blue-dark'];
+            const aLight = lighten(p.accent, 0.20) || values['vs-orange-light'];
+
+            if (pLight) values['vs-blue-light'] = pLight; // secondary (primary light)
+            if (pDark) values['vs-blue-dark'] = pDark;
+            if (aLight) values['vs-orange-light'] = aLight;
+
+            values['vs-link'] = p.primary;
+            values['vs-link-bg'] = p.primary;
+            if (pDark) values['vs-link-hover'] = pDark;
+
+            // Text tones from bg/text (keeps contrast sane)
+            const tMed = mixHex(p.text, p.bg, mode === 'dark' ? 0.55 : 0.60);
+            const tLight = mixHex(p.text, p.bg, mode === 'dark' ? 0.70 : 0.78);
+            if (tMed) values['vs-text-medium'] = tMed;
+            if (tLight) values['vs-text-light'] = tLight;
+
+            // Muted surfaces
+            const muted = mixHex(p.card, p.bg, 0.55);
+            const subtle = mixHex(p.card, p.bg, 0.75);
+            const dim = mixHex(p.card, p.bg, 0.25);
+            if (muted) values['vs-bg-muted'] = muted;
+            if (subtle) values['vs-bg-subtle'] = subtle;
+            if (dim) values['vs-bg-dim'] = dim;
+            values['vs-input-bg'] = p.card;
+
+            // Borders
+            const b = mixHex(p.card, p.primary, 0.22);
+            const bLight = mixHex(p.card, p.primary, 0.12);
+            const bLighter = mixHex(p.card, p.primary, 0.06);
+            if (b) values['vs-border'] = b;
+            if (bLight) values['vs-border-light'] = bLight;
+            if (bLighter) values['vs-border-lighter'] = bLighter;
+
+            renderInputs();
+            updateOutput();
+
+            // Apply to Custom CSS so the preview reflects the change immediately.
+            const applied = applyGeneratedToCustomCss();
+            if (applied) renderPreview();
+
+            const hint = mode === 'dark' ? 'dark palette' : 'light palette';
+            setStatus('ok', `Shuffled ${hint} (h=${p.baseHue}°). ${applied ? 'Applied to Custom CSS.' : 'Generated output only.'}`);
+        };
+
+
 
         // ---- Load variables back from Custom CSS (round-trip) ----
         /** @type {Set<string>} */
@@ -927,19 +1097,23 @@ elPreset.addEventListener('change', setFromPreset);
             setFromPreset();
             setStatus('ok', 'Reset to preset.');
         });
+        btnShuffle.addEventListener('click', shufflePalette);
         btnDerive.addEventListener('click', derive);
 
         btnInsert.addEventListener('click', () => {
             const txt = elOut.value.trimEnd();
             if (!txt) return;
-            insertAtCursor(els.customCss, txt + '\n');
-            setStatus('ok', 'Inserted theme variables into Custom CSS.');
+            const body = `/* Theme Variables */\n${txt}`;
+            const res = upsertMarkedSnippet(els.customCss, 'css', 'theme-vars', body, 1);
+            setStatus('ok', `${res.action === 'updated' ? 'Updated' : 'Inserted'} theme variables in Custom CSS.`);
             if (els.autoUpdate?.checked) renderPreview();
         });
 
         btnCopy.addEventListener('click', async () => {
             const txt = elOut.value.trimEnd();
-            await copyToClipboard(txt + '\n');
+            const body = `/* Theme Variables */\n${txt}`;
+            const snippet = buildMarkedSnippet({ kind: 'css', blockId: 'theme-vars', version: 1, body });
+            await copyToClipboard(snippet);
             setStatus('ok', 'Copied CSS snippet.');
         });
 

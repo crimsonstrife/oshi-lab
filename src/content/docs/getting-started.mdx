@@ -9,9 +9,10 @@ It gives you:
 
 - A **demo profile** so you can style immediately (no copy/paste required).
 - A **sandboxed preview** (scripts blocked) to reduce risk while experimenting.
-- A way to **export only what you paste into MyOshi** (Custom CSS/HTML), not the entire page.
+- One-click **tools** (snippets, widgets, audits) to speed up common tasks.
+- Theme **bundles** (Import/Export) so you can back up and share work as a single file.
 
-> MyOshi is currently private, so this tool does **not** fetch live profiles.
+> MyOshi is currently private, so this tool does **not** fetch live profiles automatically.
 > Instead, it ships with maintainable demo templates and documentation.
 
 ---
@@ -19,17 +20,20 @@ It gives you:
 ## Open the Lab
 
 - Go to **Theme Lab**: `/lab/`
-- Optional: open the preview as a separate window using **Pop out preview**. NOTE: the pop-out preview does not auto-update as you edit, so it’s best for testing responsiveness or seeing your theme without the editor UI, you can close and reopen the preview window after changes to refresh.
+- Optional: open the preview as a separate window using **Pop out preview**.
+  - Note: the pop-out preview is best for responsiveness testing; you can close/reopen it to refresh.
 
 ---
 
-## Typical workflow
+## Fastest workflow (recommended)
 
-1. Pick a **Template** (demo profile) to start with or paste your preview code from MyOshi, you DO NOT need to paste your preview code if you use the template.
-2. Write **Custom CSS** until it looks right.
-3. Add **Custom HTML** if you need extra structure (widgets, badges, layout wrappers, etc.).
-4. Copy **Custom CSS** and **Custom HTML** into MyOshi.
-5. Save a **Snapshot** while iterating.
+1. Open **Tools** (Ctrl/Cmd+K).
+2. Use **Quick Theme Builder** (or **Theme Variables**) to generate a cohesive baseline.
+3. Use **CSS Blocks** to add common upgrades (glass cards, background overlays, button styling).
+4. Add **Widgets** / **Schedule Builder** output if you need structured HTML.
+5. Copy **Custom CSS** and **Custom HTML** into MyOshi.
+6. Run **Audit** + **Accessibility Audit** before sharing.
+7. Export a **Theme bundle** when you want a portable backup.
 
 ---
 
@@ -44,34 +48,27 @@ The demo template is only there so your CSS has something realistic to style.
 
 ---
 
-## Safety model (important)
+## Notes about MyOshi scoping (important)
 
-The preview is rendered in an `<iframe>` with a restrictive sandbox:
+MyOshi automatically scopes submitted Custom CSS so it only affects the profile area. Because of this:
 
-- **No scripts execute**
-- This prevents accidental (or malicious) JS from running in the preview.  This is also representative of how MyOshi works.
-
-That said, always be careful with third-party assets:
-
-- Remote images are generally fine.
-- Avoid embedding third-party “widgets” that require JS.
+- You usually **do not** need to manually prefix every selector with the wrapper.
+- If you paste third-party CSS that assumes full-page control (`body`, `html`, `:root`), use **CSS Scope Fixer** to normalize it.
 
 ---
 
 ## Troubleshooting
 
 ### The preview looks different from MyOshi
-That’s currently expected unless you import an exact MyOshi preview HTML. The built-in templates aim to be *faithful enough* to develop styles comfortably, however MyOshi is still undergoing a lot of changes, and I may not be able to keep up with them.
+That’s expected unless you import an exact MyOshi preview HTML. The built-in templates aim to be *faithful enough* to develop styles comfortably, but MyOshi can change frequently.
 
 ### My CSS works in the Lab but not on MyOshi
-MyOshi may have additional wrappers, specificity, or different DOM structure.  This is especially true after a recent update started manually adding the `.profile-page.profile-custom-css` class selectors to any submitted CSS.
+Common fixes:
 
-Fixes:
-- Increase specificity (e.g. `div.card { ... }`)
+- Increase specificity slightly (e.g. `div.card { ... }`)
 - Avoid relying on overly narrow selectors that only match the demo template
-- Use browser DevTools to confirm your selector matches what you think
-- Use the **Inspect** option in your browser to confirm the element is in the DOM
-- When in doubt, submit a bug report with screenshots.
+- Use browser DevTools to confirm the selector matches what you think
+- Run the **Audit** tool to catch common pitfalls
 
 ### I can’t copy to clipboard
 Some browsers block clipboard access unless the page is served over HTTPS or you’ve interacted with the page.
@@ -83,4 +80,5 @@ Fallback: manually select text, right-click → copy.
 ## Next steps
 
 - Read **Theme Lab** for feature details and power-user tips.
-- Read **Templates** if you want to add/modify demo templates (This only works if you've downloaded the source code for this app and are running it locally.).
+- Read **Tools** for quick generators and audits.
+- Read **Templates** if you want to add/modify demo templates (local dev only).

@@ -1,0 +1,21 @@
+/*
+  Avatar sizing + shape helpers
+  - Tweak the CSS variables to your taste.
+  - Set --lab-avatar-radius to 999px for a circle.
+*/
+
+:where(*){
+  --lab-avatar-size: 96px;
+  --lab-avatar-radius: 999px;
+  --lab-avatar-border: 2px solid rgba(255,255,255,.18);
+  --lab-avatar-bg: rgba(0,0,0,.18);
+}
+
+:where(*) img.profile-avatar{
+  width: var(--lab-avatar-size) !important;
+  height: var(--lab-avatar-size) !important;
+  border-radius: var(--lab-avatar-radius) !important;
+  border: var(--lab-avatar-border) !important;
+  background: var(--lab-avatar-bg) !important;
+  object-fit: cover;
+}

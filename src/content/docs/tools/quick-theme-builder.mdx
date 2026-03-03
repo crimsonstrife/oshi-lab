@@ -1,0 +1,63 @@
+---
+title: Tool - Quick Theme Builder
+description: Guided starter theme generator (palette, spacing, card style, typography, avatar).
+---
+
+Quick Theme Builder is a beginner-friendly generator that outputs a cohesive **starter theme** CSS block.
+
+It’s designed for fast time-to-result:
+
+- Pick a preset (or your own palette)
+- Adjust a few “big knobs”
+- Insert/update a complete starter CSS block
+
+## Where to find it
+
+Open **Tools** (Ctrl/Cmd+K) → search **Quick Theme Builder**.
+
+## Use it
+
+1. Choose a **Preset** (optional).
+2. Set your **Palette**:
+   - Primary / Secondary / Accent
+   - Text / Background
+3. Adjust layout knobs:
+   - **Radius**
+   - **Padding**
+   - **Spacing**
+4. Choose a **Card style**:
+   - Flat
+   - Glass
+5. Adjust typography:
+   - Base size
+   - Header weight
+6. Adjust avatar:
+   - Size
+   - Rounding
+7. Click **Insert into Custom CSS** (or **Copy**).
+
+### Marked snippet (update-in-place)
+
+The output is wrapped in markers so applying again updates the same block:
+
+```css
+/* oshilab:begin block=quick-theme v=1 */
+...
+/* oshilab:end block=quick-theme */
+```
+
+This is what enables “same inputs → same output” and prevents duplicate blocks piling up while you iterate.
+
+## Included presets
+
+- **Clean Dark**
+- **Neon**
+- **Soft Pastel**
+- **Glass Minimal**
+
+You can always pick a preset, then tweak values before inserting.
+
+## Notes
+
+- The generated CSS favors variables and safe selectors so it’s easy to extend later.
+- If you already inserted a Quick Theme block and later decide to switch to a different approach, just delete the marked region and replace it with your own CSS.

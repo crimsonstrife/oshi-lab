@@ -10,6 +10,7 @@ import { autoBackupBeforeExtract } from '../snapshots/index.js';
 import { renderPreview } from '../preview/render.js';
 import { loadTemplateById } from '../templates/index.js';
 import { syncEditorsFromTextareas } from '../scripts/editors/index.js';
+import { updateThemeBundleSummary } from '../themeBundle.js';
 
 /**
  * A variable that holds the instance of DOMPurify for client-side use.
@@ -374,6 +375,12 @@ export function extractBase() {
 
         state.baseCss = (cssBase || '').trim();
         state.baseBody = (bodyBase || '').trim();
+        state.baseMode = 'extracted';
+        state.extractedBase = {
+            css: state.baseCss,
+            body: state.baseBody,
+            capturedAt: new Date().toISOString(),
+        };
 
         if (els.customCss && cssUserRaw.trim()) {
             const importedUserCss = stripMyOshiAutoScopeFromCss(cssUserRaw).trim();
@@ -411,10 +418,17 @@ export function extractBase() {
  *
  * @return {void} Does not return a value.
  */
-export function restoreTemplateBase() {
+export async function restoreTemplateBase() {
     if (!state.activeTemplateId) {
         setStatus('warn', 'No active template selected.');
         return;
     }
-    loadTemplateById(state.activeTemplateId);
+    try {
+        await loadTemplateById(state.activeTemplateId);
+        state.baseMode = 'template';
+        updateThemeBundleSummary();
+    } catch (e) {
+        console.error(e);
+        setStatus('err', 'Failed to restore template base.');
+    }
 }

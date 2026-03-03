@@ -3,7 +3,6 @@ title: Tool - CSS Blocks
 description: Insert pre-made CSS chunks into Custom CSS.
 ---
 
-
 **CSS Blocks** is a “snippet library” for common patterns you can drop into your theme in one click.
 
 ## Where to find it
@@ -16,15 +15,32 @@ Open **Tools** (Ctrl/Cmd+K) → search **CSS Blocks**.
 2. Review the block description and preview.
 3. Click:
    - **Insert into Custom CSS** (inserts at your cursor), or
-   - **Copy** (clipboard)
+   - **Copy** (clipboard).
+
+### Marked snippets (update-in-place)
+
+Inserted blocks are wrapped with markers like:
+
+```css
+/* oshilab:begin block=cssblock/<block-id> v=1 */
+...
+/* oshilab:end block=cssblock/<block-id> */
+```
+
+Re-inserting the same block updates the existing block instead of duplicating it.
 
 ## Included CSS blocks
 
+- **Avatar sizing + shape helpers** — Quick controls for avatar size/shape using CSS variables (circle, rounded, etc.).
 - **Background image overlay** — Adds a subtle overlay on top of your background image to improve readability.
-- **Merge stacked .blurb-section borders** — Removes inner borders between adjacent .blurb-section blocks and rounds only the outer corners.
-- **Glassmorphism cards** — Makes cards slightly translucent with a subtle blur. Great for busy background images.
+- **Merge stacked .blurb-section borders** — Removes inner borders between adjacent `.blurb-section` blocks and rounds only the outer corners.
+- **Standardize buttons + links** — Gives links/buttons a consistent pill style and hover behavior.
+- **Glassmorphism cards** — Makes cards slightly translucent with a subtle blur (great for busy backgrounds).
+- **Hide a card (pattern template)** — Template for hiding a specific card by matching something inside it (edit the selector).
+- **Layout: force single column** — Forces the profile layout into a single column (useful for minimal / mobile-first themes).
+- **Reduce visual noise (soft borders + no heavy shadows)** — Softens borders, removes heavy shadows, and calms card headers for a cleaner look.
 
 ## Tips
 
-- Most blocks are intentionally simple. After inserting, feel free to tweak values (opacity, radius, colors).
-- If a block includes a note like “Adjust selector prefix”, it means you may want to add the wrapper scope (or other class) depending on how your theme is structured.
+- These blocks are meant to be **drop-in** and **editable**. Tweak values after inserting.
+- If you want to remove a block, delete the entire marked region (including begin/end markers).

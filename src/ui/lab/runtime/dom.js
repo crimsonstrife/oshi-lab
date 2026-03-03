@@ -93,6 +93,14 @@ export const els = {
   auditOutput: null,
   /** @type {HTMLElement|null} */
   auditBadge: null,
+
+  // Theme bundle export/import
+  /** @type {HTMLElement|null} */
+  bundleInfo: null,
+  /** @type {HTMLInputElement|null} */
+  themeImportInput: null,
+  /** @type {HTMLInputElement|null} */
+  includeExtractedBase: null,
 };
 
 /**
@@ -141,6 +149,11 @@ export function refreshEls() {
   els.auditSummary = document.getElementById('auditSummary');
   els.auditOutput = document.getElementById('auditOutput');
   els.auditBadge = document.getElementById('auditBadge');
+
+  // Theme bundle export/import
+  els.bundleInfo = document.getElementById('bundleInfo');
+  els.themeImportInput = /** @type {HTMLInputElement|null} */ (document.getElementById('themeImportInput'));
+  els.includeExtractedBase = /** @type {HTMLInputElement|null} */ (document.getElementById('includeExtractedBase'));
 
   return els;
 }

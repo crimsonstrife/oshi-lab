@@ -9,6 +9,10 @@ export const state = {
   baseCss: "",
   /** @type {string} */
   baseBody: "",
+  /** @type {'template'|'extracted'} */
+  baseMode: 'template',
+  /** @type {{css:string, body:string, capturedAt:string}|null} */
+  extractedBase: null,
   /** @type {string} */
   lastBuildSrcdoc: "",
   /** @type {boolean} */
@@ -28,6 +32,12 @@ export const state = {
 
   /** @type {any} */
   toolsModal: null,
+
+  /** @type {{ open?: Function, setActive?: (id:string)=>void } | null} */
+  toolsApi: null,
+
+  /** @type {any} */
+  onboardingModal: null,
 
   /** @type {number|null} */
   debounceTimer: null,

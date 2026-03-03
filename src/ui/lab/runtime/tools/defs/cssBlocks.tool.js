@@ -3,9 +3,9 @@
 import { els } from '../../dom.js';
 import { setStatus } from '../../status.js';
 import { copyToClipboard } from '../../utils/clipboard.js';
-import { insertAtCursor } from '../../utils/textarea.js';
 import { renderPreview } from '../../preview/render.js';
 import { getCssBlocks } from '../cssBlocks/registry.js';
+import { buildMarkedSnippet, upsertMarkedSnippet } from '../../utils/snippets.js';
 
 /**
  * Wraps a given CSS snippet with a header and footer that includes the provided title.
@@ -14,10 +14,12 @@ import { getCssBlocks } from '../cssBlocks/registry.js';
  * @param {string} css - The CSS code snippet to wrap.
  * @return {string} The wrapped CSS snippet with a header and footer containing the title.
  */
-function wrapSnippet(title, css) {
-    const header = `/* === CSS Block: ${title} === */\n`;
-    const footer = `\n/* === /CSS Block: ${title} === */\n`;
-    return header + css.trimEnd() + footer;
+/** @param {any} block */
+function toSnippet(block) {
+    const id = `cssblock/${block.id}`;
+    const v = Number.isFinite(block.version) ? block.version : 1;
+    const body = `/* CSS Block: ${block.name} */\n${String(block.css || '').trimEnd()}`;
+    return buildMarkedSnippet({ kind: 'css', blockId: id, version: v, body });
 }
 
 export default {
@@ -38,7 +40,7 @@ export default {
 
         panel.innerHTML = `
       <div class="fw-semibold">CSS Blocks</div>
-      <div class="small text-body-secondary">Insert pre-made CSS chunks into Custom CSS.</div>
+      <div class="small text-body-secondary">Insert pre-made CSS chunks into Custom CSS. Re-inserting the same block updates it in place.</div>
       <hr class="my-3" />
 
       <div class="row g-3">
@@ -78,11 +80,17 @@ export default {
             activeId = block.id;
 
             descEl.textContent = block.description || '';
-            ta.value = wrapSnippet(block.name, block.css).trimEnd() + '\n';
+            ta.value = toSnippet(block).trimEnd() + '\n';
 
             btnInsert.onclick = () => {
-                insertAtCursor(els.customCss, ta.value.trimEnd() + '\n');
-                setStatus('ok', `Inserted "${block.name}".`);
+                const res = upsertMarkedSnippet(
+                    els.customCss,
+                    'css',
+                    `cssblock/${block.id}`,
+                    `/* CSS Block: ${block.name} */\n${String(block.css || '').trimEnd()}`,
+                    Number.isFinite(block.version) ? block.version : 1,
+                );
+                setStatus('ok', `${res.action === 'updated' ? 'Updated' : 'Inserted'} "${block.name}".`);
                 if (els.autoUpdate?.checked) renderPreview();
             };
 

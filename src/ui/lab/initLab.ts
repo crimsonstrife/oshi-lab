@@ -130,6 +130,7 @@ export async function initLab(root: HTMLElement | null): Promise<void> {
             </div>
 
             <div class="d-flex flex-wrap gap-2 justify-content-end">
+              <button class="btn btn-sm btn-outline-secondary" id="btnOnboarding" type="button" title="Show the new theme onboarding chooser">Start</button>
               <button class="btn btn-sm btn-outline-info" id="btnDocs" type="button">Docs</button>
               <button class="btn btn-sm btn-outline-primary" id="btnTools" type="button">Tools</button>
               <div class="vr d-none d-lg-block opacity-50"></div>
@@ -137,10 +138,27 @@ export async function initLab(root: HTMLElement | null): Promise<void> {
               <button class="btn btn-sm btn-outline-light" id="btnExtract" type="button">Extract Base</button>
               <button class="btn btn-sm btn-outline-light" id="btnRestoreTemplate" type="button">Restore Template</button>
               <button class="btn btn-sm btn-outline-warning" id="btnResetCustom" type="button">Reset Custom</button>
-              <button class="btn btn-sm btn-outline-success" id="btnDownload" type="button">Download Bundle</button>
+
+              <div class="vr d-none d-lg-block opacity-50"></div>
+
+              <button class="btn btn-sm btn-outline-success" id="btnExportTheme" type="button">Export Theme</button>
+              <button class="btn btn-sm btn-outline-success" id="btnImportTheme" type="button">Import Theme</button>
+              <button class="btn btn-sm btn-outline-light" id="btnDownload" type="button">Download Preview</button>
+
+              <input id="themeImportInput" type="file" accept="application/json,.json" class="d-none" />
             </div>
           </div>
         </nav>
+
+        <div class="d-flex flex-wrap align-items-center justify-content-between mb-2 gap-2">
+          <div id="bundleInfo" class="small text-body-secondary"></div>
+          <div class="form-check form-switch small m-0">
+            <input class="form-check-input" type="checkbox" id="includeExtractedBase" disabled />
+            <label class="form-check-label" for="includeExtractedBase" title="Optional: include extracted base CSS/body in the exported bundle (larger file). Only available when using an extracted base.">
+              Include extracted base
+            </label>
+          </div>
+        </div>
 
         <div class="row g-3 m-0">
           <!-- Editors -->
@@ -474,6 +492,64 @@ export async function initLab(root: HTMLElement | null): Promise<void> {
                   Tip: tools can insert snippets directly into Custom CSS/HTML at your cursor.
                 </div>
                 <button type="button" class="btn btn-sm btn-outline-light" data-bs-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- New Theme Onboarding -->
+        <div class="modal fade" id="onboardingModal" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <div class="d-flex flex-column">
+                  <h5 class="modal-title mb-0">Start a New Theme</h5>
+                  <div class="small text-body-secondary">Pick a path for faster time-to-result. You can always change later.</div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+
+              <div class="modal-body">
+                <div class="row g-3">
+                  <div class="col-12 col-md-4">
+                    <div class="border rounded p-3 h-100 d-flex flex-column">
+                      <div class="fw-semibold">Start from a Template</div>
+                      <div class="small text-body-secondary mt-1 flex-grow-1">
+                        Load a built-in MyOshi template and start customizing from a known-good base.
+                      </div>
+                      <button class="btn btn-sm btn-outline-primary mt-2" type="button" data-onboard="template">Use Template</button>
+                    </div>
+                  </div>
+
+                  <div class="col-12 col-md-4">
+                    <div class="border rounded p-3 h-100 d-flex flex-column">
+                      <div class="fw-semibold">Use Quick Theme Builder</div>
+                      <div class="small text-body-secondary mt-1 flex-grow-1">
+                        Pick a preset or tweak a palette + a few style knobs to generate a full starter theme.
+                      </div>
+                      <button class="btn btn-sm btn-outline-primary mt-2" type="button" data-onboard="builder">Open Builder</button>
+                    </div>
+                  </div>
+
+                  <div class="col-12 col-md-4">
+                    <div class="border rounded p-3 h-100 d-flex flex-column">
+                      <div class="fw-semibold">Paste Existing CSS/HTML</div>
+                      <div class="small text-body-secondary mt-1 flex-grow-1">
+                        Bring your current theme in, then run Scope Fixer + Audit suggestions to align with the latest MyOshi rules.
+                      </div>
+                      <button class="btn btn-sm btn-outline-primary mt-2" type="button" data-onboard="paste">Paste & Fix</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="alert alert-secondary mt-3 mb-0 small">
+                  Tip: If you close this, it won't show again automatically — use the <b>Start</b> button in the header to reopen.
+                </div>
+              </div>
+
+              <div class="modal-footer justify-content-between">
+                <div class="small text-body-secondary">You can reopen this anytime.</div>
+                <button type="button" class="btn btn-sm btn-outline-light" data-bs-dismiss="modal">Not now</button>
               </div>
             </div>
           </div>

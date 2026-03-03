@@ -34,7 +34,7 @@ export function initPreview() {
     frame.srcdoc = html;
 
     // Cleanup after loading
-    // localStorage.removeItem(key);
+    localStorage.removeItem(key);
 }
 
 initPreview();

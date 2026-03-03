@@ -3,7 +3,6 @@ title: Tools
 description: What the Tools modal is, where to find it, and what each tool does.
 ---
 
-
 The lab includes a **Tools** modal that can generate snippets, audit your theme, and help you patch common MyOshi quirks without hand-editing everything.
 
 ## Open the Tools modal
@@ -18,25 +17,48 @@ From there you can search tools by name and click one to open it in the right pa
 Most tools will do one (or more) of the following:
 
 - **Copy** output to your clipboard.
-- **Insert** output at your cursor in **Custom HTML** or **Custom CSS**.
+- **Insert / Update** output in **Custom HTML** or **Custom CSS**.
 - **Replace** content (only when the tool offers a replace button — use carefully).
 
-If **Auto Update** is enabled in the lab, tools that insert into editors will usually trigger an immediate preview refresh.
+### Marked snippets (update-in-place)
+
+Tools that generate larger snippets (widgets, schedules, CSS blocks, builders) wrap output in **stable begin/end markers**:
+
+```css
+/* oshilab:begin block=theme-vars v=1 */
+...
+/* oshilab:end block=theme-vars */
+```
+
+```html
+<!-- oshilab:begin block=widget/my-widget/html v=1 -->
+...
+<!-- oshilab:end block=widget/my-widget/html -->
+```
+
+If you run the same tool again, it will **find the existing block and update it in place** instead of duplicating.
+
+> Tip: If you delete the markers, the next insert will be treated as “new” and you’ll get another copy.
+
+If **Auto Update** is enabled in the lab, tools that insert/update editors will usually trigger an immediate preview refresh.
 
 ## Tool list
 
-- **Color Converter** — convert between HEX/RGBA and insert a `--var: ...;` snippet.
-- **CSS Scope Fixer** — rewrite pasted CSS so it plays nicely with MyOshi’s automatic scoping.
-- **Schedule Builder** — generate an HTML+CSS streaming schedule block from simple “slots”.
-- **Theme Variables** — generate scoped `--vs-*` overrides for the base template.
+- **Quick Theme Builder** — guided starter theme generator (palette, spacing, card style, typography, avatar).
+- **Theme Variables** — generate scoped `--vs-*` overrides for the base template (includes **Shuffle palette**).
 - **Component Styler** — generate scoped CSS for common components (cards, navbar, tabs, links).
-- **Widget Inserter** — insert pre-made widgets (HTML+CSS) with customizable fields.
 - **CSS Blocks** — insert ready-to-go CSS chunks (glass cards, background overlay, etc.).
+- **Widget Inserter** — insert pre-made widgets (HTML+CSS) with customizable fields.
+- **Schedule Builder** — generate an HTML+CSS streaming schedule block from simple “slots”.
+- **CSS Scope Fixer** — rewrite pasted CSS so it plays nicely with MyOshi’s automatic scoping.
 - **Accessibility Audit** — scan for common a11y issues (alt text, accessible names, contrast).
+- **Color Converter** — convert between HEX/RGBA and insert a `--var: ...;` snippet.
 
 ## Developer notes
 
-Tools are auto-registered from `tools/defs/*.tool.js` via `import.meta.glob()`. To add a new tool, export a default object with:
+Tools are auto-registered from `tools/defs/*.tool.js` via `import.meta.glob()`.
+
+To add a new tool, export a default object with:
 
 - `id`, `name`, `keywords` (optional), `order` (optional)
 - `render(panel)` — build the tool UI inside the provided element

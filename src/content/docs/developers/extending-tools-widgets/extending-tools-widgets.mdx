@@ -3,7 +3,6 @@ title: Extending Tools & Widgets
 description: Developer reference for adding new tool, widget, or CSS block definitions.
 ---
 
-
 This page is for contributors maintaining the lab’s built-in tools and widget library.
 
 ## Adding a new tool
@@ -22,6 +21,35 @@ A tool module should `export default` an object with:
 
 The tools modal reads definitions via `import.meta.glob('./defs/*.tool.js', { eager: true })`.
 
+### Marked snippets (recommended)
+
+If your tool generates a “block” of CSS/HTML that users may want to re-generate later, wrap it with stable markers so the tool can **update in place**:
+
+- `buildMarkedSnippet({ kind, blockId, version, body })`
+- `upsertMarkedSnippet(textareaEl, kind, blockId, body, version)`
+
+Marker examples:
+
+```css
+/* oshilab:begin block=theme-vars v=1 */
+...
+/* oshilab:end block=theme-vars */
+```
+
+```html
+<!-- oshilab:begin block=schedule-builder/html v=1 -->
+...
+<!-- oshilab:end block=schedule-builder/html -->
+```
+
+**Block ID conventions:**
+
+- Prefer namespaced IDs for multi-part output:
+  - `widget/<id>/html`, `widget/<id>/css`
+  - `schedule-builder/html`, `schedule-builder/css`
+  - `cssblock/<id>`
+- Bump `version` when you make a breaking change to a block’s structure.
+
 ## Adding a new widget
 
 Widgets are auto-registered from:
@@ -35,6 +63,7 @@ A widget definition should include:
 - `description` (optional)
 - `keywords` (optional)
 - `order` (optional)
+- `version` (optional, default `1`)
 - `html` (string)
 - `css` (string)
 - `fields` (optional array)
@@ -72,6 +101,7 @@ A block definition should include:
 - `description` (optional)
 - `keywords` (optional)
 - `order` (optional)
+- `version` (optional, default `1`)
 - `css` (string), usually imported from a raw `.css` file
 
 The CSS Blocks tool reads definitions via `import.meta.glob('./defs/*.block.js', { eager: true })`.

@@ -130,4 +130,17 @@ export function initTools() {
     searchEl.addEventListener('input', renderList);
 
     renderList();
+
+    // Expose a tiny API for onboarding / deep-links.
+    // @ts-ignore
+    state.toolsApi = {
+        open: openTools,
+        setActive: (id) => {
+            if (!id) return;
+            activeToolId = String(id);
+            // @ts-ignore
+            state.activeToolId = activeToolId;
+            renderList();
+        },
+    };
 }
