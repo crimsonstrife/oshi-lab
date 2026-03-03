@@ -30,6 +30,21 @@ function isOshiForgeTheme(obj) {
 }
 
 /**
+ * Escape a string for safe inclusion inside a double-quoted CSS content string.
+ *
+ * Ensures that backslashes and double quotes are escaped so the CSS string literal
+ * is not broken by user-controlled input.
+ *
+ * @param {unknown} text
+ * @returns {string}
+ */
+function escapeCssContentString(text) {
+  const s = String(text);
+  // First escape backslashes, then double quotes.
+  return s.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+}
+
+/**
  * @param {string} hex
  * @returns {{r:number,g:number,b:number}|null}
  */
@@ -270,14 +285,14 @@ function buildOshiForgeCss(s) {
   lines.push('');
   // Replace header icons with simple glyphs (more compatible than data: SVG overrides)
   lines.push('.card-header.starred:before {');
-  lines.push(`  content: "${starIcon.replace(/"/g, '\\"')}";`);
+  lines.push(`  content: "${escapeCssContentString(starIcon)}";`);
   lines.push('  background: none !important;');
   lines.push('  width: auto; height: auto;');
   lines.push('  filter: none;');
   lines.push('}');
   lines.push('');
   lines.push('.card-header.hearted:before {');
-  lines.push(`  content: "${heartIcon.replace(/"/g, '\\"')}";`);
+  lines.push(`  content: "${escapeCssContentString(heartIcon)}";`);
   lines.push('  background: none !important;');
   lines.push('  width: auto; height: auto;');
   lines.push('  filter: none;');
