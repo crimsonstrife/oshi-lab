@@ -33,6 +33,12 @@ export const state = {
   /** @type {any} */
   toolsModal: null,
 
+  /** @type {{ open?: Function, setActive?: (id:string)=>void } | null} */
+  toolsApi: null,
+
+  /** @type {any} */
+  onboardingModal: null,
+
   /** @type {number|null} */
   debounceTimer: null,
 
