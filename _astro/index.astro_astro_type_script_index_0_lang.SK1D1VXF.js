@@ -369,7 +369,7 @@ const x="modulepreload",w=function(t){return"/"+t},v={},k=function(r,i,n){let b=
 
       </div>
     </div>
-  `,window.__MYOSHI_LAB_TEMPLATES__=c,await k(()=>import("./oshi-lab.RZb5TRKh.js"),[])}const h=document.getElementById("lab-root");try{S(document.getElementById("lab-root")).catch(t=>{console.error("initLab failed:",t),h&&(h.innerHTML=`
+  `,window.__MYOSHI_LAB_TEMPLATES__=c,await k(()=>import("./oshi-lab.ayoXGrZ6.js"),[])}const h=document.getElementById("lab-root");try{S(document.getElementById("lab-root")).catch(t=>{console.error("initLab failed:",t),h&&(h.innerHTML=`
           <div class="alert alert-danger m-3" role="alert">
             <strong>Failed to load initLab.</strong><br>
             Check the browser console for details.
