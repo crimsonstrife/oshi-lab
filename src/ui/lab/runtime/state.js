@@ -9,6 +9,10 @@ export const state = {
   baseCss: "",
   /** @type {string} */
   baseBody: "",
+  /** @type {'template'|'extracted'} */
+  baseMode: 'template',
+  /** @type {{css:string, body:string, capturedAt:string}|null} */
+  extractedBase: null,
   /** @type {string} */
   lastBuildSrcdoc: "",
   /** @type {boolean} */

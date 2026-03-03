@@ -73,12 +73,6 @@ const IMPORT_HOST_ALLOWLIST = new Set([
   'cdnjs.cloudflare.com',
 ]);
 
-const FONT_FILE_HOST_ALLOWLIST = new Set([
-  ...IMPORT_HOST_ALLOWLIST,
-  // Typekit often serves font binaries from this host:
-  'p.typekit.net',
-]);
-
 /**
  * An array of CSS class names that are designated as protected and should not be altered,
  * removed, or manipulated by certain operations in the application.
@@ -352,53 +346,24 @@ function auditCss(css) {
     }
   }
 
-  // Font file host allowlist (best-effort: only when it looks like a font binary)
-  for (const m of text.matchAll(/\burl\(\s*(['"]?)([^'"\)]+)\1\s*\)/gi)) {
-    const raw = (m[2] ?? '').trim();
-    if (!raw) continue;
-
-    const decoded = safeDecode(decodeCssEscapes(raw)).trim();
-    const lower = decoded.toLowerCase();
-
-    if (!lower.startsWith('https://')) continue;
-
-    // Heuristic: treat common font extensions as font binaries
-    if (!/\.(?:woff2?|ttf|otf|eot)(?:[?#].*)?$/i.test(decoded)) continue;
-
-    const host = safeHost(decoded);
-    if (!host || !FONT_FILE_HOST_ALLOWLIST.has(host)) {
-      issues.push({
-        id: 'css-font-file-host',
-        severity: 'warn',
-        title: 'Font file host may be blocked',
-        message: `Font file appears to be loaded from "${host ?? 'unknown'}", which is not on the allowlist.`,
-        hint: `Prefer Google/Bunny/Typekit allowed hosts: ${Array.from(FONT_FILE_HOST_ALLOWLIST).join(', ')}`,
-        loc: loc(m.index ?? 0),
-        meta: { url: decoded },
-      });
-    }
-  }
-
   // @import restrictions (fonts allowlist)
   // The URL may contain semicolons in query strings (e.g. Google Fonts wght@500;700;800),
   // so match url(...) or quoted strings in full rather than stopping at the first ';'.
-  for (const imp of iterCssImports(text)) {
-    const start = imp.startIndex;
-    const url = imp.url;
-
+  for (const m of text.matchAll(/@import\s+(url\(\s*(?:'[^']*'|"[^"]*"|[^)]*)\s*\)|'[^']*'|"[^"]*")[^;]*;?/gi)) {
+    const params = String(m[1] ?? '').trim();
+    const url = extractImportUrl(params);
     if (!url) {
       issues.push({
         id: 'css-import-parse',
         severity: 'warn',
         title: '@import could not be parsed',
-        message: `@import at ${loc(start).line}:${loc(start).column}`,
+        message: `@import ${params}`,
         hint: 'MyOshi only allows font imports from specific hosts. Use @import url("https://...") format.',
-        loc: loc(start),
+        loc: loc(m.index ?? 0),
       });
       continue;
     }
-
-    const decoded = safeDecode(decodeCssEscapes(url)).trim();
+    const decoded = safeDecode(url).trim();
     const lower = decoded.toLowerCase();
 
     if (lower.startsWith('data:')) {
@@ -408,19 +373,19 @@ function auditCss(css) {
         title: 'data: @import is blocked',
         message: '@import of data: URIs is blocked by MyOshi (bypasses sanitization).',
         hint: 'Paste CSS directly (up to 50k chars) or import from an allowed font host.',
-        loc: loc(start),
+        loc: loc(m.index ?? 0),
       });
       continue;
     }
 
-    if (lower.startsWith('//') || !lower.startsWith('https://')) {
+    if (!lower.startsWith('https://')) {
       issues.push({
         id: 'css-import-https',
         severity: 'error',
         title: '@import must be https:// from allowed font hosts',
         message: `@import url is not https:// : ${decoded}`,
-        hint: `Use https:// and one of the allowed font hosts: ${Array.from(IMPORT_HOST_ALLOWLIST).join(', ')}`,
-        loc: loc(start),
+        hint: 'Use https:// and one of the allowed font hosts (Google/Bunny/Typekit/cdnjs).',
+        loc: loc(m.index ?? 0),
       });
       continue;
     }
@@ -433,7 +398,7 @@ function auditCss(css) {
         title: '@import host not allowed',
         message: `@import host "${host ?? 'unknown'}" is not on the allowlist.`,
         hint: `Allowed hosts: ${Array.from(IMPORT_HOST_ALLOWLIST).join(', ')}`,
-        loc: loc(start),
+        loc: loc(m.index ?? 0),
       });
     }
   }
@@ -515,99 +480,6 @@ function auditHtml(html) {
       hint: 'Fix malformed tags (unclosed quotes/tags). MyOshi may sanitize or drop malformed HTML.',
     });
     return issues;
-  }
-
-  // External stylesheet/font imports via <link>
-  for (const link of Array.from(doc.querySelectorAll('link[rel][href]'))) {
-    const rel = (link.getAttribute('rel') || '').toLowerCase();
-    const relTokens = rel.split(/\s+/).filter(Boolean);
-
-    const isStylesheet = relTokens.includes('stylesheet');
-    const isPreconnect = relTokens.includes('preconnect') || relTokens.includes('dns-prefetch');
-
-    if (!isStylesheet && !isPreconnect) continue;
-
-    const href = (link.getAttribute('href') || '').trim();
-    if (!href) continue;
-
-    const decoded = safeDecode(href).trim();
-    const lower = decoded.toLowerCase();
-
-    if (lower.startsWith('data:')) {
-      issues.push({
-        id: 'html-link-data',
-        severity: 'error',
-        title: 'data: stylesheet links are blocked',
-        message: `<link> points to a data: URL, which MyOshi blocks.`,
-        hint: 'Use https:// links from allowed font hosts.',
-        elementPath: elementToPath(link),
-      });
-      continue;
-    }
-
-    if (lower.startsWith('//') || !lower.startsWith('https://')) {
-      issues.push({
-        id: 'html-link-https',
-        severity: 'error',
-        title: 'Stylesheet links must be https://',
-        message: `<link> href is not https:// : ${decoded}`,
-        hint: `Allowed hosts: ${Array.from(IMPORT_HOST_ALLOWLIST).join(', ')}`,
-        elementPath: elementToPath(link),
-      });
-      continue;
-    }
-
-    const host = safeHost(decoded);
-    if (!host || !IMPORT_HOST_ALLOWLIST.has(host)) {
-      issues.push({
-        id: 'html-link-host',
-        severity: 'error',
-        title: 'Stylesheet link host not allowed',
-        message: `<link> host "${host ?? 'unknown'}" is not on the allowlist.`,
-        hint: `Allowed hosts: ${Array.from(IMPORT_HOST_ALLOWLIST).join(', ')}`,
-        elementPath: elementToPath(link),
-      });
-    }
-  }
-
-// @import inside <style> tags (common font import pattern)
-  for (const style of Array.from(doc.querySelectorAll('style'))) {
-    const cssText = style.textContent || '';
-    const stripped = stripCssComments(cssText);
-    const styleLoc = makeLocator(stripped);
-
-    for (const imp of iterCssImports(stripped)) {
-      if (!imp.url) continue;
-
-      const decoded = safeDecode(decodeCssEscapes(imp.url)).trim();
-      const lower = decoded.toLowerCase();
-
-      if (lower.startsWith('//') || !lower.startsWith('https://')) {
-        issues.push({
-          id: 'html-style-import-https',
-          severity: 'error',
-          title: '@import in <style> must be https://',
-          message: `@import url is not https:// : ${decoded}`,
-          hint: `Allowed hosts: ${Array.from(IMPORT_HOST_ALLOWLIST).join(', ')}`,
-          loc: styleLoc(imp.startIndex),
-          elementPath: elementToPath(style),
-        });
-        continue;
-      }
-
-      const host = safeHost(decoded);
-      if (!host || !IMPORT_HOST_ALLOWLIST.has(host)) {
-        issues.push({
-          id: 'html-style-import-host',
-          severity: 'error',
-          title: '@import host not allowed (in <style>)',
-          message: `@import host "${host ?? 'unknown'}" is not on the allowlist.`,
-          hint: `Allowed hosts: ${Array.from(IMPORT_HOST_ALLOWLIST).join(', ')}`,
-          loc: styleLoc(imp.startIndex),
-          elementPath: elementToPath(style),
-        });
-      }
-    }
   }
 
   // <img> alt
@@ -1078,91 +950,6 @@ function* iterRuleHeaders(css) {
   }
 }
 
-function readQuotedString(css, i) {
-  const quote = css[i];
-  let out = '';
-  i++;
-  let esc = false;
-  for (; i < css.length; i++) {
-    const ch = css[i];
-    if (esc) { out += ch; esc = false; continue; }
-    if (ch === '\\') { esc = true; continue; }
-    if (ch === quote) return { value: out, end: i + 1 };
-    out += ch;
-  }
-  return { value: out, end: i };
-}
-
-function parseImportTarget(css, i) {
-  // url(...)
-  if (css.slice(i, i + 4).toLowerCase() === 'url(') {
-    i += 4;
-    while (i < css.length && /\s/.test(css[i])) i++;
-
-    if (css[i] === '"' || css[i] === "'") {
-      const q = readQuotedString(css, i);
-      i = q.end;
-      while (i < css.length && /\s/.test(css[i])) i++;
-      if (css[i] === ')') i++;
-      return { url: q.value, endIndex: i };
-    }
-
-    // unquoted url: read until ')'
-    let j = i;
-    while (j < css.length && css[j] !== ')') j++;
-    const url = css.slice(i, j).trim();
-    const endIndex = j < css.length ? j + 1 : j;
-    return url ? { url, endIndex } : null;
-  }
-
-  // "..." or '...'
-  if (css[i] === '"' || css[i] === "'") {
-    const q = readQuotedString(css, i);
-    return { url: q.value, endIndex: q.end };
-  }
-
-  // bare token (nonstandard, but users do it)
-  let j = i;
-  while (j < css.length && !/[\s;{}]/.test(css[j])) j++;
-  const url = css.slice(i, j).trim();
-  return url ? { url, endIndex: j } : null;
-}
-
-function* iterCssImports(css) {
-  let inS = false;
-  let inD = false;
-  let esc = false;
-
-  for (let i = 0; i < css.length; i++) {
-    const ch = css[i];
-
-    if (esc) { esc = false; continue; }
-    if (ch === '\\') { esc = true; continue; }
-
-    if (!inD && ch === "'") { inS = !inS; continue; }
-    if (!inS && ch === '"') { inD = !inD; continue; }
-    if (inS || inD) continue;
-
-    if (ch === '@' && css.slice(i, i + 7).toLowerCase() === '@import') {
-      const startIndex = i;
-      i += 7;
-      while (i < css.length && /\s/.test(css[i])) i++;
-
-      const target = parseImportTarget(css, i);
-      if (!target) {
-        yield { startIndex, url: null };
-        continue;
-      }
-
-      yield { startIndex, url: target.url };
-
-      // Advance toward the end of the at-rule (best effort)
-      i = target.endIndex;
-      while (i < css.length && css[i] !== ';' && css[i] !== '{') i++;
-    }
-  }
-}
-
 /**
  * Safely decodes a URI component. If decoding fails due to an error, the original string is returned.
  *
@@ -1207,7 +994,7 @@ function extractImportUrl(params) {
  * @return {string|null} The host of the URL if valid, otherwise null.
  */
 function safeHost(url) {
-  try { return new URL(url).hostname; } catch { return null; }
+  try { return new URL(url).host; } catch { return null; }
 }
 
 /**

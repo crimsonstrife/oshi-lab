@@ -7,6 +7,7 @@ import { loadSnapshots } from './snapshots/index.js';
 import { initTools } from './tools/index.js';
 import { bindUI } from './bindings.js';
 import { initEditors } from './scripts/editors/index.js';
+import { updateThemeBundleSummary } from './themeBundle.js';
 
 /**
  * Initializes the lab runtime system.
@@ -29,6 +30,9 @@ export async function initLabRuntime() {
   applyPreviewSizing();
 
   await loadTemplatesIndex();
+
+  // Now that templates and initial base are loaded, ensure bundle summary is accurate.
+  updateThemeBundleSummary();
 
   initTools();
 }

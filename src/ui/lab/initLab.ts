@@ -137,10 +137,27 @@ export async function initLab(root: HTMLElement | null): Promise<void> {
               <button class="btn btn-sm btn-outline-light" id="btnExtract" type="button">Extract Base</button>
               <button class="btn btn-sm btn-outline-light" id="btnRestoreTemplate" type="button">Restore Template</button>
               <button class="btn btn-sm btn-outline-warning" id="btnResetCustom" type="button">Reset Custom</button>
-              <button class="btn btn-sm btn-outline-success" id="btnDownload" type="button">Download Bundle</button>
+
+              <div class="vr d-none d-lg-block opacity-50"></div>
+
+              <button class="btn btn-sm btn-outline-success" id="btnExportTheme" type="button">Export Theme</button>
+              <button class="btn btn-sm btn-outline-success" id="btnImportTheme" type="button">Import Theme</button>
+              <button class="btn btn-sm btn-outline-light" id="btnDownload" type="button">Download Preview</button>
+
+              <input id="themeImportInput" type="file" accept="application/json,.json" class="d-none" />
             </div>
           </div>
         </nav>
+
+        <div class="d-flex flex-wrap align-items-center justify-content-between mb-2 gap-2">
+          <div id="bundleInfo" class="small text-body-secondary"></div>
+          <div class="form-check form-switch small m-0">
+            <input class="form-check-input" type="checkbox" id="includeExtractedBase" disabled />
+            <label class="form-check-label" for="includeExtractedBase" title="Optional: include extracted base CSS/body in the exported bundle (larger file). Only available when using an extracted base.">
+              Include extracted base
+            </label>
+          </div>
+        </div>
 
         <div class="row g-3 m-0">
           <!-- Editors -->

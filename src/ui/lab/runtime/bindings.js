@@ -23,6 +23,13 @@ import { runAudit, copyLastAuditJson } from './audit/index.js';
 
 import { saveSnapshot, deleteSelectedSnapshot, loadSnapshotById } from './snapshots/index.js';
 
+import {
+  exportThemeBundle,
+  promptThemeBundleImport,
+  handleThemeBundleImport,
+  updateThemeBundleSummary,
+} from './themeBundle.js';
+
 /**
  * Binds UI elements to their respective event handlers and initializes various interactive features
  * of the application. This includes setting up button click listeners, input change handlers,
@@ -43,7 +50,7 @@ export function bindUI() {
     const sel = /** @type {HTMLSelectElement|null} */ (document.getElementById('templateSelect'));
     const encoded = sel ? sel.value : '';
     const id = encoded ? decodeURIComponent(encoded) : (state.templatesIndex[0]?.id || 'fallback');
-    loadTemplateById(id);
+    loadTemplateById(id).then(() => updateThemeBundleSummary());
   });
 
   on('btnRestoreTemplate', 'click', restoreTemplateBase);
@@ -59,6 +66,7 @@ export function bindUI() {
     // keep CodeMirror in sync if mounted
     syncEditorsFromTextareas();
     setStatus('ok', 'Custom CSS/HTML reset.');
+    updateThemeBundleSummary();
     if (els.autoUpdate?.checked) renderPreview();
   });
 
@@ -109,11 +117,35 @@ export function bindUI() {
   });
 
   on('btnDownload', 'click', () => {
-    const filename = `myoshi-theme-bundle-${new Date().toISOString().slice(0, 10)}.html`;
+    const filename = `myoshi-preview-${new Date().toISOString().slice(0, 10)}.html`;
     const bundle = state.lastBuildSrcdoc || buildSrcdoc();
     downloadFile(filename, bundle);
     setStatus('ok', `Downloaded: ${filename}`);
   });
+
+  // Theme bundle export/import
+  on('btnExportTheme', 'click', () => {
+    exportThemeBundle();
+    updateThemeBundleSummary();
+  });
+
+  on('btnImportTheme', 'click', () => {
+    promptThemeBundleImport();
+  });
+
+  // Hidden input change
+  if (els.themeImportInput) {
+    els.themeImportInput.addEventListener('change', () => {
+      handleThemeBundleImport();
+    });
+  } else {
+    const inp = document.getElementById('themeImportInput');
+    if (inp) {
+      inp.addEventListener('change', () => {
+        handleThemeBundleImport();
+      });
+    }
+  }
 
   on('btnFormatCss', 'click', async () => {
     if (!els.customCss) return;
@@ -186,6 +218,7 @@ export function bindUI() {
         const encoded = els.snapshotSelect.value;
       if (!encoded) return;
       loadSnapshotById(decodeURIComponent(encoded));
+      updateThemeBundleSummary();
     });
   }
 
@@ -228,6 +261,13 @@ export function bindUI() {
     state.debounceTimer = window.setTimeout(renderPreview, 150);
   };
 
+  // Theme bundle summary debounce (should update even when auto-update is off)
+  let summaryTimer = /** @type {number|null} */ (null);
+  const scheduleSummary = () => {
+    if (summaryTimer) window.clearTimeout(summaryTimer);
+    summaryTimer = window.setTimeout(updateThemeBundleSummary, 50);
+  };
+
   ['input', 'change'].forEach((evt) => {
     [
       els.customCss,
@@ -240,7 +280,24 @@ export function bindUI() {
       els.mockAvatar,
       els.mockBg,
     ].forEach((node) => {
-      if (node) node.addEventListener(evt, scheduleRender);
+      if (node) {
+        node.addEventListener(evt, scheduleRender);
+        node.addEventListener(evt, scheduleSummary);
+      }
     });
   });
+
+  // Template changes affect the summary.
+  const templateSelect2 = document.getElementById('templateSelect');
+  if (templateSelect2) {
+    templateSelect2.addEventListener('change', scheduleSummary);
+  }
+
+  
+  // Export options should not trigger preview rebuild; summary only.
+  if (els.includeExtractedBase) {
+    els.includeExtractedBase.addEventListener('change', scheduleSummary);
+  }
+// Initial paint
+  scheduleSummary();
 }
