@@ -12,6 +12,417 @@ import { loadTemplateById } from './templates/index.js';
 export const THEME_BUNDLE_SCHEMA_VERSION = 1;
 
 /**
+ * Compatibility: accept OshiForge theme exports and convert them into an oshi-lab ThemeBundle.
+ * This keeps the UI generic (same Import Theme button) while letting power users reuse files.
+ */
+
+/**
+ * @param {any} obj
+ * @returns {boolean}
+ */
+function isOshiForgeTheme(obj) {
+  return !!(obj
+    && typeof obj === 'object'
+    && (obj.app === 'oshiforge' || obj.app === 'oshi-forge' || obj.app === 'oshiforge-theme')
+    && Number(obj.version) === 1
+    && obj.state
+    && typeof obj.state === 'object');
+}
+
+/**
+ * @param {string} hex
+ * @returns {{r:number,g:number,b:number}|null}
+ */
+function hexToRgb(hex) {
+  const s = String(hex || '').trim();
+  const m = s.match(/^#?([0-9a-f]{3}|[0-9a-f]{6})$/i);
+  if (!m) return null;
+  let v = m[1].toLowerCase();
+  if (v.length === 3) v = v.split('').map((ch) => ch + ch).join('');
+  const r = parseInt(v.slice(0, 2), 16);
+  const g = parseInt(v.slice(2, 4), 16);
+  const b = parseInt(v.slice(4, 6), 16);
+  if (![r, g, b].every((n) => Number.isFinite(n))) return null;
+  return { r, g, b };
+}
+
+/** @param {number} n */
+function clamp01(n) {
+  if (!Number.isFinite(n)) return 0;
+  return Math.max(0, Math.min(1, n));
+}
+
+/**
+ * @param {any} v
+ * @param {number} fallback
+ */
+function safeNum(v, fallback) {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+/**
+ * @param {any} v
+ * @param {string} fallback
+ */
+function safeStr(v, fallback) {
+  const s = (typeof v === 'string') ? v : (v == null ? '' : String(v));
+  const out = s.trim();
+  return out ? out : fallback;
+}
+
+/**
+ * @param {string} hex
+ * @param {number} alpha
+ * @param {string} fallbackHex
+ */
+function rgba(hex, alpha, fallbackHex) {
+  const c = hexToRgb(hex) || hexToRgb(fallbackHex) || { r: 0, g: 0, b: 0 };
+  return `rgba(${c.r}, ${c.g}, ${c.b}, ${clamp01(alpha)})`;
+}
+
+/**
+ * Lighten/darken a hex color by mixing toward white/black.
+ * @param {string} hex
+ * @param {number} t positive -> lighten (0..1), negative -> darken (-1..0)
+ * @param {string} fallbackHex
+ */
+function shadeHex(hex, t, fallbackHex) {
+  const c = hexToRgb(hex) || hexToRgb(fallbackHex);
+  if (!c) return safeStr(hex, fallbackHex);
+  const k = Math.max(-1, Math.min(1, Number(t) || 0));
+  const target = k >= 0 ? { r: 255, g: 255, b: 255 } : { r: 0, g: 0, b: 0 };
+  const mix = Math.abs(k);
+  const r = Math.round(c.r + (target.r - c.r) * mix);
+  const g = Math.round(c.g + (target.g - c.g) * mix);
+  const b = Math.round(c.b + (target.b - c.b) * mix);
+  const toHex = (n) => n.toString(16).padStart(2, '0');
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+}
+
+/**
+ * Best-effort CSS generator for OshiForge theme state.
+ * @param {any} s
+ * @returns {string}
+ */
+function buildOshiForgeCss(s) {
+  const cPrimary = safeStr(s?.cPrimary, '#369');
+  const cSecondary = safeStr(s?.cSecondary, '#a8f');
+  const cAccent = safeStr(s?.cAccent, '#f60');
+  const cText = safeStr(s?.cText, '#333');
+
+  const linkColor = safeStr(s?.linkColor, cPrimary);
+  const linkHoverColor = safeStr(s?.linkHoverColor, cSecondary);
+
+  const headerGradStart = safeStr(s?.headerGradStart, cPrimary);
+  const headerGradMid = safeStr(s?.headerGradMid, shadeHex(headerGradStart, 0.15, cPrimary));
+  const headerGradEnd = safeStr(s?.headerGradEnd, shadeHex(headerGradStart, -0.2, cPrimary));
+  const headerTextColor = safeStr(s?.headerTextColor, '#fff');
+
+  const panelBaseColor = safeStr(s?.panelBaseColor, '#ffffff');
+  const panelHoverBaseColor = safeStr(s?.panelHoverBaseColor, panelBaseColor);
+  const panelAlpha = clamp01(safeNum(s?.panelAlpha, 1));
+  const borderAlpha = clamp01(safeNum(s?.borderAlpha, 1));
+  const glassBlur = Math.max(0, Math.min(16, safeNum(s?.glassBlur, 0)));
+
+  const cardRadius = Math.max(0, safeNum(s?.cardRadius, 8));
+  const cardBorderWidth = Math.max(0, safeNum(s?.cardBorderWidth, 1));
+  const cardPadding = Math.max(0, safeNum(s?.cardPadding, 10));
+  const sectionSpacing = Math.max(0, safeNum(s?.sectionSpacing, 10));
+  const panelGap = Math.max(0, safeNum(s?.panelGap, 8));
+
+  const containerWidth = Math.max(0, safeNum(s?.containerWidth, 0));
+  const rightColumnMax = Math.max(0, safeNum(s?.rightColumnMax, 0));
+
+  const fontBody = safeStr(s?.fontBody, '');
+  const fontHeader = safeStr(s?.fontHeader, 'inherit');
+  const baseFontSize = Math.max(8, safeNum(s?.baseFontSize, 11));
+  const lineHeight = Math.max(1, safeNum(s?.lineHeight, 1.5));
+
+  const headerFontSize = Math.max(8, safeNum(s?.headerFontSize, 11));
+  const headerLinkSize = Math.max(8, safeNum(s?.headerLinkSize, 10));
+  const headerUppercase = !!s?.headerUppercase;
+
+  const linkWeight = Math.max(100, Math.min(900, safeNum(s?.linkWeight, 600)));
+  const linkUnderline = (typeof s?.linkUnderline === 'boolean') ? s.linkUnderline : false;
+  const uniformLinks = (typeof s?.uniformLinks === 'boolean') ? s.uniformLinks : true;
+
+  const btnBg = safeStr(s?.btnBg, '#f5f5f5');
+  const btnText = safeStr(s?.btnText, cText);
+  const btnBorder = safeStr(s?.btnBorder, cPrimary);
+  const btnHoverBg = safeStr(s?.btnHoverBg, shadeHex(btnBg, 0.06, btnBg));
+  const btnHoverText = safeStr(s?.btnHoverText, btnText);
+  const buttonAlpha = clamp01(safeNum(s?.buttonAlpha, 1));
+  const buttonHoverAlpha = clamp01(safeNum(s?.buttonHoverAlpha, 1));
+
+  const starIcon = safeStr(s?.starIcon, '★');
+  const heartIcon = safeStr(s?.heartIcon, '♥');
+
+  const avatarSize = Math.max(32, safeNum(s?.avatarSize, 200));
+  const avatarBorder = Math.max(0, safeNum(s?.avatarBorder, 2));
+  const avatarGlow = clamp01(safeNum(s?.avatarGlow, 0));
+  const avatarShape = safeStr(s?.avatarShape, 'rounded');
+
+  const nameColor = safeStr(s?.nameColor, '#fff');
+  const nameGlow = clamp01(safeNum(s?.nameGlow, 0));
+
+  const taglineColor = safeStr(s?.taglineColor, '');
+  const taglineBoxEnabled = !!s?.taglineBoxEnabled;
+  const taglineBoxBgColor = safeStr(s?.taglineBoxBgColor, panelBaseColor);
+  const taglineBoxBorderColor = safeStr(s?.taglineBoxBorderColor, cAccent);
+  const taglineBoxAlpha = clamp01(safeNum(s?.taglineBoxAlpha, 0.6));
+  const taglineBoxGlow = clamp01(safeNum(s?.taglineBoxGlow, 0));
+  const taglineBoxRadius = Math.max(0, safeNum(s?.taglineBoxRadius, 10));
+  const taglineBoxPadding = Math.max(0, safeNum(s?.taglineBoxPadding, 8));
+
+  const commentsBg = safeStr(s?.commentsBg, taglineBoxBgColor);
+  const commentsTextColor = safeStr(s?.commentsTextColor, cText);
+  const commentsBorderColor = safeStr(s?.commentsBorderColor, taglineBoxBorderColor);
+  const commentsAlpha = clamp01(safeNum(s?.commentsAlpha, 0.75));
+  const replyBg = safeStr(s?.replyBg, panelBaseColor);
+  const replyTextColor = safeStr(s?.replyTextColor, commentsTextColor);
+  const replyBorderColor = safeStr(s?.replyBorderColor, commentsBorderColor);
+
+  const extraCss = safeStr(s?.extraCss, '');
+  const customShapeCss = safeStr(s?.customShapeCss, '');
+  const customCursorCss = safeStr(s?.customCursorCss, '');
+
+  const borderColor = safeStr(s?.decorBorderColor, cAccent);
+
+  /** @type {string[]} */
+  const lines = [];
+  lines.push('/* oshilab:begin block=imported-theme v=1 */');
+  lines.push('/* Generated from a compatible theme file. Safe to edit or delete. */');
+  lines.push('');
+  lines.push(':root {');
+  lines.push(`  --vs-blue: ${headerGradStart};`);
+  lines.push(`  --vs-blue-light: ${headerGradMid};`);
+  lines.push(`  --vs-blue-dark: ${headerGradEnd};`);
+  lines.push(`  --vs-link: ${linkColor};`);
+  lines.push(`  --vs-link-hover: ${linkHoverColor};`);
+  lines.push(`  --vs-link-bg: ${linkColor};`);
+  lines.push(`  --vs-orange: ${cAccent};`);
+  lines.push(`  --vs-orange-light: ${shadeHex(cAccent, 0.18, cAccent)};`);
+  lines.push(`  --vs-bg-white: ${rgba(panelBaseColor, panelAlpha, '#ffffff')};`);
+  lines.push(`  --vs-bg-muted: ${rgba(panelHoverBaseColor, panelAlpha, panelBaseColor)};`);
+  lines.push(`  --vs-bg-subtle: ${rgba(panelBaseColor, Math.max(0.1, panelAlpha - 0.08), panelBaseColor)};`);
+  lines.push(`  --vs-bg-light: ${rgba(panelBaseColor, Math.max(0.12, panelAlpha - 0.14), panelBaseColor)};`);
+  lines.push(`  --vs-bg-dim: ${rgba(panelHoverBaseColor, Math.max(0.12, panelAlpha - 0.10), panelHoverBaseColor)};`);
+  lines.push(`  --vs-text-dark: ${cText};`);
+  lines.push(`  --vs-text-medium: ${rgba(cText, 0.82, cText)};`);
+  lines.push(`  --vs-text-light: ${rgba(cText, 0.62, cText)};`);
+  lines.push(`  --vs-border: ${rgba(borderColor, borderAlpha, '#cccccc')};`);
+  lines.push(`  --vs-border-light: ${rgba(borderColor, Math.min(1, borderAlpha + 0.12), '#dddddd')};`);
+  lines.push(`  --vs-border-lighter: ${rgba(borderColor, Math.min(1, borderAlpha + 0.20), '#eeeeee')};`);
+  lines.push(`  --glow-cyan: ${cAccent};`);
+  lines.push(`  --glow-purple: ${cSecondary};`);
+  lines.push(`  --glow-pink: ${cSecondary};`);
+  lines.push('}');
+  lines.push('');
+  lines.push('.container {');
+  if (fontBody) lines.push(`  font-family: ${fontBody};`);
+  lines.push(`  font-size: ${baseFontSize}px;`);
+  lines.push(`  line-height: ${lineHeight};`);
+  lines.push(`  color: ${cText};`);
+  lines.push('}');
+  lines.push('');
+  if (containerWidth) {
+    lines.push('.container {');
+    lines.push(`  max-width: ${containerWidth}px;`);
+    lines.push('}');
+    lines.push('');
+  }
+  if (rightColumnMax) {
+    lines.push('.profile-right {');
+    lines.push(`  max-width: ${rightColumnMax}px;`);
+    lines.push('}');
+    lines.push('');
+  }
+  lines.push('.profile-layout {');
+  lines.push(`  gap: ${panelGap}px;`);
+  lines.push('}');
+  lines.push('');
+  lines.push('.card {');
+  lines.push(`  border-width: ${cardBorderWidth}px;`);
+  lines.push(`  border-radius: ${cardRadius}px;`);
+  lines.push(`  margin-bottom: ${sectionSpacing}px;`);
+  if (glassBlur) {
+    lines.push(`  backdrop-filter: blur(${glassBlur}px);`);
+    lines.push(`  -webkit-backdrop-filter: blur(${glassBlur}px);`);
+  }
+  lines.push('}');
+  lines.push('');
+  lines.push('.card-body {');
+  lines.push(`  padding: ${cardPadding}px;`);
+  lines.push('}');
+  lines.push('');
+  lines.push('.card-header {');
+  lines.push(`  background: linear-gradient(135deg, ${headerGradStart} 0%, ${headerGradMid} 50%, ${headerGradEnd} 100%);`);
+  lines.push(`  color: ${headerTextColor};`);
+  if (fontHeader && fontHeader !== 'inherit') lines.push(`  font-family: ${fontHeader};`);
+  lines.push(`  font-size: ${headerFontSize}px;`);
+  if (headerUppercase) lines.push('  text-transform: uppercase;');
+  lines.push('}');
+  lines.push('');
+  lines.push('.card-header a {');
+  lines.push(`  font-size: ${headerLinkSize}px;`);
+  lines.push('}');
+  lines.push('');
+  // Replace header icons with simple glyphs (more compatible than data: SVG overrides)
+  lines.push('.card-header.starred:before {');
+  lines.push(`  content: "${starIcon.replace(/"/g, '\\"')}";`);
+  lines.push('  background: none !important;');
+  lines.push('  width: auto; height: auto;');
+  lines.push('  filter: none;');
+  lines.push('}');
+  lines.push('');
+  lines.push('.card-header.hearted:before {');
+  lines.push(`  content: "${heartIcon.replace(/"/g, '\\"')}";`);
+  lines.push('  background: none !important;');
+  lines.push('  width: auto; height: auto;');
+  lines.push('  filter: none;');
+  lines.push('}');
+  lines.push('');
+  // Link normalization
+  if (uniformLinks) {
+    lines.push('a {');
+    lines.push(`  color: ${linkColor};`);
+    lines.push(`  font-weight: ${linkWeight};`);
+    lines.push(`  text-decoration: ${linkUnderline ? 'underline' : 'none'};`);
+    lines.push('}');
+    lines.push('');
+    lines.push('a:hover {');
+    lines.push(`  color: ${linkHoverColor};`);
+    lines.push('}');
+    lines.push('');
+  }
+  // Buttons/links
+  lines.push('.action-btn, .contact-link {');
+  lines.push(`  background: ${rgba(btnBg, buttonAlpha, btnBg)};`);
+  lines.push(`  border-color: ${btnBorder};`);
+  lines.push(`  color: ${btnText};`);
+  lines.push('  box-shadow: none;');
+  lines.push('}');
+  lines.push('');
+  lines.push('.action-btn:hover, .contact-link:hover {');
+  lines.push(`  background: ${rgba(btnHoverBg, buttonHoverAlpha, btnHoverBg)};`);
+  lines.push(`  color: ${btnHoverText};`);
+  lines.push('}');
+  lines.push('');
+  // Avatar
+  lines.push('.profile-avatar {');
+  lines.push(`  width: ${avatarSize}px;`);
+  lines.push(`  height: ${avatarSize}px;`);
+  lines.push(`  border-width: ${avatarBorder}px;`);
+  lines.push(`  border-color: ${rgba(borderColor, Math.max(0.2, borderAlpha), borderColor)};`);
+  if (avatarGlow > 0) {
+    const blur = Math.round(24 * avatarGlow);
+    lines.push(`  box-shadow: 0 0 ${blur}px ${rgba(borderColor, 0.65, borderColor)};`);
+  }
+  if (avatarShape === 'circle') {
+    lines.push('  border-radius: 999px;');
+    lines.push('  clip-path: none;');
+  } else if (avatarShape === 'diamond') {
+    lines.push('  border-radius: 0;');
+    lines.push('  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);');
+  } else {
+    lines.push(`  border-radius: ${Math.max(0, Math.round(cardRadius * 1.2))}px;`);
+    lines.push('  clip-path: none;');
+  }
+  lines.push('}');
+  lines.push('');
+  // Name styling
+  lines.push('.profile-display-name {');
+  lines.push(`  color: ${nameColor};`);
+  if (nameGlow > 0) {
+    const blur = Math.round(18 * nameGlow);
+    lines.push(`  text-shadow: 0 0 ${blur}px ${rgba(nameColor, 0.8, nameColor)};`);
+  }
+  lines.push('}');
+  lines.push('');
+  // Tagline box (optional)
+  if (taglineBoxEnabled) {
+    lines.push('.profile-tagline {');
+    if (taglineColor) lines.push(`  color: ${taglineColor};`);
+    lines.push(`  background: ${rgba(taglineBoxBgColor, taglineBoxAlpha, taglineBoxBgColor)};`);
+    lines.push(`  border: 1px solid ${taglineBoxBorderColor};`);
+    lines.push(`  border-radius: ${taglineBoxRadius}px;`);
+    lines.push(`  padding: ${taglineBoxPadding}px;`);
+    if (taglineBoxGlow > 0) {
+      const blur = Math.round(18 * taglineBoxGlow);
+      lines.push(`  box-shadow: 0 0 ${blur}px ${rgba(taglineBoxBorderColor, 0.55, taglineBoxBorderColor)};`);
+    }
+    lines.push('}');
+    lines.push('');
+  } else if (taglineColor) {
+    lines.push('.profile-tagline {');
+    lines.push(`  color: ${taglineColor};`);
+    lines.push('}');
+    lines.push('');
+  }
+  // Comments (best-effort)
+  lines.push('#comments .add-comment {');
+  lines.push(`  background: ${rgba(commentsBg, commentsAlpha, commentsBg)};`);
+  lines.push(`  border-bottom-color: ${rgba(commentsBorderColor, 0.55, commentsBorderColor)};`);
+  lines.push('}');
+  lines.push('');
+  lines.push('#comments .add-comment textarea {');
+  lines.push(`  background: ${rgba(replyBg, 0.9, replyBg)};`);
+  lines.push(`  color: ${replyTextColor};`);
+  lines.push(`  border-color: ${rgba(replyBorderColor, 0.6, replyBorderColor)};`);
+  lines.push('}');
+  lines.push('');
+  lines.push('#comments .profile-comment, #comments .profile-comment:nth-child(2n) {');
+  lines.push(`  background: ${rgba(commentsBg, Math.max(0.1, commentsAlpha - 0.12), commentsBg)};`);
+  lines.push(`  border-bottom-color: ${rgba(commentsBorderColor, 0.35, commentsBorderColor)};`);
+  lines.push('}');
+  lines.push('');
+  lines.push('#comments .comment-body {');
+  lines.push(`  color: ${commentsTextColor};`);
+  lines.push('}');
+  lines.push('');
+  // Extra passthrough CSS from the source file (if any)
+  if (customShapeCss) {
+    lines.push('/* --- extra: customShapeCss --- */');
+    lines.push(customShapeCss.trim());
+    lines.push('');
+  }
+  if (customCursorCss) {
+    lines.push('/* --- extra: customCursorCss --- */');
+    lines.push(customCursorCss.trim());
+    lines.push('');
+  }
+  if (extraCss) {
+    lines.push('/* --- extra: extraCss --- */');
+    lines.push(extraCss.trim());
+    lines.push('');
+  }
+
+  lines.push('/* oshilab:end block=imported-theme */');
+  lines.push('');
+
+  return lines.join('\n');
+}
+
+/**
+ * Convert an OshiForge export to a ThemeBundleV1 while preserving current non-theme preferences.
+ * @param {any} obj
+ * @returns {any}
+ */
+function convertOshiForgeThemeToBundle(obj) {
+  const current = buildThemeBundle();
+  // Preserve mock + template selection + base mode; replace only Custom CSS (and keep existing HTML).
+  current.customCss = buildOshiForgeCss(obj.state || {});
+  current.customHtml = els.customHtml?.value || current.customHtml || '';
+  // Normalize schema fields for export/import consistency.
+  current.app = 'oshi-lab';
+  current.schemaVersion = THEME_BUNDLE_SCHEMA_VERSION;
+  current.appVersion = getAppVersion();
+  current.exportedAt = new Date().toISOString();
+  return current;
+}
+
+/**
  * Best-effort app version for embedding into exported bundles.
  * @returns {string}
  */
@@ -84,7 +495,7 @@ export function buildThemeBundle() {
 
   };
 
-  // Optional: include extracted base snapshot (for reproducible previews across devices).
+  // include extracted base snapshot (for reproducible previews across devices).
   const canInclude = !!(els.includeExtractedBase?.checked && state.baseMode === 'extracted' && state.extractedBase);
   if (canInclude) {
     // @ts-ignore
@@ -297,7 +708,9 @@ export async function handleThemeBundleImport() {
       throw new Error('Invalid JSON file.');
     }
 
-    const bundle = normalizeThemeBundle(obj);
+    const bundle = isOshiForgeTheme(obj)
+      ? convertOshiForgeThemeToBundle(obj)
+      : normalizeThemeBundle(obj);
     await applyThemeBundle(bundle);
 
     // Provide a richer status message including summary.
