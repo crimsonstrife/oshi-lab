@@ -1,0 +1,17 @@
+/*
+  Hide a card by matching something INSIDE it.
+
+  How to use:
+  1) Open DevTools on your MyOshi profile.
+  2) Find the card you want to hide.
+  3) Pick a selector that only appears inside that card (class, data-attr, unique link).
+  4) Replace `.link-btn` below with that selector.
+
+  Notes:
+  - Uses :has(), supported in modern browsers.
+  - `:where(*)` is an auto-scope safe “root” selector.
+*/
+
+:where(*) .card:has(.link-btn){
+  display: none !important;
+}

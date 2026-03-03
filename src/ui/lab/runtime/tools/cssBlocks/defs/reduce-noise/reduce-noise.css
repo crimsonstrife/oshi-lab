@@ -1,0 +1,30 @@
+/*
+  Reduce visual noise
+  - Softer borders
+  - No heavy shadows
+  - Calmer headers / bodies
+*/
+
+:where(*){
+  --lab-soft-border: rgba(255,255,255,.14);
+  --lab-soft-bg: rgba(0,0,0,.06);
+}
+
+:where(*) .card{
+  box-shadow: none !important;
+  border-color: var(--lab-soft-border) !important;
+}
+
+:where(*) .card-header{
+  background: transparent !important;
+  border-bottom-color: var(--lab-soft-border) !important;
+}
+
+:where(*) .card-body{
+  background: transparent !important;
+}
+
+:where(*) .blurb-section{
+  border-color: var(--lab-soft-border) !important;
+  background: var(--lab-soft-bg) !important;
+}

@@ -1,0 +1,42 @@
+/*
+  Standardize buttons + links
+  - Works well for .link-btn and .section-links a
+  - Uses conservative transforms (no fixed positioning, no extreme z-index)
+*/
+
+:where(*){
+  --lab-accent: var(--vs-link, #6df);
+  --lab-btn-bg: rgba(0,0,0,.14);
+  --lab-btn-bg-hover: rgba(0,0,0,.22);
+  --lab-btn-border: rgba(255,255,255,.16);
+  --lab-btn-radius: 12px;
+}
+
+:where(*) a{ text-decoration: none; }
+:where(*) a:hover{ text-decoration: underline; }
+
+:where(*) .link-btn,
+:where(*) .section-links a,
+:where(*) .card-header a{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border: 1px solid var(--lab-btn-border);
+  border-radius: var(--lab-btn-radius);
+  background: var(--lab-btn-bg);
+  color: var(--lab-accent);
+  font-weight: 800;
+  transition: background .12s ease, transform .12s ease;
+}
+
+:where(*) .link-btn{ justify-content: space-between; width: 100%; }
+:where(*) .section-links a{ padding: 8px 10px; }
+:where(*) .card-header a{ padding: 6px 10px; font-size: 12px; }
+
+:where(*) .link-btn:hover,
+:where(*) .section-links a:hover,
+:where(*) .card-header a:hover{
+  background: var(--lab-btn-bg-hover);
+  transform: translateY(-1px);
+}
