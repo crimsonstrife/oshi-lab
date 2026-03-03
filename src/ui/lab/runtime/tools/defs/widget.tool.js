@@ -3,9 +3,9 @@
 import { els } from '../../dom.js';
 import { setStatus } from '../../status.js';
 import { copyToClipboard } from '../../utils/clipboard.js';
-import { insertAtCursor } from '../../utils/textarea.js';
 import { renderPreview } from '../../preview/render.js';
 import { getWidgets } from '../widgets/registry.js';
+import { buildMarkedSnippet, upsertMarkedSnippet } from '../../utils/snippets.js';
 
 /**
  * Escapes special HTML characters in a string to their corresponding HTML entities.
@@ -30,10 +30,26 @@ function escapeHtml(s) {
  * @param {string} lang - The programming language of the code snippet.
  * @return {string} The formatted code snippet with a header and footer.
  */
-function wrapSnippet(title, code, lang) {
-    const header = `/* === ${title} (${lang}) === */\n`;
-    const footer = `\n/* === /${title} === */\n`;
-    return header + code.trimEnd() + footer;
+/**
+ * Build the marked HTML/CSS snippets for a widget.
+ * @param {any} widget
+ * @param {{html:string, css:string}} built
+ */
+function buildWidgetSnippets(widget, built) {
+    const idBase = `widget/${widget.id}`;
+    const v = Number.isFinite(widget.version) ? widget.version : 1;
+
+    const htmlBody = `<!-- Widget: ${widget.name} -->\n${String(built.html || '').trimEnd()}`;
+    const cssBody = `/* Widget: ${widget.name} */\n${String(built.css || '').trimEnd()}`;
+
+    return {
+        htmlBody,
+        cssBody,
+        html: buildMarkedSnippet({ kind: 'html', blockId: `${idBase}/html`, version: v, body: htmlBody }),
+        css: buildMarkedSnippet({ kind: 'css', blockId: `${idBase}/css`, version: v, body: cssBody }),
+        v,
+        idBase,
+    };
 }
 
 /**
@@ -83,7 +99,7 @@ export default {
       <div class="d-flex justify-content-between align-items-start gap-2">
         <div>
           <div class="fw-semibold">Widget Inserter</div>
-          <div class="small text-body-secondary">Pick a widget, tweak fields, then insert HTML/CSS into your editors.</div>
+          <div class="small text-body-secondary">Pick a widget, tweak fields, then insert HTML/CSS into your editors. Re-inserting updates the existing widget block instead of duplicating.</div>
         </div>
       </div>
 
@@ -227,10 +243,7 @@ export default {
 
             const getSnippets = () => {
                 const built = applyTemplate(widget, values);
-                return {
-                    html: wrapSnippet(widget.name, built.html, 'HTML'),
-                    css: wrapSnippet(widget.name, built.css, 'CSS'),
-                };
+                return buildWidgetSnippets(widget, built);
             };
 
             const updatePreviews = () => {
@@ -241,23 +254,24 @@ export default {
 
             btnInsertHtml.addEventListener('click', () => {
                 const s = getSnippets();
-                insertAtCursor(els.customHtml, s.html.trimEnd() + '\n');
-                setStatus('ok', `Inserted "${widget.name}" HTML.`);
+                const res = upsertMarkedSnippet(els.customHtml, 'html', `${s.idBase}/html`, s.htmlBody, s.v);
+                setStatus('ok', `${res.action === 'updated' ? 'Updated' : 'Inserted'} "${widget.name}" HTML.`);
                 if (els.autoUpdate?.checked) renderPreview();
             });
 
             btnInsertCss.addEventListener('click', () => {
                 const s = getSnippets();
-                insertAtCursor(els.customCss, s.css.trimEnd() + '\n');
-                setStatus('ok', `Inserted "${widget.name}" CSS.`);
+                const res = upsertMarkedSnippet(els.customCss, 'css', `${s.idBase}/css`, s.cssBody, s.v);
+                setStatus('ok', `${res.action === 'updated' ? 'Updated' : 'Inserted'} "${widget.name}" CSS.`);
                 if (els.autoUpdate?.checked) renderPreview();
             });
 
             btnInsertBoth.addEventListener('click', () => {
                 const s = getSnippets();
-                insertAtCursor(els.customCss, s.css.trimEnd() + '\n');
-                insertAtCursor(els.customHtml, s.html.trimEnd() + '\n');
-                setStatus('ok', `Inserted "${widget.name}" HTML + CSS.`);
+                const cssRes = upsertMarkedSnippet(els.customCss, 'css', `${s.idBase}/css`, s.cssBody, s.v);
+                const htmlRes = upsertMarkedSnippet(els.customHtml, 'html', `${s.idBase}/html`, s.htmlBody, s.v);
+                const verb = cssRes.action === 'updated' || htmlRes.action === 'updated' ? 'Updated' : 'Inserted';
+                setStatus('ok', `${verb} "${widget.name}" HTML + CSS.`);
                 if (els.autoUpdate?.checked) renderPreview();
             });
 

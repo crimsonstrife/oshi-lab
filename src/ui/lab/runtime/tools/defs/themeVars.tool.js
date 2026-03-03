@@ -4,8 +4,8 @@ import { els } from '../../dom.js';
 import { state } from '../../state.js';
 import { setStatus } from '../../status.js';
 import { copyToClipboard } from '../../utils/clipboard.js';
-import { insertAtCursor } from '../../utils/textarea.js';
 import { renderPreview } from '../../preview/render.js';
+import { buildMarkedSnippet, upsertMarkedSnippet } from '../../utils/snippets.js';
 import { parseColor, formatHex } from '../color.js';
 
 /**
@@ -1103,14 +1103,17 @@ elPreset.addEventListener('change', setFromPreset);
         btnInsert.addEventListener('click', () => {
             const txt = elOut.value.trimEnd();
             if (!txt) return;
-            insertAtCursor(els.customCss, txt + '\n');
-            setStatus('ok', 'Inserted theme variables into Custom CSS.');
+            const body = `/* Theme Variables */\n${txt}`;
+            const res = upsertMarkedSnippet(els.customCss, 'css', 'theme-vars', body, 1);
+            setStatus('ok', `${res.action === 'updated' ? 'Updated' : 'Inserted'} theme variables in Custom CSS.`);
             if (els.autoUpdate?.checked) renderPreview();
         });
 
         btnCopy.addEventListener('click', async () => {
             const txt = elOut.value.trimEnd();
-            await copyToClipboard(txt + '\n');
+            const body = `/* Theme Variables */\n${txt}`;
+            const snippet = buildMarkedSnippet({ kind: 'css', blockId: 'theme-vars', version: 1, body });
+            await copyToClipboard(snippet);
             setStatus('ok', 'Copied CSS snippet.');
         });
 

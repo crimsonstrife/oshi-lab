@@ -3,8 +3,8 @@
 import { els } from '../../dom.js';
 import { setStatus } from '../../status.js';
 import { copyToClipboard } from '../../utils/clipboard.js';
-import { insertAtCursor } from '../../utils/textarea.js';
 import { renderPreview } from '../../preview/render.js';
+import { buildMarkedSnippet, upsertMarkedSnippet } from '../../utils/snippets.js';
 
 /**
  * An array containing objects that represent the days of the week.
@@ -98,6 +98,9 @@ function scheduleCss() {
   padding: 14px;
   color: var(--labw-text);
 }
+
+const SCHEDULE_HTML_BLOCK = 'schedule-builder/html';
+const SCHEDULE_CSS_BLOCK = 'schedule-builder/css';
 
 .labw-schedule__header{
   display:flex;
@@ -394,8 +397,11 @@ ${dayHtml}
 </div>
 `.trim();
 
-            elHtml.value = html + '\n';
-            elCss.value = scheduleCss() + '\n';
+            const htmlBody = `<!-- Schedule Builder -->\n${html}`;
+            const cssBody = `/* Schedule Builder */\n${scheduleCss()}`;
+
+            elHtml.value = buildMarkedSnippet({ kind: 'html', blockId: SCHEDULE_HTML_BLOCK, version: 1, body: htmlBody });
+            elCss.value = buildMarkedSnippet({ kind: 'css', blockId: SCHEDULE_CSS_BLOCK, version: 1, body: cssBody });
         };
 
         panel.querySelector('#sbAdd')?.addEventListener('click', () => {
@@ -418,23 +424,31 @@ ${dayHtml}
 
         panel.querySelector('#sbInsertBoth')?.addEventListener('click', () => {
             if (!elHtml.value || !elCss.value) generate();
-            insertAtCursor(els.customCss, elCss.value.trimEnd() + '\n');
-            insertAtCursor(els.customHtml, elHtml.value.trimEnd() + '\n');
-            setStatus('ok', 'Inserted schedule HTML + CSS.');
+            // Recompute bodies for idempotent upsert.
+            const htmlBody = elHtml.value.split('\n').slice(1, -2).join('\n');
+            const cssBody = elCss.value.split('\n').slice(1, -2).join('\n');
+
+            const cssRes = upsertMarkedSnippet(els.customCss, 'css', SCHEDULE_CSS_BLOCK, cssBody, 1);
+            const htmlRes = upsertMarkedSnippet(els.customHtml, 'html', SCHEDULE_HTML_BLOCK, htmlBody, 1);
+
+            const verb = cssRes.action === 'updated' || htmlRes.action === 'updated' ? 'Updated' : 'Inserted';
+            setStatus('ok', `${verb} schedule HTML + CSS.`);
             if (els.autoUpdate?.checked) renderPreview();
         });
 
         panel.querySelector('#sbInsertHtml')?.addEventListener('click', () => {
             if (!elHtml.value) generate();
-            insertAtCursor(els.customHtml, elHtml.value.trimEnd() + '\n');
-            setStatus('ok', 'Inserted schedule HTML.');
+            const htmlBody = elHtml.value.split('\n').slice(1, -2).join('\n');
+            const res = upsertMarkedSnippet(els.customHtml, 'html', SCHEDULE_HTML_BLOCK, htmlBody, 1);
+            setStatus('ok', `${res.action === 'updated' ? 'Updated' : 'Inserted'} schedule HTML.`);
             if (els.autoUpdate?.checked) renderPreview();
         });
 
         panel.querySelector('#sbInsertCss')?.addEventListener('click', () => {
             if (!elCss.value) generate();
-            insertAtCursor(els.customCss, elCss.value.trimEnd() + '\n');
-            setStatus('ok', 'Inserted schedule CSS.');
+            const cssBody = elCss.value.split('\n').slice(1, -2).join('\n');
+            const res = upsertMarkedSnippet(els.customCss, 'css', SCHEDULE_CSS_BLOCK, cssBody, 1);
+            setStatus('ok', `${res.action === 'updated' ? 'Updated' : 'Inserted'} schedule CSS.`);
             if (els.autoUpdate?.checked) renderPreview();
         });
 

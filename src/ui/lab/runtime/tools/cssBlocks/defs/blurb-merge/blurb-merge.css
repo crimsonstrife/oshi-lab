@@ -1,20 +1,20 @@
-/* Adjust selector prefix if needed for your theme */
-.blurb-section{
+/* Auto-scope safe (.blurb-section merged into one text panel) */
+:where(*) .blurb-section{
     border-radius: 0;
     margin: 0;
 }
 
 /* remove the seam between stacked blurbs */
-.blurb-section + .blurb-section{
+:where(*) .blurb-section + .blurb-section{
     border-top: 0 !important;
 }
 
 /* only round the outside corners */
-.blurb-section:first-child{
+:where(*) .blurb-section:first-child{
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
 }
-.blurb-section:last-child{
+:where(*) .blurb-section:last-child{
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
 }

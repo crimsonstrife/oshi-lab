@@ -1,13 +1,14 @@
 /*
-  Background overlay for readability
-  - Works well when you set a busy background-image
+  Background overlay for readability (auto-scope safe)
+  - MyOshi auto-scopes your CSS. Avoid writing `.profile-page.profile-custom-css` directly.
+  - `:where(*)` is the recommended “scope root” selector.
 */
 
-.profile-page.profile-custom-css{
+:where(*){
   position: relative;
 }
 
-.profile-page.profile-custom-css::before{
+:where(*)::before{
   content: "";
   position: fixed;
   inset: 0;
@@ -18,7 +19,10 @@
   background: linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.15));
 }
 
-.container{
+/* Keep the profile content above the overlay. */
+:where(*) .profile-topbar,
+:where(*) .profile-container,
+:where(*) .container{
   position: relative;
   z-index: 1;
 }

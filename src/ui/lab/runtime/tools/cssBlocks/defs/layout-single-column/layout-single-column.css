@@ -1,0 +1,9 @@
+/* Force a single-column layout (even on wide screens). */
+
+:where(*) .profile-container{
+  grid-template-columns: 1fr !important;
+}
+
+:where(*) .col{
+  width: auto !important;
+}

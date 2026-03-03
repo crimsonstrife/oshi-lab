@@ -5,6 +5,7 @@ import { setStatus } from '../../status.js';
 import { copyToClipboard } from '../../utils/clipboard.js';
 import { insertAtCursor } from '../../utils/textarea.js';
 import { renderPreview } from '../../preview/render.js';
+import { buildMarkedSnippet, upsertMarkedSnippet } from '../../utils/snippets.js';
 
 /**
  * Component Styler
@@ -349,7 +350,10 @@ export default {
                 setStatus('warn', 'Nothing to copy. Click Generate first.');
                 return;
             }
-            await copyToClipboard(txt + '\n');
+            const blockId = `component-styler/${elKind.value || 'component'}`;
+            const body = `/* Component Styler: ${String(elKind.value || 'component')} */\n${txt}`;
+            const snippet = buildMarkedSnippet({ kind: 'css', blockId, version: 1, body });
+            await copyToClipboard(snippet + '\n');
             setStatus('ok', 'Copied component CSS.');
         });
 
@@ -360,8 +364,10 @@ export default {
                 return;
             }
             if (!els.customCss) return;
-            insertAtCursor(els.customCss, txt + '\n');
-            setStatus('ok', 'Inserted component CSS into Custom CSS.');
+            const blockId = `component-styler/${elKind.value || 'component'}`;
+            const body = `/* Component Styler: ${String(elKind.value || 'component')} */\n${txt}`;
+            const res = upsertMarkedSnippet(els.customCss, 'css', blockId, body, 1);
+            setStatus('ok', `${res.action === 'updated' ? 'Updated' : 'Inserted'} component CSS in Custom CSS.`);
             if (els.autoUpdate?.checked) renderPreview();
         });
 

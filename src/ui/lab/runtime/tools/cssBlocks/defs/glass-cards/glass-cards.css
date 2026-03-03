@@ -1,21 +1,26 @@
 /*
-  Glass cards (scoped)
-  - Tweak the selector prefix if your custom CSS is scoped differently.
+  Glass cards (auto-scope safe)
+  - Uses `:where(*)` as the scope-root selector (works with MyOshi auto-scope).
+  - Blur kept conservative (6px) to stay within typical sanitizer caps.
 */
 
-.card{
-  background: rgba(255,255,255,.78);
+:where(*){
+  --lab-glass-card-bg: rgba(255,255,255,.78);
+  --lab-glass-card-bg-dark: rgba(26,26,46,.78);
+}
+
+:where(*) .card{
+  background: var(--lab-glass-card-bg);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
 }
 
-.theme-dark .card,
-.theme-dark .card{
-  background: rgba(26,26,46,.78);
+@media (prefers-color-scheme: dark){
+  :where(*) .card{ background: var(--lab-glass-card-bg-dark); }
 }
 
 /* Optional: keep headers slightly more opaque */
-.card-header{
+:where(*) .card-header{
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
 }
