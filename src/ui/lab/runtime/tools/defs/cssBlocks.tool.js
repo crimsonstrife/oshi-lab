@@ -6,6 +6,7 @@ import { copyToClipboard } from '../../utils/clipboard.js';
 import { renderPreview } from '../../preview/render.js';
 import { getCssBlocks } from '../cssBlocks/registry.js';
 import { buildMarkedSnippet, upsertMarkedSnippet } from '../../utils/snippets.js';
+import { TOOL_SCHEMA_VERSION } from '../schema.js';
 
 /**
  * Wraps a given CSS snippet with a header and footer that includes the provided title.
@@ -22,9 +23,17 @@ function toSnippet(block) {
     return buildMarkedSnippet({ kind: 'css', blockId: id, version: v, body });
 }
 
-export default {
+/** @type {import('../schema.js').ToolDef} */
+const tool = {
+    schemaVersion: TOOL_SCHEMA_VERSION,
     id: 'css-blocks',
     name: 'CSS Blocks',
+    description: 'Insert pre-made CSS chunks into Custom CSS (re-insert updates in place).',
+    icon: '🧱',
+    category: 'Layout',
+    supportsInsert: true,
+    supportsUpdate: true,
+    shortcut: 'Alt+4',
     keywords: 'css snippet block insert',
     order: 30,
 
@@ -39,10 +48,6 @@ export default {
         let activeId = blocks[0].id;
 
         panel.innerHTML = `
-      <div class="fw-semibold">CSS Blocks</div>
-      <div class="small text-body-secondary">Insert pre-made CSS chunks into Custom CSS. Re-inserting the same block updates it in place.</div>
-      <hr class="my-3" />
-
       <div class="row g-3">
         <div class="col-12 col-lg-5">
           <input id="cssBlockSearch" class="form-control form-control-sm mb-2" placeholder="Search CSS blocks…" autocomplete="off" />
@@ -133,3 +138,5 @@ export default {
         renderList();
     },
 };
+
+export default tool;

@@ -5,6 +5,7 @@ import { setStatus } from '../../status.js';
 import { copyToClipboard } from '../../utils/clipboard.js';
 import { renderPreview } from '../../preview/render.js';
 import { buildMarkedSnippet, upsertMarkedSnippet } from '../../utils/snippets.js';
+import { TOOL_SCHEMA_VERSION } from '../schema.js';
 
 /**
  * An array containing objects that represent the days of the week.
@@ -177,9 +178,17 @@ const SCHEDULE_CSS_BLOCK = 'schedule-builder/css';
  * @typedef {{ dayId: string; start: string; end: string; title: string; note: string; }} Row
  */
 
-export default {
+/** @type {import('../schema.js').ToolDef} */
+const tool = {
+    schemaVersion: TOOL_SCHEMA_VERSION,
     id: 'schedule-builder',
     name: 'Schedule Builder',
+    description: 'Generate a responsive HTML+CSS weekly schedule widget (updates in place).',
+    icon: '📅',
+    category: 'Widgets',
+    supportsInsert: true,
+    supportsUpdate: true,
+    shortcut: 'Alt+6',
     keywords: 'schedule twitch vtuber stream weekly generator',
     order: 12,
 
@@ -193,11 +202,6 @@ export default {
         ];
 
         panel.innerHTML = `
-      <div class="fw-semibold">Schedule Builder</div>
-      <div class="small text-body-secondary">Add slots, then generate a responsive HTML+CSS schedule block.</div>
-
-      <hr class="my-3" />
-
       <div class="row g-3">
         <div class="col-12 col-lg-6">
           <div class="row g-2">
@@ -468,3 +472,5 @@ ${dayHtml}
         generate();
     },
 };
+
+export default tool;

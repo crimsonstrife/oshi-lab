@@ -6,6 +6,7 @@ import { copyToClipboard } from '../../utils/clipboard.js';
 import { renderPreview } from '../../preview/render.js';
 import { getWidgets } from '../widgets/registry.js';
 import { buildMarkedSnippet, upsertMarkedSnippet } from '../../utils/snippets.js';
+import { TOOL_SCHEMA_VERSION } from '../schema.js';
 
 /**
  * Escapes special HTML characters in a string to their corresponding HTML entities.
@@ -77,9 +78,17 @@ function applyTemplate(widget, values) {
     };
 }
 
-export default {
+/** @type {import('../schema.js').ToolDef} */
+const tool = {
+    schemaVersion: TOOL_SCHEMA_VERSION,
     id: 'widgets',
     name: 'Widget Inserter',
+    description: 'Insert HTML/CSS widgets into your editors (re-insert updates in place).',
+    icon: '🧩',
+    category: 'Widgets',
+    supportsInsert: true,
+    supportsUpdate: true,
+    shortcut: 'Alt+3',
     keywords: 'widget html css snippet component block',
     order: 20,
 
@@ -96,15 +105,6 @@ export default {
         let values = {};
 
         panel.innerHTML = `
-      <div class="d-flex justify-content-between align-items-start gap-2">
-        <div>
-          <div class="fw-semibold">Widget Inserter</div>
-          <div class="small text-body-secondary">Pick a widget, tweak fields, then insert HTML/CSS into your editors. Re-inserting updates the existing widget block instead of duplicating.</div>
-        </div>
-      </div>
-
-      <hr class="my-3" />
-
       <div class="row g-3">
         <div class="col-12 col-lg-5">
           <input id="widgetSearch" class="form-control form-control-sm mb-2" placeholder="Search widgets…" autocomplete="off" />
@@ -323,3 +323,5 @@ export default {
         renderList();
     },
 };
+
+export default tool;

@@ -7,6 +7,7 @@ import { copyToClipboard } from '../../utils/clipboard.js';
 import { renderPreview } from '../../preview/render.js';
 import { buildMarkedSnippet, upsertMarkedSnippet } from '../../utils/snippets.js';
 import { parseColor, formatHex } from '../color.js';
+import { TOOL_SCHEMA_VERSION } from '../schema.js';
 
 /**
  * Theme Variables Builder
@@ -482,24 +483,23 @@ function upsertThemeVarsBlock(css, block) {
     const prefix = css && css.trim().length ? css.trimEnd() + '\n\n' : '';
     return prefix + block.trimEnd() + '\n';
 }
-export default {
+/** @type {import('../schema.js').ToolDef} */
+const tool = {
+    schemaVersion: TOOL_SCHEMA_VERSION,
     id: 'theme-vars',
     name: 'Theme Variables',
+    description: 'Generate scoped CSS variable overrides for the base template (updates in place).',
+    icon: '🎚️',
+    category: 'Theme',
+    supportsInsert: true,
+    supportsUpdate: true,
+    shortcut: 'Alt+2',
     keywords: 'css variables custom properties palette colors theme base template',
     order: 15,
 
     /** @param {HTMLElement} panel */
     render(panel) {
         panel.innerHTML = `
-      <div class="d-flex justify-content-between align-items-start gap-2">
-        <div>
-          <div class="fw-semibold">Theme Variables</div>
-          <div class="small text-body-secondary">Generate scoped <code>--vs-*</code> variable overrides for the base template.</div>
-        </div>
-      </div>
-
-      <hr class="my-3" />
-
       <div class="row g-3">
         <div class="col-12 col-lg-5">
           <label class="form-label small">Scope selector</label>
@@ -1121,3 +1121,5 @@ elPreset.addEventListener('change', setFromPreset);
         setFromPreset();
     },
 };
+
+export default tool;

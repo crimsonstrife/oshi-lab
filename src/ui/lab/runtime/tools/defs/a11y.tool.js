@@ -5,6 +5,7 @@ import { setStatus } from '../../status.js';
 import { copyToClipboard } from '../../utils/clipboard.js';
 import { insertAtCursor } from '../../utils/textarea.js';
 import { renderPreview } from '../../preview/render.js';
+import { TOOL_SCHEMA_VERSION } from '../schema.js';
 
 /**
  * Retrieves the source document (srcdoc) content of the preview iframe element.
@@ -615,20 +616,22 @@ function diffContrast(mainIssues, baseIssues) {
     }
 }
 
-export default {
+/** @type {import('../schema.js').ToolDef} */
+const tool = {
+    schemaVersion: TOOL_SCHEMA_VERSION,
     id: 'a11y',
     name: 'Accessibility Audit',
+    description: 'Check common a11y issues + run contrast checks (optional baseline diff).',
+    icon: '♿️',
+    category: 'Accessibility',
+    supportsInsert: true,
+    supportsUpdate: false,
+    shortcut: 'Alt+9',
     keywords: 'accessibility a11y contrast alt aria wcag',
+
     /** @param {HTMLElement} panel */
     render(panel) {
         panel.innerHTML = `
-      <div class="fw-semibold">Accessibility Audit</div>
-      <div class="small text-body-secondary">
-        Semantics are checked only in <code>.profile-custom-html</code>. Contrast is checked page-wide, with optional diff vs baseline (no custom CSS).
-      </div>
-
-      <hr class="my-3" />
-
       <div class="row g-2">
         <div class="col-12 col-md-4">
           <label class="form-label small">WCAG</label>
@@ -882,3 +885,5 @@ export default {
         renderIssues();
     },
 };
+
+export default tool;
