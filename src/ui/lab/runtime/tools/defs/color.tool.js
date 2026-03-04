@@ -14,7 +14,7 @@ const tool = {
     id: 'color',
     name: 'Color Converter',
     description: 'Convert HEX/RGB/RGBA and insert snippets into your Custom CSS.',
-    icon: '🎨',
+    icon: 'fa-solid fa-palette',
     category: 'Utilities',
     supportsInsert: true,
     supportsUpdate: false,

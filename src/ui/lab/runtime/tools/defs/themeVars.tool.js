@@ -489,7 +489,7 @@ const tool = {
     id: 'theme-vars',
     name: 'Theme Variables',
     description: 'Generate scoped CSS variable overrides for the base template (updates in place).',
-    icon: '🎚️',
+    icon: 'fa-solid fa-sliders',
     category: 'Theme',
     supportsInsert: true,
     supportsUpdate: true,

@@ -184,7 +184,7 @@ const tool = {
     id: 'schedule-builder',
     name: 'Schedule Builder',
     description: 'Generate a responsive HTML+CSS weekly schedule widget (updates in place).',
-    icon: '📅',
+    icon: 'fa-solid fa-calendar-days',
     category: 'Widgets',
     supportsInsert: true,
     supportsUpdate: true,

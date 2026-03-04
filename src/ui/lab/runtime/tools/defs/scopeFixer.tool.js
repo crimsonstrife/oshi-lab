@@ -508,7 +508,7 @@ const tool = {
     id: 'scope-fixer',
     name: 'CSS Scope Fixer',
     description: "Rewrite pasted CSS so it plays nicely with MyOshi's automatic selector scoping.",
-    icon: '🧹',
+    icon: 'fa-solid fa-screwdriver-wrench',
     category: 'Utilities',
     supportsInsert: true,
     supportsUpdate: false,

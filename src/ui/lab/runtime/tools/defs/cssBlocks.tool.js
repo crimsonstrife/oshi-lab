@@ -4,7 +4,7 @@ import { els } from '../../dom.js';
 import { setStatus } from '../../status.js';
 import { copyToClipboard } from '../../utils/clipboard.js';
 import { renderPreview } from '../../preview/render.js';
-import { getCssBlocks } from '../cssBlocks/registry.js';
+import { getCssBlocks } from '../../cssBlocks/registry.js';
 import { buildMarkedSnippet, upsertMarkedSnippet } from '../../utils/snippets.js';
 import { TOOL_SCHEMA_VERSION } from '../schema.js';
 
@@ -29,7 +29,7 @@ const tool = {
     id: 'css-blocks',
     name: 'CSS Blocks',
     description: 'Insert pre-made CSS chunks into Custom CSS (re-insert updates in place).',
-    icon: '🧱',
+    icon: 'fa-brands fa-css',
     category: 'Layout',
     supportsInsert: true,
     supportsUpdate: true,

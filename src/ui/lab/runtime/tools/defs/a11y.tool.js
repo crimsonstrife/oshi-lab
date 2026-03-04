@@ -622,7 +622,7 @@ const tool = {
     id: 'a11y',
     name: 'Accessibility Audit',
     description: 'Check common a11y issues + run contrast checks (optional baseline diff).',
-    icon: '♿️',
+    icon: 'fa-brands fa-accessible-icon',
     category: 'Accessibility',
     supportsInsert: true,
     supportsUpdate: false,

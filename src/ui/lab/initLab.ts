@@ -456,7 +456,7 @@ export async function initLab(root: HTMLElement | null): Promise<void> {
 
         <!-- Tools / Command Palette -->
         <div class="modal fade" id="toolsModal" tabindex="-1" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+          <div class="modal-dialog modal-dialog-centered modal-xl modal-xxl modal-dialog-scrollable">
             <div class="modal-content">
               <div class="modal-header">
                 <div class="d-flex flex-column">

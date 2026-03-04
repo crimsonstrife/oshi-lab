@@ -50,7 +50,7 @@ const tool = {
     id: 'component-styler',
     name: 'Component Styler',
     description: 'Generate scoped CSS for common components without hand-writing selectors.',
-    icon: '🧰',
+    icon: 'fa-solid fa-paintbrush',
     category: 'Layout',
     supportsInsert: true,
     supportsUpdate: true,

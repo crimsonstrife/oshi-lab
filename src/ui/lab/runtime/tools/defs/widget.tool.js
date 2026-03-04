@@ -4,7 +4,7 @@ import { els } from '../../dom.js';
 import { setStatus } from '../../status.js';
 import { copyToClipboard } from '../../utils/clipboard.js';
 import { renderPreview } from '../../preview/render.js';
-import { getWidgets } from '../widgets/registry.js';
+import { getWidgets } from '../../widgets/registry.js';
 import { buildMarkedSnippet, upsertMarkedSnippet } from '../../utils/snippets.js';
 import { TOOL_SCHEMA_VERSION } from '../schema.js';
 
@@ -84,7 +84,7 @@ const tool = {
     id: 'widgets',
     name: 'Widget Inserter',
     description: 'Insert HTML/CSS widgets into your editors (re-insert updates in place).',
-    icon: '🧩',
+    icon: 'fa-solid fa-puzzle-piece',
     category: 'Widgets',
     supportsInsert: true,
     supportsUpdate: true,

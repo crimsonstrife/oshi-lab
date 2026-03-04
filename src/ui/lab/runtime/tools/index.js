@@ -38,6 +38,25 @@ function normEventCombo(e) {
     return [...mods.sort(), k].join('+');
 }
 
+function initToolListTooltips(containerEl) {
+    if (!window.bootstrap?.Tooltip) return;
+
+    // Dispose old ones to avoid duplicates if the list re-renders
+    containerEl.querySelectorAll('[data-bs-toggle="tooltip"]').forEach((el) => {
+        const inst = window.bootstrap.Tooltip.getInstance(el);
+        if (inst) inst.dispose();
+    });
+
+    // Create new ones
+    containerEl.querySelectorAll('[data-bs-toggle="tooltip"]').forEach((el) => {
+        new window.bootstrap.Tooltip(el, {
+            trigger: 'hover focus',
+            boundary: 'window',
+            html: false,
+        });
+    });
+}
+
 /**
  * Ensures the tools modal instance is initialized and available.
  * If the modal is not already initialized, it instantiates a new modal using the Bootstrap Modal API.
@@ -94,7 +113,7 @@ export function initTools() {
             return;
         }
 
-        // Optional per-tool shortcuts (e.g., Alt+1) to open palette and jump directly.
+        // per-tool shortcuts (e.g., Alt+1) to open palette and jump directly.
         const combo = normEventCombo(e);
         if (!combo) return;
 
@@ -145,16 +164,16 @@ export function initTools() {
 
         // Standardized header from metadata.
         const header = document.createElement('div');
-        header.className = 'd-flex justify-content-between align-items-start gap-2';
+        header.className = 'd-flex justify-content-between align-items-start gap-2 oshi-tools-panel-header';
         header.innerHTML = `
           <div class="d-flex align-items-start gap-2">
-            <div class="fs-4" aria-hidden="true">${escapeHtml(tool.icon || '')}</div>
+            <div class="fs-4" aria-hidden="true"><i class="${escapeHtml(tool.icon || '')}" aria-hidden="true"></i></div>
             <div class="min-w-0">
               <div class="fw-semibold">${escapeHtml(tool.name)}</div>
-              <div class="small text-body-secondary">${escapeHtml(tool.description || '')}</div>
+              <div class="small text-body-secondary oshi-tools-panel-desc">${escapeHtml(tool.description || '')}</div>
             </div>
           </div>
-          <div class="d-flex flex-column align-items-end gap-1">
+          <div class="d-flex flex-column align-items-end gap-1 min-w-0">
             <div class="d-flex flex-wrap gap-1 justify-content-end">
               ${tool.supportsInsert ? '<span class="badge text-bg-secondary">Insert</span>' : ''}
               ${tool.supportsUpdate ? '<span class="badge text-bg-secondary">Update</span>' : ''}
@@ -207,28 +226,37 @@ export function initTools() {
 
             for (const t of groups.get(cat) || []) {
                 const btn = document.createElement('button');
+                const desc = (t.description || '').trim();
                 btn.type = 'button';
                 btn.className = `list-group-item list-group-item-action ${t.id === activeToolId ? 'active' : ''}`;
                 btn.dataset.tool = t.id;
-                // Keep markup tiny; rely on metadata for consistent list rows.
+                if (desc) {
+                    btn.setAttribute('data-bs-toggle', 'tooltip');
+                    btn.setAttribute('data-bs-placement', 'right');
+                    btn.setAttribute('data-bs-title', desc); // Bootstrap tooltip content
+                    btn.setAttribute('data-bs-custom-class', 'oshi-tooltip'); // style hook
+                }
+                // rely on metadata for consistent list rows.
                 btn.innerHTML = `
-                  <div class="d-flex align-items-start gap-2">
-                    <div class="fs-5" aria-hidden="true">${escapeHtml(t.icon || '')}</div>
-                    <div class="flex-grow-1 min-w-0">
-                      <div class="d-flex justify-content-between align-items-center gap-2">
-                        <div class="fw-semibold text-truncate">${escapeHtml(t.name)}</div>
-                        <div class="d-flex gap-1 flex-shrink-0">
+                  <div class="oshi-tool-row">
+                    <div class="fs-5 oshi-tool-icon" aria-hidden="true"><i class="${escapeHtml(t.icon || '')}" aria-hidden="true"></i></div>
+                    <div class="oshi-tool-main">
+                      <div class="oshi-tool-head">
+                        <div class="fw-semibold oshi-tool-name" title="${escapeHtml(t.name)}">${escapeHtml(t.name)}</div>
+                        <div class="oshi-tool-meta">
                           ${t.supportsUpdate ? '<span class="badge text-bg-secondary" title="Updates existing snippet blocks">U</span>' : ''}
                           ${t.supportsInsert ? '<span class="badge text-bg-secondary" title="Inserts snippets into editors">I</span>' : ''}
-                          ${t.shortcut?.combo ? `<span class="badge text-bg-dark">${escapeHtml(t.shortcut.combo)}</span>` : ''}
+                          ${t.shortcut?.combo ? `<span class="badge text-bg-dark oshi-tool-shortcut" title="Shortcut: ${escapeHtml(t.shortcut.combo)}">${escapeHtml(t.shortcut.combo)}</span>` : ''}
                         </div>
                       </div>
-                      <div class="small text-body-secondary text-truncate">${escapeHtml(t.description || '')}</div>
                     </div>
                   </div>
                 `;
                 listEl.appendChild(btn);
             }
+
+            // after list is rebuilt
+            initToolListTooltips(listEl);
         }
 
         if (!visible.some((t) => t.id === activeToolId)) {

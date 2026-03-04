@@ -346,7 +346,7 @@ const tool = {
   id: 'quick-theme',
   name: 'Quick Theme Builder',
   description: 'Generate a cohesive starter theme (presets + guided inputs; re-apply updates in place).',
-  icon: '✨',
+  icon: 'fa-solid fa-wand-magic-sparkles',
   category: 'Theme',
   supportsInsert: true,
   supportsUpdate: true,
