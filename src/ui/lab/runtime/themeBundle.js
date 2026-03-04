@@ -709,10 +709,14 @@ export async function applyThemeBundle(bundle) {
 /**
  * Handle file input selection.
  */
-export async function handleThemeBundleImport() {
-  const input = els.themeImportInput || /** @type {HTMLInputElement|null} */ (document.getElementById('themeImportInput'));
-  const file = input?.files?.[0];
-  if (!file) return;
+export async function handleThemeBundleImport(evt) {
+    const input =
+        (evt?.target instanceof HTMLInputElement ? evt.target : null) ||
+        els.themeImportInput ||
+        document.getElementById('themeImportInput');
+
+    const file = input?.files?.[0];
+    if (!file) return;
 
   try {
     const text = await file.text();
