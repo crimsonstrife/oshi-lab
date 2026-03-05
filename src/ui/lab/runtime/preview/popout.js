@@ -18,5 +18,13 @@ export function popoutPreview() {
 
   const url = `${BASE_PATH}lab/preview?key=${encodeURIComponent(key)}`;
   const win = window.open(url, '_blank');
-  if (!win) setStatus('warn', 'Pop-up blocked. Allow pop-ups for this site to use Pop out.');
+  if (!win) {
+    setStatus('warn', 'Pop-up blocked. Allow pop-ups for this site to use Pop out.');
+    return;
+  }
+
+  // Track the pop-out so tools (like Selector Inspector) can attach pick handlers there too.
+  state.previewPopoutWin = win;
+  state.previewPopoutUrl = url;
+
 }

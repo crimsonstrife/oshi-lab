@@ -446,7 +446,7 @@ export async function initLab(root: HTMLElement | null): Promise<void> {
 
                 <div class="border rounded bg-body-tertiary flex-grow-1 min-h-0" id="frameShell">
                   <div id="frameViewport" class="w-100 h-100 d-flex justify-content-center align-items-start p-2">
-                    <iframe id="previewFrame" title="MyOshi Theme Lab Preview" sandbox="" referrerpolicy="no-referrer"></iframe>
+                    <iframe id="previewFrame" title="MyOshi Theme Lab Preview" sandbox="allow-same-origin" referrerpolicy="no-referrer"></iframe>
                   </div>
                 </div>
               </div>

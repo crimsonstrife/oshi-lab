@@ -134,6 +134,30 @@ export function initTools() {
     const searchEl = /** @type {HTMLInputElement|null} */ (document.getElementById('toolsSearch'));
     if (!listEl || !panelEl || !searchEl) return;
 
+
+    /** @type {import('./schema.js').ToolContext} */
+    const ctx = { els, setStatus, renderPreview };
+
+    /** @type {any|null} */
+    let lastTool = null;
+
+    // Ensure any tool cleanup runs when the modal closes (e.g. pick-mode listeners).
+    const modalEl = document.getElementById('toolsModal');
+    // @ts-ignore
+    if (modalEl && !state.toolsCleanupBound) {
+        modalEl.addEventListener('hidden.bs.modal', () => {
+            // During pick-mode, some tools temporarily hide the modal.
+            // Skip cleanup in that case so the tool can keep running.
+            // @ts-ignore
+            if (state.toolsSuspendCleanup) return;
+            if (lastTool && typeof lastTool.destroy === 'function') {
+                try { lastTool.destroy(ctx); } catch {}
+            }
+        });
+        // @ts-ignore
+        state.toolsCleanupBound = true;
+    }
+
     if (!TOOL_DEFS.length) {
         panelEl.textContent = 'No tools registered.';
         return;
@@ -159,6 +183,12 @@ export function initTools() {
         activeToolId = tool.id;
         // @ts-ignore
         state.activeToolId = activeToolId;
+
+        // Cleanup previous tool if switching (optional destroy hook).
+        if (lastTool && lastTool.id !== tool.id && typeof lastTool.destroy === 'function') {
+            try { lastTool.destroy(ctx); } catch {}
+        }
+        lastTool = tool;
 
         panelEl.innerHTML = '';
 
@@ -191,9 +221,6 @@ export function initTools() {
         hr.className = 'my-3';
         panelEl.appendChild(hr);
         panelEl.appendChild(body);
-
-        /** @type {import('./schema.js').ToolContext} */
-        const ctx = { els, setStatus, renderPreview };
 
         // Tools may ignore ctx; extra args are safe.
         tool.render(body, ctx);
