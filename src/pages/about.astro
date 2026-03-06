@@ -1,0 +1,145 @@
+---
+import AppLayout from '../ui/AppLayout.astro';
+
+const base = import.meta.env.BASE_URL;
+const communityUrl = "https://myoshi.co/groups/oshilab";
+---
+
+<AppLayout title="About">
+    <section class="border-bottom">
+        <div class="container py-5">
+            <div class="row g-4 align-items-start">
+                <div class="col-12 col-lg-8">
+                    <h1 class="display-6 fw-semibold mb-3">About Oshi-Lab</h1>
+                    <p class="lead text-body-secondary mb-0">
+                        Oshi Theme Lab is a browser-based workspace for building, testing, and refining
+                        custom MyOshi CSS and HTML in a safer sandboxed preview.
+                    </p>
+                </div>
+
+                <div class="col-12 col-lg-4">
+                    <div class="card">
+                        <div class="card-header fw-semibold">Quick Links</div>
+                        <div class="list-group list-group-flush">
+                            <a class="list-group-item list-group-item-action" href={`${base}lab/`}>Open the Lab</a>
+                            <a class="list-group-item list-group-item-action" href={`${base}docs/`}>Read the Docs</a>
+                            <a class="list-group-item list-group-item-action" href={communityUrl} target="_blank" rel="noopener">Join the Community</a>
+                            <a class="list-group-item list-group-item-action" href="https://github.com/crimsonstrife/oshi-lab" target="_blank" rel="noopener">View on GitHub</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="container py-5">
+        <div class="row g-4">
+            <div class="col-12 col-lg-8">
+                <div class="card mb-4">
+                    <div class="card-header fw-semibold">What is this place?</div>
+                    <div class="card-body text-body-secondary">
+                        <p>
+                            Oshi-Lab exists to make MyOshi customization easier to experiment with.
+                            Instead of editing blindly, you can test layouts, styles, widgets, and helper tools
+                            in one place before copying them into your profile.  It also provides some starter templates and tools for users new to CSS and HTML.
+                        </p>
+                        <p class="mb-0">
+                            The goal is to make theme building more approachable for newer users while also
+                            giving more experienced creators faster workflows, reusable snippets, and better tooling.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header fw-semibold">About the developer</div>
+                    <div class="card-body text-body-secondary">
+                        <p>
+                            I’m <a href="https://crimsonstrife.live" target="_blank" rel="noopener">CrimsonStrife</a>,
+                            a software developer and creator building tools, sites, and experiments for creators,
+                            communities, and interactive projects.
+                        </p>
+                        <p>
+                            Oshi-Lab is one of several things I’m building around customization, creator workflows,
+                            and community-driven tooling.
+                        </p>
+                        <p class="mb-0">
+                            If you find the project useful, you can join the community, report issues, or check out
+                            my other work through the links below.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header fw-semibold">Need help or want to share feedback?</div>
+                    <div class="card-body">
+                        <p class="text-body-secondary small mb-3">
+                            Join the Oshi-Lab group on MyOshi to ask questions, share ideas, and submit issues or feedback.
+                        </p>
+
+                        <div class="d-flex flex-wrap gap-2">
+                            <a class="btn btn-primary" href={communityUrl} target="_blank" rel="noopener">
+                                Join the Oshi-Lab Group
+                            </a>
+                            <a class="btn btn-outline-secondary" href="https://github.com/crimsonstrife/oshi-lab/issues" target="_blank" rel="noopener">
+                                Report on GitHub
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-4">
+                <div class="card mb-4">
+                    <div class="card-header fw-semibold">Project Focus</div>
+                    <div class="card-body">
+                        <div class="d-flex flex-wrap gap-2">
+                            <span class="badge text-bg-secondary">MyOshi themes</span>
+                            <span class="badge text-bg-secondary">Custom CSS</span>
+                            <span class="badge text-bg-secondary">Custom HTML</span>
+                            <span class="badge text-bg-secondary">Widgets</span>
+                            <span class="badge text-bg-secondary">Theme tools</span>
+                            <span class="badge text-bg-secondary">Docs</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header fw-semibold">Elsewhere</div>
+                    <div class="list-group list-group-flush">
+                        <a class="list-group-item list-group-item-action" href="https://crimsonstrife.live" target="_blank" rel="noopener">
+                            crimsonstrife.live
+                        </a>
+                        <a class="list-group-item list-group-item-action" href="https://twitch.tv/crimsonstrife" target="_blank" rel="noopener">
+                            Twitch
+                        </a>
+                        <a class="list-group-item list-group-item-action" href="https://github.com/crimsonstrife/oshi-lab" target="_blank" rel="noopener">
+                            GitHub Repository
+                        </a>
+                        <a class="list-group-item list-group-item-action" href="https://discord.gg/TcTMauzNgR" target="_blank" rel="noopener">
+                            Discord
+                        </a>
+                        <a class="list-group-item list-group-item-action" href="https://x.com/imcrimsonstrife" target="_blank" rel="noopener">
+                            X / Twitter
+                        </a>
+                        <a class="list-group-item list-group-item-action" href="https://bsky.app/profile/crimsonstrife.live" target="_blank" rel="noopener">
+                            Bluesky
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header fw-semibold">Start Here</div>
+                    <div class="card-body">
+                        <p class="small text-body-secondary mb-3">
+                            New to the project? Open the lab or start with the docs.
+                        </p>
+                        <div class="d-grid gap-2">
+                            <a class="btn btn-outline-primary" href={`${base}lab/`}>Open the Lab</a>
+                            <a class="btn btn-outline-secondary" href={`${base}docs/getting-started/`}>Getting Started</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</AppLayout>
