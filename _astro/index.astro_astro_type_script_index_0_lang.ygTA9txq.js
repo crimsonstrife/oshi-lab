@@ -344,7 +344,7 @@ const x="modulepreload",w=function(t){return"/"+t},v={},k=function(r,i,n){let m=
 
         <!-- Tools / Command Palette -->
         <div class="modal fade" id="toolsModal" tabindex="-1" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+          <div class="modal-dialog modal-dialog-centered modal-xl modal-xxl modal-dialog-scrollable">
             <div class="modal-content">
               <div class="modal-header">
                 <div class="d-flex flex-column">
@@ -445,7 +445,7 @@ const x="modulepreload",w=function(t){return"/"+t},v={},k=function(r,i,n){let m=
 
       </div>
     </div>
-  `,window.__MYOSHI_LAB_TEMPLATES__=c,await k(()=>import("./oshi-lab.e6f-KHX1.js"),[])}const h=document.getElementById("lab-root");try{S(document.getElementById("lab-root")).catch(t=>{console.error("initLab failed:",t),h&&(h.innerHTML=`
+  `,window.__MYOSHI_LAB_TEMPLATES__=c,await k(()=>import("./oshi-lab.DJG5ybHt.js"),[])}const h=document.getElementById("lab-root");try{S(document.getElementById("lab-root")).catch(t=>{console.error("initLab failed:",t),h&&(h.innerHTML=`
           <div class="alert alert-danger m-3" role="alert">
             <strong>Failed to load initLab.</strong><br>
             Check the browser console for details.
