@@ -13,6 +13,9 @@ const baseN = withSlash(base);
 const isHome = path === baseN;
 const isLab  = path.startsWith(`${baseN}lab/`);
 const isDocs = path.startsWith(`${baseN}docs/`);
+const isAbout = path.startsWith(`${baseN}about/`);
+
+const communityUrl = "https://myoshi.co/groups/oshilab";
 ---
 
 <a class="visually-hidden-focusable" href="#main">Skip to content</a>
@@ -21,7 +24,7 @@ const isDocs = path.startsWith(`${baseN}docs/`);
     <div class="container-fluid">
         <a class="navbar-brand fw-semibold d-flex align-items-center gap-2" href={baseN}>
             <Icon name="fa-solid fa-flask" title="Theme Lab" />
-            <span>MyOshi Theme Lab</span>
+            <span>Oshi Theme Lab</span>
         </a>
 
         <button
@@ -45,8 +48,25 @@ const isDocs = path.startsWith(`${baseN}docs/`);
                 </li>
 
                 <li class="nav-item">
+                    <a class={`nav-link ${isAbout ? "active" : ""}`} href={`${baseN}about/`} aria-current={isAbout ? "page" : undefined}>
+                        About
+                    </a>
+                </li>
+
+                <li class="nav-item">
                     <a class={`nav-link ${isLab ? "active" : ""}`} href={`${baseN}lab/`} aria-current={isLab ? "page" : undefined}>
                         Lab
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a
+                            class="nav-link"
+                            href={communityUrl}
+                            target="_blank"
+                            rel="noopener"
+                    >
+                        Community
                     </a>
                 </li>
 
@@ -70,8 +90,20 @@ const isDocs = path.startsWith(`${baseN}docs/`);
                         {/* <li><a class="dropdown-item" href={`${baseN}docs/components/`}>Components</a></li> */}
                         <li><hr class="dropdown-divider" /></li>
                         <li>
+                            <a
+                                    class="dropdown-item"
+                                    href={communityUrl}
+                                    target="_blank"
+                                    rel="noopener"
+                            >
+                                <Icon name="fa-solid fa-user-group" title="Community" />
+                                <span class="ms-2">Ask questions / submit issues</span>
+                            </a>
+                        </li>
+                        <li>
                             <a class="dropdown-item" href="https://github.com/crimsonstrife/oshi-lab/issues" target="_blank" rel="noopener">
-                                <Icon name="fa-solid fa-bug" title="Issues" /> <span class="ms-2">Report an issue</span>
+                                <Icon name="fa-solid fa-bug" title="Issues" />
+                                <span class="ms-2">Report on GitHub</span>
                             </a>
                         </li>
                     </ul>
@@ -93,6 +125,18 @@ const isDocs = path.startsWith(`${baseN}docs/`);
             </form>
 
             <div class="d-flex gap-2 align-items-center">
+                <a
+                        class="btn btn-sm btn-primary"
+                        href={communityUrl}
+                        target="_blank"
+                        rel="noopener"
+                        aria-label="Join the Oshi-Lab community on MyOshi"
+                        title="Questions, feedback, and issue submissions"
+                >
+                    <Icon name="fa-solid fa-user-group" title="Community" />
+                    <span class="ms-2">Community</span>
+                </a>
+
                 {/* Theme toggle */}
                 <button
                         class="btn btn-sm btn-outline-light"

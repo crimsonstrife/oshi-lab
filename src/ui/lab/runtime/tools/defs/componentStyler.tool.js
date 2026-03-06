@@ -6,6 +6,7 @@ import { copyToClipboard } from '../../utils/clipboard.js';
 import { insertAtCursor } from '../../utils/textarea.js';
 import { renderPreview } from '../../preview/render.js';
 import { buildMarkedSnippet, upsertMarkedSnippet } from '../../utils/snippets.js';
+import { TOOL_SCHEMA_VERSION } from '../schema.js';
 
 /**
  * Component Styler
@@ -43,9 +44,17 @@ function sanitizeCssValue(s) {
     return String(s ?? '').replace(/[\r\n]+/g, ' ').trim();
 }
 
-export default {
+/** @type {import('../schema.js').ToolDef} */
+const tool = {
+    schemaVersion: TOOL_SCHEMA_VERSION,
     id: 'component-styler',
     name: 'Component Styler',
+    description: 'Generate scoped CSS for common components without hand-writing selectors.',
+    icon: 'fa-solid fa-paintbrush',
+    category: 'Layout',
+    supportsInsert: true,
+    supportsUpdate: true,
+    shortcut: 'Alt+5',
     keywords: 'component style cards navbar tabs links buttons',
     order: 16,
 
@@ -55,12 +64,6 @@ export default {
         const shadowOpts = SHADOW_PRESETS.map((s) => `<option value="${s.id}">${s.label}</option>`).join('');
 
         panel.innerHTML = `
-      <div class="fw-semibold">Component Styler</div>
-      <div class="small text-body-secondary">
-        Generate scoped CSS for common components without hand-writing selectors.
-      </div>
-      <hr class="my-3" />
-
       <div class="row g-3">
         <div class="col-12 col-lg-5">
           <label class="form-label small">Scope selector</label>
@@ -375,3 +378,5 @@ export default {
         build();
     },
 };
+
+export default tool;

@@ -6,25 +6,28 @@ import { copyToClipboard } from '../../utils/clipboard.js';
 import { insertAtCursor } from '../../utils/textarea.js';
 import { renderPreview } from '../../preview/render.js';
 import { parseColor, formatHex, formatRgba } from '../color.js';
+import { TOOL_SCHEMA_VERSION } from '../schema.js';
 
-export default {
+/** @type {import('../schema.js').ToolDef} */
+const tool = {
+    schemaVersion: TOOL_SCHEMA_VERSION,
     id: 'color',
     name: 'Color Converter',
+    description: 'Convert HEX/RGB/RGBA and insert snippets into your Custom CSS.',
+    icon: 'fa-solid fa-palette',
+    category: 'Utilities',
+    supportsInsert: true,
+    supportsUpdate: false,
+    shortcut: 'Alt+7',
     keywords: 'color hex rgb rgba css',
     order: 10,
 
     /** @param {HTMLElement} panel */
     render(panel) {
         panel.innerHTML = `
-      <div class="d-flex justify-content-between align-items-start gap-2">
-        <div>
-          <div class="fw-semibold">Color Converter</div>
-          <div class="small text-body-secondary">Paste a color and get HEX / RGBA. Insert snippets into your editors.</div>
-        </div>
+      <div class="d-flex justify-content-end mb-2">
         <div id="colorSwatch" class="border rounded" style="width:48px;height:48px;background:#000;"></div>
       </div>
-
-      <hr class="my-3" />
 
       <label class="form-label small">Input</label>
       <input id="colorInput" class="form-control" placeholder="#ff3366, #f36, rgba(255, 51, 102, .8)" />
@@ -106,3 +109,5 @@ export default {
         });
     },
 };
+
+export default tool;

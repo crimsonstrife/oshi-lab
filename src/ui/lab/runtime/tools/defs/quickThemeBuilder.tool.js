@@ -7,6 +7,7 @@ import { copyToClipboard } from '../../utils/clipboard.js';
 import { renderPreview } from '../../preview/render.js';
 import { buildMarkedSnippet, upsertMarkedSnippet } from '../../utils/snippets.js';
 import { parseColor, formatHex, formatRgba } from '../color.js';
+import { TOOL_SCHEMA_VERSION } from '../schema.js';
 
 /**
  * Quick Theme Builder
@@ -339,27 +340,23 @@ function moveCssCursorToStart() {
   els.customCss.setSelectionRange(0, 0);
 }
 
-export default {
+/** @type {import('../schema.js').ToolDef} */
+const tool = {
+  schemaVersion: TOOL_SCHEMA_VERSION,
   id: 'quick-theme',
   name: 'Quick Theme Builder',
+  description: 'Generate a cohesive starter theme (presets + guided inputs; re-apply updates in place).',
+  icon: 'fa-solid fa-wand-magic-sparkles',
+  category: 'Theme',
+  supportsInsert: true,
+  supportsUpdate: true,
+  shortcut: 'Alt+1',
   keywords: 'beginner starter theme builder guided preset palette radius padding spacing typography avatar',
   order: 11,
 
   /** @param {HTMLElement} panel */
   render(panel) {
     panel.innerHTML = `
-      <div class="d-flex justify-content-between align-items-start gap-2">
-        <div>
-          <div class="fw-semibold">Quick Theme Builder</div>
-          <div class="small text-body-secondary">
-            Pick a preset or tweak a few inputs to generate a complete starter theme.
-            Output uses snippet markers so re-applying updates in place.
-          </div>
-        </div>
-      </div>
-
-      <hr class="my-3" />
-
       <div class="row g-3">
         <div class="col-12 col-lg-5">
           <label class="form-label small">Preset</label>
@@ -654,6 +651,8 @@ export default {
     updateOutput(true);
   },
 };
+
+export default tool;
 
 /**
  * Build a label + picker + text input row.

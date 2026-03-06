@@ -5,6 +5,7 @@ import { setStatus } from '../../status.js';
 import { copyToClipboard } from '../../utils/clipboard.js';
 import { insertAtCursor } from '../../utils/textarea.js';
 import { renderPreview } from '../../preview/render.js';
+import { TOOL_SCHEMA_VERSION } from '../schema.js';
 
 /**
  * CSS Scope Fixer
@@ -501,21 +502,23 @@ function scopeCss(css, scope, opts) {
 /**
  * Builds the tool UI.
  */
-export default {
+/** @type {import('../schema.js').ToolDef} */
+const tool = {
+    schemaVersion: TOOL_SCHEMA_VERSION,
     id: 'scope-fixer',
     name: 'CSS Scope Fixer',
+    description: "Rewrite pasted CSS so it plays nicely with MyOshi's automatic selector scoping.",
+    icon: 'fa-solid fa-screwdriver-wrench',
+    category: 'Utilities',
+    supportsInsert: true,
+    supportsUpdate: false,
+    shortcut: 'Alt+8',
     keywords: 'scope prefix selector rewrite fix pasted css myoshi',
     order: 12,
 
     /** @param {HTMLElement} panel */
     render(panel) {
         panel.innerHTML = `
-      <div class="fw-semibold">CSS Scope Fixer</div>
-      <div class="small text-body-secondary">
-        Paste CSS from anywhere and rewrite it so it plays nicely with MyOshi's automatic selector scoping.
-      </div>
-      <hr class="my-3" />
-
       <div class="row g-3">
         <div class="col-12 col-lg-5">
           <label class="form-label small">Scope selector</label>
@@ -685,3 +688,5 @@ export default {
         });
     },
 };
+
+export default tool;
