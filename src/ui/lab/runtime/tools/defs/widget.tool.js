@@ -93,8 +93,8 @@ const tool = {
     order: 20,
 
     /** @param {HTMLElement} panel */
-    render(panel) {
-        const widgets = getWidgets();
+    render(panel, ctx) {
+        const widgets = getWidgets(ctx?.target || 'profile');
         if (!widgets.length) {
             panel.innerHTML = `<div class="text-body-secondary">No widgets registered.</div>`;
             return;

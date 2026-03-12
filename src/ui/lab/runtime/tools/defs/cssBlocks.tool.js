@@ -38,8 +38,8 @@ const tool = {
     order: 30,
 
     /** @param {HTMLElement} panel */
-    render(panel) {
-        const blocks = getCssBlocks();
+    render(panel, ctx) {
+        const blocks = getCssBlocks(ctx?.target || 'profile');
         if (!blocks.length) {
             panel.innerHTML = `<div class="text-body-secondary">No CSS blocks registered.</div>`;
             return;

@@ -342,13 +342,13 @@ function auditSemanticsCustom(doc) {
     /** @type {Issue[]} */
     const issues = [];
 
-    const root = doc.querySelector('.profile-custom-html');
+    const root = doc.querySelector('.profile-custom-html, .oshi-card-custom-html');
     if (!root) {
         issues.push({
             type: 'img-alt',
             level: 'info',
             scope: 'custom-html',
-            message: 'No .profile-custom-html container found in preview.',
+            message: 'No .profile-custom-html or .oshi-card-custom-html container found in preview.',
         });
         return issues;
     }
@@ -445,7 +445,7 @@ function auditContrast(doc, level) {
     const issues = [];
 
     const root = doc.body;
-    const customRoot = doc.querySelector('.profile-custom-html');
+    const customRoot = doc.querySelector('.profile-custom-html, .oshi-card-custom-html');
 
     const minNormalAA = 4.5;
     const minLargeAA = 3.0;
