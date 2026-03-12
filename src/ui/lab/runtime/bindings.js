@@ -11,7 +11,8 @@ import { applyPreviewSizing } from './preview/sizing.js';
 import { popoutPreview } from './preview/popout.js';
 import { buildSrcdoc } from './preview/build.js';
 
-import { loadTemplateById } from './templates/index.js';
+import { loadTemplateById, loadTemplateForCurrentTarget, refreshTemplateSelect } from './templates/index.js';
+import { getTargetConfig } from './targets.js';
 
 import { copyToClipboard } from './utils/clipboard.js';
 import { downloadFile } from './utils/download.js';
@@ -20,7 +21,6 @@ import { formatCss, formatHtml } from './scripts/format/prettier.js';
 import { syncEditorsFromTextareas } from './scripts/editors/index.js';
 
 import { runAudit, copyLastAuditJson } from './audit/index.js';
-
 import { saveSnapshot, deleteSelectedSnapshot, loadSnapshotById } from './snapshots/index.js';
 
 import {
@@ -30,14 +30,58 @@ import {
   updateThemeBundleSummary,
 } from './themeBundle.js';
 
-/**
- * Binds UI elements to their respective event handlers and initializes various interactive features
- * of the application. This includes setting up button click listeners, input change handlers,
- * custom rendering logic, and other UI-specific functionality.
- *
- * @return {void} Nothing is returned by this function. It sets up event bindings and configurations.
- */
+function updateTargetChrome() {
+  const cfg = getTargetConfig(state.target);
+  try { window.__OSHI_LAB_TARGET__ = state.target; } catch {}
+
+  const subtitle = document.getElementById('workspaceSubtitle');
+  if (subtitle) subtitle.textContent = cfg.subtitle;
+
+  const help = document.getElementById('templateInputHelp');
+  if (help) help.textContent = state.target === 'oshi-card'
+    ? 'Template input can be the outer iframe HTML or the raw OshiCard srcdoc HTML.'
+    : 'Template input can be the outer iframe HTML or the raw srcdoc HTML.';
+
+  if (els.templateInput) els.templateInput.placeholder = cfg.templateInputPlaceholder;
+  if (els.customHtml) els.customHtml.placeholder = `Your Custom HTML (${cfg.customHtmlHelpText})`;
+
+  const htmlHelp = document.getElementById('customHtmlHelpText');
+  if (htmlHelp) htmlHelp.innerHTML = `<b>Custom HTML</b> ${cfg.customHtmlHelpText}`;
+
+  const mock = document.getElementById('mockDataSummary');
+  if (mock) mock.textContent = cfg.mockTitle;
+
+  const mobile = document.getElementById('btnToggleMobile');
+  if (mobile) mobile.textContent = cfg.mobileButtonLabel;
+
+  if (els.previewFrame) els.previewFrame.title = cfg.previewTitle;
+
+  const btnProfile = document.getElementById('btnTargetProfile');
+  const btnCard = document.getElementById('btnTargetOshiCard');
+  btnProfile?.classList.toggle('active', state.target === 'profile');
+  btnCard?.classList.toggle('active', state.target === 'oshi-card');
+
+  refreshTemplateSelect();
+}
+
+async function switchTarget(target) {
+  const normalized = target === 'oshi-card' ? 'oshi-card' : 'profile';
+  if (state.target === normalized) return;
+
+  state.target = normalized;
+  try { localStorage.setItem('myoshi_theme_lab_target', state.target); } catch {}
+  updateTargetChrome();
+  await loadTemplateForCurrentTarget();
+  updateThemeBundleSummary();
+  state.toolsApi?.refresh?.();
+}
+
 export function bindUI() {
+  updateTargetChrome();
+
+  on('btnTargetProfile', 'click', () => { void switchTarget('profile'); });
+  on('btnTargetOshiCard', 'click', () => { void switchTarget('oshi-card'); });
+
   on('btnExtract', 'click', extractBase);
   on('btnRenderNow', 'click', renderPreview);
 
@@ -49,12 +93,15 @@ export function bindUI() {
   on('btnLoadDemo', 'click', () => {
     const sel = /** @type {HTMLSelectElement|null} */ (document.getElementById('templateSelect'));
     const encoded = sel ? sel.value : '';
-    const id = encoded ? decodeURIComponent(encoded) : (state.templatesIndex[0]?.id || 'fallback');
-    loadTemplateById(id).then(() => updateThemeBundleSummary());
+    if (!encoded) {
+      void loadTemplateForCurrentTarget();
+      return;
+    }
+    const id = decodeURIComponent(encoded);
+    void loadTemplateById(id).then(() => updateThemeBundleSummary());
   });
 
   on('btnRestoreTemplate', 'click', restoreTemplateBase);
-
   on('btnDocs', 'click', () => {
     window.open(`${BASE_PATH}docs/getting-started/`, '_blank', 'noopener,noreferrer');
   });
@@ -63,26 +110,22 @@ export function bindUI() {
     if (els.customCss) els.customCss.value = '';
     if (els.customHtml) els.customHtml.value = '';
     if (els.appendInstead) els.appendInstead.checked = false;
-    // keep CodeMirror in sync if mounted
     syncEditorsFromTextareas();
     setStatus('ok', 'Custom CSS/HTML reset.');
     updateThemeBundleSummary();
     if (els.autoUpdate?.checked) renderPreview();
   });
 
-  // Zoom / Height
   if (els.zoomRange) {
     els.zoomRange.addEventListener('input', () => {
-      // @ts-ignore
-        state.previewScale = parseInt(els.zoomRange.value, 10) / 100;
+      state.previewScale = parseInt(els.zoomRange.value, 10) / 100;
       applyPreviewSizing();
     });
   }
 
   if (els.heightRange) {
     els.heightRange.addEventListener('input', () => {
-      // @ts-ignore
-        state.previewMinHeightPx = parseInt(els.heightRange.value, 10);
+      state.previewMinHeightPx = parseInt(els.heightRange.value, 10);
       applyPreviewSizing();
     });
   }
@@ -97,7 +140,6 @@ export function bindUI() {
 
   on('btnPopout', 'click', popoutPreview);
 
-  // Copy + download
   on('btnCopyCSS', 'click', async () => {
     try {
       await copyToClipboard(els.customCss?.value || '');
@@ -123,28 +165,18 @@ export function bindUI() {
     setStatus('ok', `Downloaded: ${filename}`);
   });
 
-  // Theme bundle export/import
   on('btnExportTheme', 'click', () => {
     exportThemeBundle();
     updateThemeBundleSummary();
   });
 
-  on('btnImportTheme', 'click', () => {
-    promptThemeBundleImport();
-  });
+  on('btnImportTheme', 'click', promptThemeBundleImport);
 
-  // Hidden input change
   if (els.themeImportInput) {
-    els.themeImportInput.addEventListener('change', () => {
-      handleThemeBundleImport();
-    });
+    els.themeImportInput.addEventListener('change', () => { void handleThemeBundleImport(); });
   } else {
     const inp = document.getElementById('themeImportInput');
-    if (inp) {
-      inp.addEventListener('change', () => {
-        handleThemeBundleImport();
-      });
-    }
+    inp?.addEventListener('change', () => { void handleThemeBundleImport(); });
   }
 
   on('btnFormatCss', 'click', async () => {
@@ -155,7 +187,6 @@ export function bindUI() {
       if (els.autoUpdate?.checked) renderPreview();
       setStatus('ok', 'Formatted CSS.');
     } catch (e) {
-      // fallback to simple formatter
       console.error(e);
       els.customCss.value = quickFormatCss(els.customCss.value || '');
       syncEditorsFromTextareas();
@@ -204,18 +235,14 @@ export function bindUI() {
     }
   });
 
-  // Snapshots
   on('btnSaveSnapshot', 'click', saveSnapshot);
   on('btnDeleteSnapshot', 'click', deleteSelectedSnapshot);
-
-  // Audit
   on('btnRunAudit', 'click', runAudit);
   on('btnCopyAuditJson', 'click', copyLastAuditJson);
 
   if (els.snapshotSelect) {
     els.snapshotSelect.addEventListener('change', () => {
-      // @ts-ignore
-        const encoded = els.snapshotSelect.value;
+      const encoded = els.snapshotSelect.value;
       if (!encoded) return;
       loadSnapshotById(decodeURIComponent(encoded));
       updateThemeBundleSummary();
@@ -223,20 +250,16 @@ export function bindUI() {
   }
 
   const templateSelect = document.getElementById('templateSelect');
-  if (templateSelect) {
-    templateSelect.addEventListener('change', () => {
-      const encoded = /** @type {HTMLSelectElement} */ (templateSelect).value;
-      if (!encoded) return;
-      loadTemplateById(decodeURIComponent(encoded));
-    });
-  }
+  templateSelect?.addEventListener('change', () => {
+    const encoded = /** @type {HTMLSelectElement} */ (templateSelect).value;
+    if (!encoded) return;
+    void loadTemplateById(decodeURIComponent(encoded));
+  });
 
-  // Tabs
   document.querySelectorAll('.tab').forEach((tab) => {
     tab.addEventListener('click', () => {
       document.querySelectorAll('.tab').forEach((t) => t.classList.remove('active'));
       tab.classList.add('active');
-
       const id = /** @type {HTMLElement} */ (tab).dataset.tab;
       const wrapMap = {
         template: 'wrap-template',
@@ -245,23 +268,19 @@ export function bindUI() {
         audit: 'wrap-audit',
         basePeek: 'wrap-basePeek',
       };
-
       document.querySelectorAll('.editor-wrap').forEach((w) => w.classList.remove('active'));
-      // @ts-ignore
-        const targetId = wrapMap[id];
+      const targetId = wrapMap[id];
       const target = targetId ? document.getElementById(targetId) : null;
       if (target) target.classList.add('active');
     });
   });
 
-  // Auto-update debounce
   const scheduleRender = () => {
     if (!els.autoUpdate?.checked) return;
     if (state.debounceTimer) window.clearTimeout(state.debounceTimer);
     state.debounceTimer = window.setTimeout(renderPreview, 150);
   };
 
-  // Theme bundle summary debounce (should update even when auto-update is off)
   let summaryTimer = /** @type {number|null} */ (null);
   const scheduleSummary = () => {
     if (summaryTimer) window.clearTimeout(summaryTimer);
@@ -280,24 +299,14 @@ export function bindUI() {
       els.mockAvatar,
       els.mockBg,
     ].forEach((node) => {
-      if (node) {
-        node.addEventListener(evt, scheduleRender);
-        node.addEventListener(evt, scheduleSummary);
-      }
+      if (!node) return;
+      node.addEventListener(evt, scheduleRender);
+      node.addEventListener(evt, scheduleSummary);
     });
   });
 
-  // Template changes affect the summary.
-  const templateSelect2 = document.getElementById('templateSelect');
-  if (templateSelect2) {
-    templateSelect2.addEventListener('change', scheduleSummary);
-  }
+  templateSelect?.addEventListener('change', scheduleSummary);
+  if (els.includeExtractedBase) els.includeExtractedBase.addEventListener('change', scheduleSummary);
 
-  
-  // Export options should not trigger preview rebuild; summary only.
-  if (els.includeExtractedBase) {
-    els.includeExtractedBase.addEventListener('change', scheduleSummary);
-  }
-// Initial paint
   scheduleSummary();
 }
