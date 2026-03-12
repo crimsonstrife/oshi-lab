@@ -8,7 +8,9 @@ describe('smoke: preview render', () => {
     await mountLabScaffold();
 
     const { state } = await import('../src/ui/lab/runtime/state.js');
-    state.baseCss = '/* base */\n.profile-page{padding:10px;}';
+    state.target = 'profile';
+    state.baseCss = `/* base */
+.profile-page{padding:10px;}`;
     state.baseBody = "<div class='profile-page'><div class='profile-custom-html'></div></div>";
 
     const { els } = await import('../src/ui/lab/runtime/dom.js');
@@ -18,7 +20,7 @@ describe('smoke: preview render', () => {
     els.enableMock.checked = false;
   });
 
-  it('builds srcdoc and sets iframe srcdoc without throwing', async () => {
+  it('builds srcdoc and sets iframe srcdoc without throwing for profile target', async () => {
     const { renderPreview } = await import('../src/ui/lab/runtime/preview/render.js');
     const { state } = await import('../src/ui/lab/runtime/state.js');
     const { els } = await import('../src/ui/lab/runtime/dom.js');
@@ -31,6 +33,31 @@ describe('smoke: preview render', () => {
     expect(state.lastBuildSrcdoc).toContain('Injected');
     expect(els.previewFrame.getAttribute('sandbox')).toContain('allow-same-origin');
     expect(els.previewFrame.srcdoc).toContain('Injected');
-    expect(els.statusText.textContent).toMatch(/Rendered\./i);
+    expect(els.previewFrame.title).toBe('MyOshi Profile Preview');
+    expect(els.statusText.textContent).toMatch(/Rendered Profile Lab/i);
+  });
+
+  it('builds srcdoc and sets iframe srcdoc without throwing for oshi-card target', async () => {
+    const { renderPreview } = await import('../src/ui/lab/runtime/preview/render.js');
+    const { state } = await import('../src/ui/lab/runtime/state.js');
+    const { els } = await import('../src/ui/lab/runtime/dom.js');
+
+    state.target = 'oshi-card';
+    state.baseCss = `/* card base */
+.oshi-card-root{padding:12px;}`;
+    state.baseBody = "<div class='oshi-card-root'><div class='oshi-card-container oshi-card-custom-css'><div class='oshi-card-custom-html'></div></div></div>";
+    els.customCss.value = '.oshi-card-link{letter-spacing:.04em;}';
+    els.customHtml.value = '<div class="card-html">Card Injected</div>';
+
+    expect(() => renderPreview()).not.toThrow();
+
+    expect(state.lastBuildSrcdoc).toContain('<!doctype html>');
+    expect(state.lastBuildSrcdoc).toContain('/* card base */');
+    expect(state.lastBuildSrcdoc).toContain('oshi-card-root');
+    expect(state.lastBuildSrcdoc).toContain('Card Injected');
+    expect(els.previewFrame.getAttribute('sandbox')).toContain('allow-same-origin');
+    expect(els.previewFrame.srcdoc).toContain('Card Injected');
+    expect(els.previewFrame.title).toBe('OshiCard Preview');
+    expect(els.statusText.textContent).toMatch(/Rendered OshiCard Lab/i);
   });
 });
