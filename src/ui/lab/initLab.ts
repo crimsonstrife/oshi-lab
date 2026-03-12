@@ -129,7 +129,7 @@ export async function initLab(root: HTMLElement | null): Promise<void> {
               </div>
               <div class="btn-group btn-group-sm mt-2" role="group" aria-label="Lab workspace">
                 <button class="btn btn-outline-primary active" id="btnTargetProfile" type="button">Profile Lab</button>
-                <button class="btn btn-outline-primary" id="btnTargetOshiCard" type="button">OshiCard Lab</button>
+                <button class="btn btn-outline-primary" id="btnTargetOshiCard" type="button">OshiCard Lab - BETA</button>
               </div>
             </div>
 
