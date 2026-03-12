@@ -13,7 +13,8 @@
         "tagline": "I'm a tagline!",
         "avatar": "https://placehold.co/128x128/png",
         "background": "https://placehold.co/1600x900/png"
-      }
+      },
+      "target": "profile"
     },
     {
       "id": "myoshi-core",
@@ -27,7 +28,8 @@
         "tagline": "",
         "avatar": "https://placehold.co/128x128/png",
         "background": "https://placehold.co/1600x900/png"
-      }
+      },
+      "target": "profile"
     },
     {
       "id": "minimal",
@@ -41,6 +43,22 @@
         "tagline": "",
         "avatar": "",
         "background": ""
+      },
+      "target": "profile"
+    },
+    {
+      "id": "oshi-card-core",
+      "target": "oshi-card",
+      "name": "OshiCard Core",
+      "description": "Approximate OshiCard shell with identity, links, groups, and bulletin sections.",
+      "baseCssFile": "templates/oshi-card-core/base.css",
+      "baseBodyFile": "templates/oshi-card-core/base.html",
+      "mockDefaults": {
+        "displayName": "CrimsonStrife",
+        "username": "@crimsonstrife",
+        "tagline": "Content Creator, Twitch Affiliate, Web & Game Dev. Working on a Horror Game.",
+        "avatar": "https://placehold.co/128x128/png",
+        "background": "https://placehold.co/1600x900/png"
       }
     }
   ]
