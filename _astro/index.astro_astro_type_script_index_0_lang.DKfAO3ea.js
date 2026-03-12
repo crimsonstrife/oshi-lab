@@ -1,4 +1,4 @@
-const x="modulepreload",w=function(t){return"/"+t},v={},k=function(r,i,n){let m=Promise.resolve();if(i&&i.length>0){let l=function(e){return Promise.all(e.map(o=>Promise.resolve(o).then(d=>({status:"fulfilled",value:d}),d=>({status:"rejected",reason:d}))))};document.getElementsByTagName("link");const s=document.querySelector("meta[property=csp-nonce]"),u=s?.nonce||s?.getAttribute("nonce");m=l(i.map(e=>{if(e=w(e),e in v)return;v[e]=!0;const o=e.endsWith(".css"),d=o?'[rel="stylesheet"]':"";if(document.querySelector(`link[href="${e}"]${d}`))return;const a=document.createElement("link");if(a.rel=o?"stylesheet":x,o||(a.as="script"),a.crossOrigin="",a.href=e,u&&a.setAttribute("nonce",u),document.head.appendChild(a),o)return new Promise((g,y)=>{a.addEventListener("load",g),a.addEventListener("error",()=>y(new Error(`Unable to preload CSS for ${e}`)))})}))}function p(l){const s=new Event("vite:preloadError",{cancelable:!0});if(s.payload=l,window.dispatchEvent(s),!s.defaultPrevented)throw l}return m.then(l=>{for(const s of l||[])s.status==="rejected"&&p(s.reason);return r().catch(p)})};const C=[{id:"myoshi-classic",name:"MyOshi Classic",description:"Classic MyOshi profile as accurate as possible.",baseCssFile:"templates/myoshi-classic/base.css",baseBodyFile:"templates/myoshi-classic/base.html",mockDefaults:{displayName:"Username",username:"@username",tagline:"I'm a tagline!",avatar:"https://placehold.co/128x128/png",background:"https://placehold.co/1600x900/png"}},{id:"myoshi-core",name:"MyOshi Core (approx)",description:"A close-enough approximation of MyOshi profile structure (cards, groups, custom HTML mount).",baseCssFile:"templates/myoshi-core/base.css",baseBodyFile:"templates/myoshi-core/base.html",mockDefaults:{displayName:"CrimsonStrife",username:"@crimsonstrife",tagline:"",avatar:"https://placehold.co/128x128/png",background:"https://placehold.co/1600x900/png"}},{id:"minimal",name:"Minimal Mount Only",description:"Bare minimum markup with .profile-page + .profile-custom-html mount for quick experiments.",baseCssFile:"templates/minimal/base.css",baseBodyFile:"templates/minimal/base.html",mockDefaults:{displayName:"Demo User",username:"@demo",tagline:"",avatar:"",background:""}}],b={version:3,templates:C},f=b??{},c=Array.isArray(f.templates)?f.templates:Array.isArray(b)?b:[];async function S(t){if(!t)return;if(!c.length){t.innerHTML=`
+const x="modulepreload",w=function(t){return"/"+t},v={},k=function(r,i,n){let m=Promise.resolve();if(i&&i.length>0){let l=function(e){return Promise.all(e.map(o=>Promise.resolve(o).then(d=>({status:"fulfilled",value:d}),d=>({status:"rejected",reason:d}))))};document.getElementsByTagName("link");const s=document.querySelector("meta[property=csp-nonce]"),u=s?.nonce||s?.getAttribute("nonce");m=l(i.map(e=>{if(e=w(e),e in v)return;v[e]=!0;const o=e.endsWith(".css"),d=o?'[rel="stylesheet"]':"";if(document.querySelector(`link[href="${e}"]${d}`))return;const a=document.createElement("link");if(a.rel=o?"stylesheet":x,o||(a.as="script"),a.crossOrigin="",a.href=e,u&&a.setAttribute("nonce",u),document.head.appendChild(a),o)return new Promise((g,y)=>{a.addEventListener("load",g),a.addEventListener("error",()=>y(new Error(`Unable to preload CSS for ${e}`)))})}))}function p(l){const s=new Event("vite:preloadError",{cancelable:!0});if(s.payload=l,window.dispatchEvent(s),!s.defaultPrevented)throw l}return m.then(l=>{for(const s of l||[])s.status==="rejected"&&p(s.reason);return r().catch(p)})};const C=[{id:"myoshi-classic",name:"MyOshi Classic",description:"Classic MyOshi profile as accurate as possible.",baseCssFile:"templates/myoshi-classic/base.css",baseBodyFile:"templates/myoshi-classic/base.html",mockDefaults:{displayName:"Username",username:"@username",tagline:"I'm a tagline!",avatar:"https://placehold.co/128x128/png",background:"https://placehold.co/1600x900/png"},target:"profile"},{id:"myoshi-core",name:"MyOshi Core (approx)",description:"A close-enough approximation of MyOshi profile structure (cards, groups, custom HTML mount).",baseCssFile:"templates/myoshi-core/base.css",baseBodyFile:"templates/myoshi-core/base.html",mockDefaults:{displayName:"CrimsonStrife",username:"@crimsonstrife",tagline:"",avatar:"https://placehold.co/128x128/png",background:"https://placehold.co/1600x900/png"},target:"profile"},{id:"minimal",name:"Minimal Mount Only",description:"Bare minimum markup with .profile-page + .profile-custom-html mount for quick experiments.",baseCssFile:"templates/minimal/base.css",baseBodyFile:"templates/minimal/base.html",mockDefaults:{displayName:"Demo User",username:"@demo",tagline:"",avatar:"",background:""},target:"profile"},{id:"oshi-card-core",target:"oshi-card",name:"OshiCard Core",description:"Approximate OshiCard shell with identity, links, groups, and bulletin sections.",baseCssFile:"templates/oshi-card-core/base.css",baseBodyFile:"templates/oshi-card-core/base.html",mockDefaults:{displayName:"CrimsonStrife",username:"@crimsonstrife",tagline:"Content Creator, Twitch Affiliate, Web & Game Dev. Working on a Horror Game.",avatar:"https://placehold.co/128x128/png",background:"https://placehold.co/1600x900/png"}}],b={version:3,templates:C},f=b??{},c=Array.isArray(f.templates)?f.templates:Array.isArray(b)?b:[];async function S(t){if(!t)return;if(!c.length){t.innerHTML=`
       <div class="alert alert-danger m-3">
         <strong>No templates found.</strong><br>
         Check <code>templates.json</code> format.
@@ -12,8 +12,12 @@ const x="modulepreload",w=function(t){return"/"+t},v={},k=function(r,i,n){let m=
           <div class="container-fluid p-0 gap-2 align-items-start align-items-lg-center">
             <div class="d-flex flex-column min-w-0 me-auto">
               <div class="navbar-brand mb-0 fw-semibold">MyOshi Theme Lab</div>
-              <div class="small text-body-secondary">
+              <div class="small text-body-secondary" id="workspaceSubtitle">
                 Edit Custom CSS/HTML against a built-in demo profile. Import a real MyOshi preview for more accurate representation.
+              </div>
+              <div class="btn-group btn-group-sm mt-2" role="group" aria-label="Lab workspace">
+                <button class="btn btn-outline-primary active" id="btnTargetProfile" type="button">Profile Lab</button>
+                <button class="btn btn-outline-primary" id="btnTargetOshiCard" type="button">OshiCard Lab - BETA</button>
               </div>
             </div>
 
@@ -57,7 +61,7 @@ const x="modulepreload",w=function(t){return"/"+t},v={},k=function(r,i,n){let m=
                   <div class="d-flex align-items-center gap-2 min-w-0">
                     <div class="fw-semibold">Editors</div>
                     <div class="text-body-secondary small text-truncate">
-                      Template input can be the outer iframe HTML or the raw srcdoc HTML.
+                      <span id="templateInputHelp">Template input can be the outer iframe HTML or the raw srcdoc HTML.</span>
                     </div>
                   </div>
 
@@ -150,7 +154,7 @@ const x="modulepreload",w=function(t){return"/"+t},v={},k=function(r,i,n){let m=
 
                 <div class="border-top bg-body-tertiary p-2 small">
                   <div class="d-flex flex-wrap gap-2">
-                    <span class="badge text-bg-secondary"><b>Custom HTML</b> injected into .profile-custom-html</span>
+                    <span class="badge text-bg-secondary" id="customHtmlHelpText"><b>Custom HTML</b> injected into .profile-custom-html</span>
                   </div>
 
                   <div class="d-flex flex-wrap gap-3 align-items-center mt-2">
@@ -296,7 +300,7 @@ const x="modulepreload",w=function(t){return"/"+t},v={},k=function(r,i,n){let m=
                 </div>
 
                 <details class="border rounded p-2">
-                  <summary class="fw-semibold">Mock Profile Data</summary>
+                  <summary class="fw-semibold" id="mockDataSummary">Mock Profile Data</summary>
                   <div class="pt-2 d-flex flex-column gap-2">
                     <div class="row g-2">
                       <div class="col-12 col-md-6">
@@ -334,7 +338,7 @@ const x="modulepreload",w=function(t){return"/"+t},v={},k=function(r,i,n){let m=
 
                 <div class="border rounded bg-body-tertiary flex-grow-1 min-h-0" id="frameShell">
                   <div id="frameViewport" class="w-100 h-100 d-flex justify-content-center align-items-start p-2">
-                    <iframe id="previewFrame" title="MyOshi Theme Lab Preview" sandbox="" referrerpolicy="no-referrer"></iframe>
+                    <iframe id="previewFrame" title="Lab Preview" sandbox="" referrerpolicy="no-referrer"></iframe>
                   </div>
                 </div>
               </div>
@@ -445,7 +449,7 @@ const x="modulepreload",w=function(t){return"/"+t},v={},k=function(r,i,n){let m=
 
       </div>
     </div>
-  `,window.__MYOSHI_LAB_TEMPLATES__=c,await k(()=>import("./oshi-lab.DJG5ybHt.js"),[])}const h=document.getElementById("lab-root");try{S(document.getElementById("lab-root")).catch(t=>{console.error("initLab failed:",t),h&&(h.innerHTML=`
+  `,window.__MYOSHI_LAB_TEMPLATES__=c,await k(()=>import("./oshi-lab.CnOHhiQ0.js"),[])}const h=document.getElementById("lab-root");try{S(document.getElementById("lab-root")).catch(t=>{console.error("initLab failed:",t),h&&(h.innerHTML=`
           <div class="alert alert-danger m-3" role="alert">
             <strong>Failed to load initLab.</strong><br>
             Check the browser console for details.
