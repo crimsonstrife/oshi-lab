@@ -36,6 +36,15 @@ export const state = {
   /** @type {{ open?: Function, setActive?: (id:string)=>void } | null} */
   toolsApi: null,
 
+  /** @type {boolean} */
+  toolsSuspendCleanup: false,
+
+  /** @type {Window|null} */
+  previewPopoutWin: null,
+
+  /** @type {string|null} */
+  previewPopoutUrl: null,
+
   /** @type {any} */
   onboardingModal: null,
 

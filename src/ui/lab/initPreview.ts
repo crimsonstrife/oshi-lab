@@ -9,6 +9,9 @@ export function initPreview() {
     const frame = document.getElementById('fullPreviewFrame') as HTMLIFrameElement | null;
     if (!frame) return;
 
+    // Needed for Selector Inspector pick mode (parent must access contentDocument).
+    frame.setAttribute('sandbox', 'allow-same-origin');
+
     const params = new URLSearchParams(window.location.search);
     const key = params.get('key');
 
