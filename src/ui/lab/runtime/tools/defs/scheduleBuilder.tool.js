@@ -7,6 +7,9 @@ import { renderPreview } from '../../preview/render.js';
 import { buildMarkedSnippet, upsertMarkedSnippet } from '../../utils/snippets.js';
 import { TOOL_SCHEMA_VERSION } from '../schema.js';
 
+const SCHEDULE_HTML_BLOCK = 'schedule-builder/html';
+const SCHEDULE_CSS_BLOCK = 'schedule-builder/css';
+
 /**
  * An array containing objects that represent the days of the week.
  * Each object in the array includes:
@@ -23,20 +26,8 @@ const DAYS = [
     { id: 'sun', name: 'Sun' },
 ];
 
-/**
- * Pads a given number to ensure it has at least two digits by adding a leading zero if necessary.
- *
- * @param {number|string} n The number or string to be padded.
- * @return {string} A string representing the padded value, ensuring it has at least two characters.
- */
 function pad2(n) { return String(n).padStart(2, '0'); }
 
-/**
- * Converts a time string in "HH:mm" format to the total number of minutes past midnight.
- *
- * @param {string} hhmm - A string representing time in "HH:mm" format. Example: "14:30".
- * @return {number|null} The total number of minutes past midnight, or null if the input is invalid.
- */
 function toMinutes(hhmm) {
     const m = String(hhmm || '').match(/^(\d{1,2}):(\d{2})$/);
     if (!m) return null;
@@ -46,12 +37,6 @@ function toMinutes(hhmm) {
     return h * 60 + min;
 }
 
-/**
- * Converts a time in minutes since midnight to a 12-hour clock format with AM/PM notation.
- *
- * @param {number} minutes - The total number of minutes since midnight.
- * @return {string} The time formatted as a 12-hour clock string (e.g., "hh:mm AM/PM").
- */
 function fmt12(minutes) {
     const h24 = Math.floor(minutes / 60);
     const m = minutes % 60;
@@ -61,12 +46,6 @@ function fmt12(minutes) {
     return `${h12}:${pad2(m)} ${am ? 'AM' : 'PM'}`;
 }
 
-/**
- * Escapes special characters in a given string to their corresponding HTML entities.
- *
- * @param {string} s - The string to be escaped.
- * @return {string} The escaped string with special characters replaced by HTML entities.
- */
 function esc(s) {
     return String(s ?? '')
         .replaceAll('&', '&amp;')
@@ -76,13 +55,6 @@ function esc(s) {
         .replaceAll("'", '&#039;');
 }
 
-/**
- * Generates a CSS stylesheet string for styling a schedule component.
- *
- * The returned CSS includes styles for various elements of a schedule component, such as headers, titles, pills, links, grid layouts, and individual day and slot elements. It defines CSS variables for customizable colors, borders, text styles, and spacing, and includes responsive grid configurations for larger screen sizes.
- *
- * @return {string} A string containing the CSS stylesheet for the schedule component.
- */
 function scheduleCss() {
     return `
 .labw-schedule{
@@ -99,9 +71,6 @@ function scheduleCss() {
   padding: 14px;
   color: var(--labw-text);
 }
-
-const SCHEDULE_HTML_BLOCK = 'schedule-builder/html';
-const SCHEDULE_CSS_BLOCK = 'schedule-builder/css';
 
 .labw-schedule__header{
   display:flex;
