@@ -8,6 +8,7 @@ import { downloadTextFile } from './utils/download.js';
 import { syncEditorsFromTextareas } from './scripts/editors/index.js';
 import { renderPreview } from './preview/render.js';
 import { loadTemplateById } from './templates/index.js';
+import { getTargetConfig } from './targets.js';
 
 export const THEME_BUNDLE_SCHEMA_VERSION = 1;
 
@@ -471,6 +472,7 @@ export function getAppVersion() {
  * @property {number} schemaVersion
  * @property {string} appVersion
  * @property {string} exportedAt
+ * @property {'profile'|'oshi-card'} [target]
  * @property {string|null} templateId
  * @property {'template'|'extracted'} [baseMode]
  * @property {{capturedAt:string, css:string, body:string}|null} [extractedBase]
@@ -492,6 +494,7 @@ export function buildThemeBundle() {
     schemaVersion: THEME_BUNDLE_SCHEMA_VERSION,
     appVersion: getAppVersion(),
     exportedAt: new Date().toISOString(),
+    target: state.target || 'profile',
     templateId: state.activeTemplateId || null,
     baseMode: state.baseMode || 'template',
 
@@ -550,9 +553,10 @@ function computeThemeBundleSummary(bundle) {
   const includesHtml = !!(bundle.customHtml || '').trim();
   const includesMock = !!bundle.enableMock;
   const templateId = bundle.templateId || '—';
+  const target = bundle.target || 'profile';
   const baseMode = bundle.baseMode || (bundle.extractedBase ? 'extracted' : 'template');
   const includesBase = !!bundle.extractedBase && baseMode === 'extracted';
-  return { json, bytes, includesHtml, includesMock, templateId, baseMode, includesBase };
+  return { json, bytes, includesHtml, includesMock, templateId, target, baseMode, includesBase };
 }
 
 /**
@@ -581,6 +585,7 @@ export function updateThemeBundleSummary() {
       s.baseMode === 'extracted'
         ? `Base: extracted${s.includesBase ? ' ✓' : ''}`
         : 'Base: template',
+      `Target: ${s.target}`,
       `Template: ${s.templateId}`,
     ];
     infoEl.textContent = parts.join(' • ');
@@ -613,7 +618,7 @@ export function exportThemeBundle() {
 
     setStatus(
       'ok',
-      `Exported theme bundle (${formatBytes(s.bytes)} • HTML ${s.includesHtml ? '✓' : '—'} • Mock ${s.includesMock ? '✓' : '—'} • ${s.baseMode === 'extracted' ? `Base extracted${s.includesBase ? ' ✓' : ''}` : 'Base template'} • Template ${s.templateId}).`
+      `Exported theme bundle (${formatBytes(s.bytes)} • Target ${s.target} • HTML ${s.includesHtml ? '✓' : '—'} • Mock ${s.includesMock ? '✓' : '—'} • ${s.baseMode === 'extracted' ? `Base extracted${s.includesBase ? ' ✓' : ''}` : 'Base template'} • Template ${s.templateId}).`
     );
   } catch (e) {
     console.error(e);
@@ -653,6 +658,7 @@ function normalizeThemeBundle(obj) {
     schemaVersion,
     appVersion: typeof obj.appVersion === 'string' ? obj.appVersion : 'unknown',
     exportedAt: typeof obj.exportedAt === 'string' ? obj.exportedAt : '',
+    target: obj.target === 'oshi-card' ? 'oshi-card' : 'profile',
     templateId: (typeof obj.templateId === 'string') ? obj.templateId : null,
 
     customCss: typeof obj.customCss === 'string' ? obj.customCss : '',
@@ -677,6 +683,23 @@ function normalizeThemeBundle(obj) {
  * @param {ThemeBundleV1} bundle
  */
 export async function applyThemeBundle(bundle) {
+  // Apply target early so template selection and preview behavior stay aligned.
+  state.target = bundle.target === 'oshi-card' ? 'oshi-card' : 'profile';
+  try { localStorage.setItem('myoshi_theme_lab_target', state.target); } catch {}
+  try { window.__OSHI_LAB_TARGET__ = state.target; } catch {}
+  const cfg = getTargetConfig(state.target);
+  document.getElementById('btnTargetProfile')?.classList.toggle('active', state.target === 'profile');
+  document.getElementById('btnTargetOshiCard')?.classList.toggle('active', state.target === 'oshi-card');
+  if (els.templateInput) els.templateInput.placeholder = cfg.templateInputPlaceholder;
+  if (els.customHtml) els.customHtml.placeholder = `Your Custom HTML (${cfg.customHtmlHelpText})`;
+  const htmlHelp = document.getElementById('customHtmlHelpText');
+  if (htmlHelp) htmlHelp.innerHTML = `<b>Custom HTML</b> ${cfg.customHtmlHelpText}`;
+  const mock = document.getElementById('mockDataSummary');
+  if (mock) mock.textContent = cfg.mockTitle;
+  const mobile = document.getElementById('btnToggleMobile');
+  if (mobile) mobile.textContent = cfg.mobileButtonLabel;
+  if (els.previewFrame) els.previewFrame.title = cfg.previewTitle;
+
   // Apply autoUpdate preference early so template load doesn't render unexpectedly.
   if (els.autoUpdate && typeof bundle.autoUpdate === 'boolean') els.autoUpdate.checked = bundle.autoUpdate;
 
@@ -736,7 +759,7 @@ export async function handleThemeBundleImport(evt) {
     const s = computeThemeBundleSummary(bundle);
     setStatus(
       'ok',
-      `Imported theme bundle (${formatBytes(s.bytes)} • HTML ${s.includesHtml ? '✓' : '—'} • Mock ${s.includesMock ? '✓' : '—'} • ${s.baseMode === 'extracted' ? `Base extracted${s.includesBase ? ' ✓' : ''}` : 'Base template'} • Template ${s.templateId}).`
+      `Imported theme bundle (${formatBytes(s.bytes)} • Target ${s.target} • HTML ${s.includesHtml ? '✓' : '—'} • Mock ${s.includesMock ? '✓' : '—'} • ${s.baseMode === 'extracted' ? `Base extracted${s.includesBase ? ' ✓' : ''}` : 'Base template'} • Template ${s.templateId}).`
     );
   } catch (e) {
     console.error(e);

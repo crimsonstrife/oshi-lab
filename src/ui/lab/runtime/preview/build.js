@@ -2,31 +2,47 @@
 
 import { state } from '../state.js';
 import { els } from '../dom.js';
+import { getTargetConfig } from '../targets.js';
+
+function pickLargestMount(bodyEl, selector) {
+  const nodes = [...bodyEl.querySelectorAll(selector)];
+  let best = null;
+  let bestLen = -1;
+  for (const n of nodes) {
+    const len = (n.innerHTML || '').trim().length;
+    if (len > bestLen) {
+      best = n;
+      bestLen = len;
+    }
+  }
+  return best;
+}
 
 function buildBodyWithInjection() {
-  let working = state.baseBody || "<div class='profile-custom-html'></div>";
+  const cfg = getTargetConfig(state.target);
+  const mountClass = cfg.customHtmlMount.replace(/^\./, '');
+  let working = state.baseBody || `<div class="${mountClass}"></div>`;
 
-  const doc = new DOMParser().parseFromString('<body>' + working + '</body>', 'text/html');
+  const doc = new DOMParser().parseFromString(`<body>${working}</body>`, 'text/html');
   const bodyEl = doc.body;
 
   const custom = els.customHtml?.value || '';
-  const placeholder = bodyEl.querySelector('.profile-custom-html');
+  const placeholder = pickLargestMount(bodyEl, cfg.customHtmlMount) || bodyEl.querySelector(cfg.customHtmlMount);
 
   if (els.appendInstead?.checked) {
     const wrapper = doc.createElement('div');
-    wrapper.className = 'profile-custom-html';
+    wrapper.className = mountClass;
     wrapper.innerHTML = custom;
     bodyEl.appendChild(wrapper);
   } else if (placeholder) {
     placeholder.innerHTML = custom;
   } else {
     const wrapper = doc.createElement('div');
-    wrapper.className = 'profile-custom-html';
+    wrapper.className = mountClass;
     wrapper.innerHTML = custom;
     bodyEl.appendChild(wrapper);
   }
 
-  // Mock replacement pass
   if (els.enableMock?.checked) {
     const displayName = els.mockDisplayName?.value.trim() || '';
     const username = els.mockUsername?.value.trim() || '';
@@ -35,30 +51,32 @@ function buildBodyWithInjection() {
     const bg = els.mockBg?.value.trim() || '';
 
     if (displayName) {
-      const el = bodyEl.querySelector('.profile-display-name');
+      const el = bodyEl.querySelector(cfg.displayNameSelector);
       if (el) el.textContent = displayName;
     }
     if (username) {
-      const el = bodyEl.querySelector('.profile-username');
+      const el = bodyEl.querySelector(cfg.usernameSelector);
       if (el) el.textContent = username;
-      const headerUser = bodyEl.querySelector('.card-header.hearted span');
-      if (headerUser) headerUser.textContent = `${username.replace(/^@/, '')}'s Groups`;
+      if (state.target === 'profile') {
+        const headerUser = bodyEl.querySelector('.card-header.hearted span');
+        if (headerUser) headerUser.textContent = `${username.replace(/^@/, '')}'s Groups`;
+      }
     }
     if (tagline) {
-      const el = bodyEl.querySelector('.profile-tagline');
+      const el = bodyEl.querySelector(cfg.taglineSelector);
       if (el) el.textContent = tagline;
     }
     if (avatar) {
-      const img = bodyEl.querySelector('img.profile-avatar');
+      const img = bodyEl.querySelector(cfg.avatarSelector);
       if (img) img.setAttribute('src', avatar);
     }
     if (bg) {
-      const page = bodyEl.querySelector('.profile-page');
-      if (page) {
-        const style = page.getAttribute('style') || '';
-        const cleaned = style.replace(/background-image\s*:\s*url\([^)]+\)\s*;?/i, '').trim();
-        const spacer = cleaned && !cleaned.endsWith(';') ? ';' : '';
-        page.setAttribute('style', `${cleaned}${spacer} background-image: url('${bg}');`);
+      const root = bodyEl.querySelector(cfg.bgTargetSelector);
+      if (root) {
+        const style = root.getAttribute('style') || '';
+        const cleaned = style.replace(/background-image\s*:\s*url\([^)]+\)\s*;?/ig, '').trim();
+        const prefix = cleaned ? `${cleaned}${cleaned.endsWith(';') ? ' ' : '; '}` : '';
+        root.setAttribute('style', `${prefix}background-image: url('${bg}'); background-size: cover; background-position: center top; background-repeat: no-repeat;`);
       }
     }
   }
@@ -67,8 +85,11 @@ function buildBodyWithInjection() {
 }
 
 export function buildSrcdoc() {
-  const base = state.baseCss || '/* Base CSS is empty. Paste a MyOshi preview srcdoc → Extract Base to get started. */';
-  const css = `${base}\n\n/* ===== User Custom CSS (appended) ===== */\n${els.customCss?.value || ''}`;
+  const base = state.baseCss || '/* Base CSS is empty. Paste a preview srcdoc → Extract Base to get started. */';
+  const css = `${base}
+
+/* ===== User Custom CSS (appended) ===== */
+${els.customCss?.value || ''}`;
   const body = buildBodyWithInjection();
 
   return `<!doctype html>

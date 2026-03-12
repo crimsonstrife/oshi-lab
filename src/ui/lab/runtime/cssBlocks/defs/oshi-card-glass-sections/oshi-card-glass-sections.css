@@ -1,0 +1,10 @@
+.oshi-card-custom-css .card.oshi-card-section {
+  background: rgba(255, 255, 255, 0.68);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 12px 30px rgba(20, 34, 56, 0.12);
+}
+.oshi-card-custom-css .card-header {
+  background: linear-gradient(180deg, rgba(93, 139, 192, 0.95), rgba(51, 102, 153, 0.95));
+  letter-spacing: .08em;
+}

@@ -1,0 +1,12 @@
+.labw-oshi-cta {
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(255,255,255,.7);
+  border: 1px solid rgba(50,84,128,.16);
+  backdrop-filter: blur(8px);
+}
+.labw-oshi-cta-title { font-weight: 800; font-size: 13px; color: var(--vs-text-dark, #223); }
+.labw-oshi-cta-body { margin-top: 6px; color: var(--vs-text-medium, #556); line-height: 1.5; }
+.labw-oshi-cta-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.labw-oshi-cta-btn { display:inline-flex; align-items:center; justify-content:center; padding: 9px 14px; border-radius: 999px; background: linear-gradient(180deg, var(--vs-blue-light, #5d8bc0), var(--vs-blue, #336699)); color:#fff; text-decoration:none; font-weight:700; }
+.labw-oshi-cta-btn-secondary { background: rgba(93,139,192,.14); color: var(--vs-blue-dark, #1e3658); }

@@ -517,12 +517,13 @@ const tool = {
     order: 12,
 
     /** @param {HTMLElement} panel */
-    render(panel) {
+    render(panel, ctx) {
+        const defaultScope = ctx?.target === 'oshi-card' ? '.oshi-card-custom-css' : '.profile-page.profile-custom-css';
         panel.innerHTML = `
       <div class="row g-3">
         <div class="col-12 col-lg-5">
           <label class="form-label small">Scope selector</label>
-          <input id="sfScope" class="form-control form-control-sm font-monospace" value=".profile-page.profile-custom-css" />
+          <input id="sfScope" class="form-control form-control-sm font-monospace" value="${defaultScope}" />
 
           <div class="form-check mt-2">
             <input class="form-check-input" type="checkbox" id="sfMyOshiAuto" checked />
@@ -611,7 +612,7 @@ const tool = {
 
         /** @return {string} */
         const run = () => {
-            const scope = elScope.value.trim() || '.profile-page.profile-custom-css';
+            const scope = elScope.value.trim() || defaultScope;
             const input = elIn.value || '';
             const myoshiAuto = !!elMyOshiAuto.checked;
 

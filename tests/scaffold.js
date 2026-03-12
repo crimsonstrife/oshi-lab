@@ -8,6 +8,13 @@ export async function mountLabScaffold() {
     <div id="lab-root" data-version="test"></div>
     <div id="bundleInfo"></div>
     <div id="statusText"></div>
+    <div id="workspaceSubtitle"></div>
+    <div id="customHtmlHelpText"></div>
+    <div id="mockDataSummary"></div>
+
+    <button id="btnTargetProfile" type="button"></button>
+    <button id="btnTargetOshiCard" type="button"></button>
+    <button id="btnToggleMobile" type="button"></button>
 
     <textarea id="customCss"></textarea>
     <textarea id="customHtml"></textarea>
@@ -25,6 +32,7 @@ export async function mountLabScaffold() {
     <input id="mockBg" type="text" />
 
     <select id="snapshotSelect"></select>
+    <select id="templateSelect"></select>
 
     <input id="themeImportInput" type="file" />
     <input id="includeExtractedBase" type="checkbox" />
@@ -40,6 +48,7 @@ export async function mountLabScaffold() {
 
 export async function resetLabState() {
   const { state } = await import('../src/ui/lab/runtime/state.js');
+  state.target = 'profile';
   state.baseCss = '';
   state.baseBody = '';
   state.baseMode = 'template';
@@ -56,6 +65,11 @@ export async function resetLabState() {
   state.onboardingModal = null;
   state.debounceTimer = null;
   state.lastAuditReport = null;
+  try {
+    window.__OSHI_LAB_TARGET__ = 'profile';
+  } catch {
+    // ignore in tests
+  }
 }
 
 export function setFileInput(inputEl, file) {

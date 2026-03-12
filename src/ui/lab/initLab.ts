@@ -124,8 +124,12 @@ export async function initLab(root: HTMLElement | null): Promise<void> {
           <div class="container-fluid p-0 gap-2 align-items-start align-items-lg-center">
             <div class="d-flex flex-column min-w-0 me-auto">
               <div class="navbar-brand mb-0 fw-semibold">MyOshi Theme Lab</div>
-              <div class="small text-body-secondary">
+              <div class="small text-body-secondary" id="workspaceSubtitle">
                 Edit Custom CSS/HTML against a built-in demo profile. Import a real MyOshi preview for more accurate representation.
+              </div>
+              <div class="btn-group btn-group-sm mt-2" role="group" aria-label="Lab workspace">
+                <button class="btn btn-outline-primary active" id="btnTargetProfile" type="button">Profile Lab</button>
+                <button class="btn btn-outline-primary" id="btnTargetOshiCard" type="button">OshiCard Lab - BETA</button>
               </div>
             </div>
 
@@ -169,7 +173,7 @@ export async function initLab(root: HTMLElement | null): Promise<void> {
                   <div class="d-flex align-items-center gap-2 min-w-0">
                     <div class="fw-semibold">Editors</div>
                     <div class="text-body-secondary small text-truncate">
-                      Template input can be the outer iframe HTML or the raw srcdoc HTML.
+                      <span id="templateInputHelp">Template input can be the outer iframe HTML or the raw srcdoc HTML.</span>
                     </div>
                   </div>
 
@@ -262,7 +266,7 @@ export async function initLab(root: HTMLElement | null): Promise<void> {
 
                 <div class="border-top bg-body-tertiary p-2 small">
                   <div class="d-flex flex-wrap gap-2">
-                    <span class="badge text-bg-secondary"><b>Custom HTML</b> injected into .profile-custom-html</span>
+                    <span class="badge text-bg-secondary" id="customHtmlHelpText"><b>Custom HTML</b> injected into .profile-custom-html</span>
                   </div>
 
                   <div class="d-flex flex-wrap gap-3 align-items-center mt-2">
@@ -408,7 +412,7 @@ export async function initLab(root: HTMLElement | null): Promise<void> {
                 </div>
 
                 <details class="border rounded p-2">
-                  <summary class="fw-semibold">Mock Profile Data</summary>
+                  <summary class="fw-semibold" id="mockDataSummary">Mock Profile Data</summary>
                   <div class="pt-2 d-flex flex-column gap-2">
                     <div class="row g-2">
                       <div class="col-12 col-md-6">
@@ -446,7 +450,7 @@ export async function initLab(root: HTMLElement | null): Promise<void> {
 
                 <div class="border rounded bg-body-tertiary flex-grow-1 min-h-0" id="frameShell">
                   <div id="frameViewport" class="w-100 h-100 d-flex justify-content-center align-items-start p-2">
-                    <iframe id="previewFrame" title="MyOshi Theme Lab Preview" sandbox="" referrerpolicy="no-referrer"></iframe>
+                    <iframe id="previewFrame" title="Lab Preview" sandbox="" referrerpolicy="no-referrer"></iframe>
                   </div>
                 </div>
               </div>

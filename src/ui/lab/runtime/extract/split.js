@@ -1,5 +1,9 @@
 // @ts-check
 
+function mountSelectorForTarget(target) {
+  return target === 'oshi-card' ? '.oshi-card-custom-html' : '.profile-custom-html';
+}
+
 /**
  * Split a full CSS payload into base vs user CSS based on known markers.
  * @param {string} cssText
@@ -8,7 +12,6 @@ export function splitCssFromPreview(cssText) {
   const raw = (cssText || '').trim();
   if (!raw) return { baseCss: '', userCss: '', marker: null };
 
-  // Prefer the MyOshi marker if present
   const myoshiMarker = raw.match(/\/\*\s*User's\s+custom\s+CSS[\s\S]*?\*\//i);
   if (myoshiMarker && typeof myoshiMarker.index === 'number') {
     const idx = myoshiMarker.index;
@@ -17,7 +20,6 @@ export function splitCssFromPreview(cssText) {
     return { baseCss, userCss, marker: 'myoshi' };
   }
 
-  // Fallback: lab's own marker (if someone pastes a built srcdoc)
   const labMarker = raw.match(/\/\*\s*={2,}\s*User\s+Custom\s+CSS[\s\S]*?\*\//i);
   if (labMarker && typeof labMarker.index === 'number') {
     const idx = labMarker.index;
@@ -30,16 +32,17 @@ export function splitCssFromPreview(cssText) {
 }
 
 /**
- * Split body into base html (with injected .profile-custom-html cleared) and extracted user html.
+ * Split body into base html (with injected custom mount cleared) and extracted user html.
  * @param {Document} doc
+ * @param {'profile'|'oshi-card'} [target]
  */
-export function splitBodyFromPreview(doc) {
+export function splitBodyFromPreview(doc, target = 'profile') {
   const body = doc?.body;
   if (!body) return { baseBody: '', userHtml: '' };
 
-  const nodes = [...body.querySelectorAll('.profile-custom-html')];
+  const mountSelector = mountSelectorForTarget(target);
+  const nodes = [...body.querySelectorAll(mountSelector)];
 
-  // Pick the “best” candidate: non-empty and largest content.
   let bestNode = null;
   let bestHtml = '';
   for (const n of nodes) {
@@ -51,9 +54,7 @@ export function splitBodyFromPreview(doc) {
     }
   }
 
-  if (bestNode) {
-    bestNode.innerHTML = '';
-  }
+  if (bestNode) bestNode.innerHTML = '';
 
   return {
     baseBody: (body.innerHTML || '').trim(),

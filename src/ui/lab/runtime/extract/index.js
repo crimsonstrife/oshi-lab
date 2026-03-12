@@ -330,6 +330,21 @@ function stripMyOshiAutoScopeFromCss(css) {
 }
 
 /**
+ * OshiCard custom CSS commonly scopes to `.oshi-card-custom-css`.
+ * Strip that wrapper when importing so tools can re-target cleanly.
+ * @param {string} css
+ * @returns {string}
+ */
+function stripOshiCardAutoScopeFromCss(css) {
+    if (!css) return css || '';
+    return String(css)
+        .replace(/(^|,)\s*\.oshi-card-custom-css\s+/g, '$1 ')
+        .replace(/(^|,)\s*\.oshi-card-custom-css(?=[\s,{.:#\[]|$)/g, '$1 :root')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+}
+
+/**
  * Extracts and processes the base CSS and HTML content from a provided template input.
  * It performs sanitization, parsing, and splitting of CSS and HTML content,
  * updating relevant state and UI components accordingly.
@@ -366,7 +381,7 @@ export function extractBase() {
         // @ts-ignore
         const { css: cssBase } = safeStripInjectedCssNoise(cssBaseRaw);
 
-        const { baseBody: bodyBase, userHtml } = splitBodyFromPreview(doc);
+        const { baseBody: bodyBase, userHtml } = splitBodyFromPreview(doc, state.target);
 
         if (!cssBase && !bodyBase) {
             setStatus('err', 'Could not extract base CSS/body. Make sure you pasted the actual srcdoc HTML.');
@@ -383,8 +398,8 @@ export function extractBase() {
         };
 
         if (els.customCss && cssUserRaw.trim()) {
-            const importedUserCss = stripMyOshiAutoScopeFromCss(cssUserRaw).trim();
-            const header = '/* ===== Imported from existing MyOshi Custom CSS ===== */\n';
+            const importedUserCss = (state.target === 'oshi-card' ? stripOshiCardAutoScopeFromCss(cssUserRaw) : stripMyOshiAutoScopeFromCss(cssUserRaw)).trim();
+            const header = '/* ===== Imported from existing custom CSS ===== */\n';
             els.customCss.value = importedUserCss.startsWith('/* ===== Imported')
                 ? importedUserCss
                 : header + importedUserCss;
