@@ -59,7 +59,8 @@ const tool = {
     order: 16,
 
     /** @param {HTMLElement} panel */
-    render(panel) {
+    render(panel, ctx) {
+        const defaultScope = ctx?.target === 'oshi-card' ? '.oshi-card-custom-css' : '.profile-page.profile-custom-css';
         const radiusOpts = RADIUS_PRESETS.map((r) => `<option value="${r.id}">${r.label}</option>`).join('');
         const shadowOpts = SHADOW_PRESETS.map((s) => `<option value="${s.id}">${s.label}</option>`).join('');
 
@@ -67,7 +68,7 @@ const tool = {
       <div class="row g-3">
         <div class="col-12 col-lg-5">
           <label class="form-label small">Scope selector</label>
-          <input id="csScope" class="form-control form-control-sm font-monospace" value=".profile-page.profile-custom-css" />
+          <input id="csScope" class="form-control form-control-sm font-monospace" value="${defaultScope}" />
 
           <label class="form-label small mt-3">Component</label>
           <select id="csKind" class="form-select form-select-sm">
@@ -236,7 +237,7 @@ const tool = {
         };
 
         const build = () => {
-            const scope = elScope.value.trim() || '.profile-page.profile-custom-css';
+            const scope = elScope.value.trim() || defaultScope;
             const kind = elKind.value;
 
             let css = '';
@@ -333,7 +334,7 @@ const tool = {
         };
 
         const reset = () => {
-            elScope.value = '.profile-page.profile-custom-css';
+            elScope.value = defaultScope;
             elKind.value = 'cards';
             renderFields();
             build();

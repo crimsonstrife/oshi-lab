@@ -498,12 +498,14 @@ const tool = {
     order: 15,
 
     /** @param {HTMLElement} panel */
-    render(panel) {
+    render(panel, ctx) {
+        const defaultScope = ctx?.target === 'oshi-card' ? '.oshi-card-custom-css' : '.profile-page.profile-custom-css';
+        const scopeHint = ctx?.target === 'oshi-card' ? '&lt;div class="oshi-card-container oshi-card-custom-css"&gt;' : '&lt;div class="profile-page profile-custom-css"&gt;';
         panel.innerHTML = `
       <div class="row g-3">
         <div class="col-12 col-lg-5">
           <label class="form-label small">Scope selector</label>
-          <input id="tvScope" class="form-control form-control-sm font-monospace" value=".profile-page.profile-custom-css" />
+          <input id="tvScope" class="form-control form-control-sm font-monospace" value="${defaultScope}" />
           <div class="form-text">Matches the template root: <code>&lt;div class=\"profile-page profile-custom-css\"&gt;</code></div>
 
           <label class="form-label small mt-2">Wrapper (optional)</label>
@@ -663,7 +665,7 @@ const tool = {
 
         const updateOutput = () => {
             const baseline = getBaseline();
-            const scope = elScope.value.trim() || '.profile-page.profile-custom-css';
+            const scope = elScope.value.trim() || defaultScope;
             const wrapper = elWrapper.value.trim();
             const selector = wrapper ? `${wrapper} ${scope}` : scope;
 
@@ -1056,7 +1058,7 @@ const tool = {
                 return;
             }
 
-            const scope = elScope.value.trim() || '.profile-page.profile-custom-css';
+            const scope = elScope.value.trim() || defaultScope;
             const wrapper = elWrapper.value.trim();
             const cssText = String(els.customCss.value || '');
 

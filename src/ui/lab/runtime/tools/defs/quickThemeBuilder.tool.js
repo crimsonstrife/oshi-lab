@@ -226,7 +226,7 @@ function buildCssBody(v) {
 
   lines.push('/* Quick Theme Builder */');
   lines.push('/* Notes:');
-  lines.push('   - MyOshi auto-scopes Custom CSS; avoid writing `.profile-page.profile-custom-css` manually.');
+  lines.push('   - Workspace scope differs by target: Profile uses `.profile-page.profile-custom-css`; OshiCard uses `.oshi-card-custom-css`.');
   lines.push('   - Variables are set on `:root` (MyOshi maps this to the profile scope).');
   lines.push('*/');
   lines.push('');
@@ -305,7 +305,7 @@ function buildCssBody(v) {
   lines.push('}');
   lines.push('');
 
-  lines.push('.profile-avatar, img.profile-avatar {');
+  lines.push('.profile-avatar, img.profile-avatar, .oshi-card-avatar, .oshi-card-avatar img {');
   lines.push('  width: var(--qt-avatar-size) !important;');
   lines.push('  height: var(--qt-avatar-size) !important;');
   lines.push('  border-radius: var(--qt-avatar-radius) !important;');
